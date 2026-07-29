@@ -18,13 +18,15 @@ env/
 # Jupyter
 .ipynb_checkpoints/
 
-# Data / results (often large or sensitive)
-data/
+# Data / results (often large or sensitive) -- anchored to repo root so this
+# doesn't also match src/causal_fairness_sdg/data/ (the actual package code)
+/data/
 *.csv
 *.parquet
 *.pkl
 results/
 outputs/
+experiments.db
 
 # OS / editor
 .DS_Store

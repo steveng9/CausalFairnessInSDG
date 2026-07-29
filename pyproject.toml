@@ -1,0 +1,25 @@
+[project]
+name = "causal-fairness-sdg"
+version = "0.1.0"
+description = "Causal-graph fairness mechanisms (FTU/DP/CF/DF, a la DECAF) for graphical/marginal-based DP synthetic data generators (MST, PrivBayes, ...)"
+requires-python = ">=3.10,<3.11"
+dependencies = [
+    "numpy",
+    "pandas",
+    "networkx",
+    "scikit-learn",
+    "scipy",
+    "disjoint-set",
+    "ucimlrepo",
+    "private-pgm @ git+https://github.com/ryan112358/private-pgm.git",
+]
+
+[project.optional-dependencies]
+dev = ["pytest"]
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
