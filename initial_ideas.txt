@@ -1,0 +1,64 @@
+New Ideas
+
+Idea: Refer to this project as “Causal Fairness in SDG” instead of “DECAF on graphical models”
+
+Idea: include more definitions of fairness in the causal context than DECAF does
+
+idea: Replace GAN in DECAF with Diffusion (i.e. DDPM) model, like TabDDPM or TabSyn
+
+Benefit: 
+Diffusion models are better than GANs
+Can compare with utility of e-DP marginals-based graphical SDG, like MST. At what epsilon are the data qualities comparable?
+Requires us to become practiced in training 
+Various diffusion models on multi-dimensional data
+Various diffusion models on single-dimensional data
+GANS
+Transformers
+
+Idea: apply fairness in two ways. a) Allow for causal fairness modification, and b) apply DP to marginals in a way that prevents disparate impact on subgroups.
+
+Idea: 
+
+
+
+	
+
+
+PreFair SDG (already a published paper: "Prefair: Privately generating justifiably fair synthetic data
+author: Pujol"
+
+Claude: read paper and see where there is overlap / gap for our idea.
+
+Applies causal fairness to MST, (and other graphical SDGs?)
+Preprocessing, so removes unfair edges before MST discovers graph, therefor the graph may be more optimal than the graph that simply removes the unfair edges after being built.
+The privacy budget isn’t wasted on discovering high mutual information edges that are just going to be removed later
+Has nice DP proofs
+Has a greedy, and an exponential-time graph generation version
+Code is available, so can replicate results
+
+
+DECAF introduces 4 definitions of fairness in graphs. Read all 4, and understand the mechanisms. We will create code to apply all four of these for privbayes and MST.
+
+
+What I like about this project:
+-Will require that I learn about different notions of fairness
+-Involves graphical representations
+-Involves re-architecting other defensive algorithms
+-Moderate novelty and utility
+
+
+Work entailed:
+-Surveying current fair SDG process
+-Familiarize with accepted fairness criteria and evaluation
+-Replicating DECAF results to compare
+-Privacy
+-Fairness
+-Utility
+-Applying this to MST, PrivBayes, (what others build graphical representations?)
+-Changing definition from causal DAG to undirected trees (MST)
+
+
+One benefit to applying this to DP Marginals based data:
+By replacing a conditional parent (i.e. an edge) with a “surrogate” parent value, we may not need to apply DP, if not dependent on the data. So the DP noise can be reduced? (verify this…)
+
+

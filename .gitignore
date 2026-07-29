@@ -1,0 +1,33 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# Environments
+.venv/
+venv/
+env/
+.conda/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Data / results (often large or sensitive)
+data/
+*.csv
+*.parquet
+*.pkl
+results/
+outputs/
+
+# OS / editor
+.DS_Store
+.idea/
+.vscode/
+*.swp
