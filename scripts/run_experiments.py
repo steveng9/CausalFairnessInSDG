@@ -59,11 +59,32 @@ SEEDS = [0]
 
 # DECAF trains one GAN per (dataset, seed) thanks to `DECAFMethod`'s train
 # cache -- fairness is applied at generation time only -- so epochs are cheap
-# here relative to the rest of the grid. Sized per dataset by gradient steps,
-# not epochs: COMPAS has ~5x fewer batches per epoch than Adult, and the
-# earlier smoke test showed 1-epoch COMPAS training collapsing the outcome
-# column entirely.
-DECAF_EPOCHS = {"adult": 50, "compas": 200}
+# here relative to the rest of the grid.
+#
+# Both knobs are per dataset because measurement said they had to be (1-way
+# TVD / accuracy, from scripts run against the real data):
+#
+#   COMPAS  every column has a narrow 0-5 code range, so DECAF as shipped
+#           (unbounded linear heads, raw codes) works well: TVD 0.048,
+#           accuracy 0.659. Bounding the heads made it much worse (TVD 0.321).
+#           200 epochs because COMPAS has ~5x fewer batches per epoch than
+#           Adult -- at 1 epoch the outcome column collapsed entirely.
+#   ADULT   code ranges span 0-1 (`income`) to 0-40 (`native-country`), and
+#           with unbounded heads the wide columns dominate the loss: `income`
+#           collapsed to a single class at both 10 and 50 epochs, plus 3 other
+#           constant columns. Bounding the heads to [0, 1] (DECAF's own
+#           `nonlin_out`) with matching min-max scaling fixes it, and unlike
+#           the unbounded version it keeps improving with training:
+#           10 epochs -> TVD 0.438/accuracy 0.634, 30 -> 0.395/0.695.
+#
+# DECAF is a baseline here, not the contribution, so this is deliberately
+# "good enough and measured" rather than a full hyperparameter search --
+# Adult's fidelity (TVD 0.395) remains clearly worse than the DP synthesizers'
+# and is worth a dedicated tuning pass before it goes in a paper.
+DECAF_SETTINGS = {
+    "adult": {"max_epochs": 30, "output_activation": "sigmoid"},
+    "compas": {"max_epochs": 200, "output_activation": None},
+}
 
 # Protected/admissible role splits. The first entry for each dataset is the
 # PreFair Table 1 split (comparable to published numbers); the others vary
@@ -154,7 +175,11 @@ def build_configs(batch: str) -> List[RunConfig]:
                                 protected=protected,
                                 admissible=admissible,
                                 eval_reference=EVAL_REFERENCE_BOTH,
-                                extra_params={"batch": batch},
+                                # Record which DECAF variant produced the row,
+                                # since the settings differ per dataset.
+                                extra_params={
+                                    "batch": batch, **DECAF_SETTINGS[dataset]
+                                },
                                 sdg_method="decaf",
                                 fairness_mechanism=mechanism,
                                 # Placeholder only: `run_single` writes NULL
@@ -238,7 +263,8 @@ def main() -> int:
     n_ok = n_failed = 0
     for i, config in enumerate(todo, start=1):
         if config.sdg_method == "decaf":
-            SDG_METHODS["decaf"].max_epochs = DECAF_EPOCHS[config.dataset]
+            for attr, value in DECAF_SETTINGS[config.dataset].items():
+                setattr(SDG_METHODS["decaf"], attr, value)
         eps = "n/a" if config.sdg_method == "decaf" else f"{config.epsilon:g}"
         label = (f"{config.dataset}/{config.role_config}/{config.sdg_method}/"
                  f"{config.fairness_mechanism}/eps={eps}")

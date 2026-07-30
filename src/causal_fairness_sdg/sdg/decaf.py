@@ -58,6 +58,7 @@ class DECAFMethod(SDGMethod):
         batch_size: int = 64,
         accelerator: str = "cpu",
         devices="auto",
+        output_activation: Optional[str] = "sigmoid",
         cache_trained_models: bool = True,
     ):
         self.max_epochs = max_epochs
@@ -65,6 +66,25 @@ class DECAFMethod(SDGMethod):
         self.batch_size = batch_size
         self.accelerator = accelerator
         self.devices = devices
+        # Output-head configuration, which also selects the input scaling --
+        # the two only make sense together:
+        #
+        #   None      DECAF exactly as shipped: unbounded linear heads fed raw
+        #             ordinal codes. Works well when every column has a
+        #             similar, narrow code range (COMPAS: all 0-5).
+        #   "sigmoid" DECAF's own `nonlin_out` hook bounding every column to
+        #             [0, 1], with the data min-max scaled to match. Needed
+        #             when code ranges differ wildly (Adult spans 0-1 for
+        #             `income` up to 0-40 for `native-country`): with linear
+        #             heads the wide columns dominate the loss and the narrow
+        #             ones collapse -- Adult's binary `income` degenerated to
+        #             a single class, along with 3 other constant columns.
+        #
+        # Measured on this project's data (1-way TVD, lower better):
+        # COMPAS 0.048 unbounded vs 0.321 sigmoid; Adult collapses when
+        # unbounded vs 0.438 sigmoid. So it is genuinely per-dataset, and the
+        # experiment grid sets it per dataset rather than picking one globally.
+        self.output_activation = output_activation
         # DECAF's fairness mechanisms act *only* at generation time
         # (`biased_edges` shuffling inside `gen_synthetic`) -- the trained
         # weights are identical across FTU/DP/CF/none and across different
@@ -85,12 +105,20 @@ class DECAFMethod(SDGMethod):
             self.max_epochs,
             self.h_dim,
             self.batch_size,
+            self.output_activation,
         )
         if self.cache_trained_models and key in self._train_cache:
             return self._train_cache[key]
 
         dm = DataModule(values, batch_size=self.batch_size)
-        model = _DECAFModel(input_dim=n_cols, dag_seed=dag_seed, h_dim=self.h_dim)
+        model = _DECAFModel(
+            input_dim=n_cols,
+            dag_seed=dag_seed,
+            h_dim=self.h_dim,
+            nonlin_out=(
+                [(self.output_activation, n_cols)] if self.output_activation else None
+            ),
+        )
         trainer = pl.Trainer(
             max_epochs=self.max_epochs,
             accelerator=self.accelerator,
@@ -139,7 +167,16 @@ class DECAFMethod(SDGMethod):
         dag = as_digraph(CAUSAL_GRAPHS[dataset_name], columns)
         dag_seed = [[col_index[p], col_index[c]] for p, c in dag.edges]
 
-        values = data.to_numpy(dtype="float32")
+        # Min-max scale onto [0, 1] iff the generator's heads are bounded to
+        # [0, 1] too (see `output_activation`); DECAF's `DataModule` does no
+        # normalization of its own. Either way this is preprocessing on our
+        # side only -- the GAN, its training loop, and the `biased_edges`
+        # mechanism are untouched.
+        if self.output_activation == "sigmoid":
+            scale = np.array([max(domain[c] - 1, 1) for c in columns], dtype="float32")
+        else:
+            scale = np.ones(len(columns), dtype="float32")
+        values = data.to_numpy(dtype="float32") / scale
         model = self._fit_model(values, dag_seed, len(columns), seed)
 
         # Re-seed before generation so a cache hit samples the same way a
@@ -162,7 +199,7 @@ class DECAFMethod(SDGMethod):
         x = torch.as_tensor(seed_rows)
         synth = model.gen_synthetic(x, biased_edges=biased_edges).detach().cpu().numpy()
 
-        synth_df = pd.DataFrame(synth, columns=columns)
+        synth_df = pd.DataFrame(synth * scale, columns=columns)
         for col in columns:
             synth_df[col] = synth_df[col].round().clip(0, domain[col] - 1).astype(int)
 
