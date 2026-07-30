@@ -26,7 +26,8 @@ bookkeeping.
 
 from __future__ import annotations
 
-from typing import Dict, Optional
+import hashlib
+from typing import Dict, Optional, Tuple
 
 import numpy as np
 import pandas as pd
@@ -48,11 +49,63 @@ else:
 
 class DECAFMethod(SDGMethod):
     name = "decaf"
+    is_private = False
 
-    def __init__(self, max_epochs: int = 10, h_dim: int = 200, batch_size: int = 64):
+    def __init__(
+        self,
+        max_epochs: int = 10,
+        h_dim: int = 200,
+        batch_size: int = 64,
+        accelerator: str = "cpu",
+        devices="auto",
+        cache_trained_models: bool = True,
+    ):
         self.max_epochs = max_epochs
         self.h_dim = h_dim
         self.batch_size = batch_size
+        self.accelerator = accelerator
+        self.devices = devices
+        # DECAF's fairness mechanisms act *only* at generation time
+        # (`biased_edges` shuffling inside `gen_synthetic`) -- the trained
+        # weights are identical across FTU/DP/CF/none and across different
+        # protected/admissible role splits of the same data. Caching the
+        # fitted model therefore trains once per (data, seed, hyperparams)
+        # instead of once per experiment cell, which is a 4x-plus saving on
+        # the single most expensive method in the grid. The cache key hashes
+        # the actual training array, so any change to the data invalidates it.
+        self.cache_trained_models = cache_trained_models
+        self._train_cache: Dict[Tuple, object] = {}
+
+    def _fit_model(self, values: np.ndarray, dag_seed, n_cols: int, seed):
+        key = (
+            hashlib.sha1(values.tobytes()).hexdigest(),
+            tuple(tuple(e) for e in dag_seed),
+            n_cols,
+            seed,
+            self.max_epochs,
+            self.h_dim,
+            self.batch_size,
+        )
+        if self.cache_trained_models and key in self._train_cache:
+            return self._train_cache[key]
+
+        dm = DataModule(values, batch_size=self.batch_size)
+        model = _DECAFModel(input_dim=n_cols, dag_seed=dag_seed, h_dim=self.h_dim)
+        trainer = pl.Trainer(
+            max_epochs=self.max_epochs,
+            accelerator=self.accelerator,
+            devices=self.devices,
+            logger=False,
+            enable_progress_bar=False,
+            enable_checkpointing=False,
+            enable_model_summary=False,
+        )
+        trainer.fit(model, dm)
+        model = model.cpu().eval()
+        if self.cache_trained_models:
+            self._train_cache.clear()  # only ever need the most recent dataset
+            self._train_cache[key] = model
+        return model
 
     def fit_generate(
         self,
@@ -87,19 +140,12 @@ class DECAFMethod(SDGMethod):
         dag_seed = [[col_index[p], col_index[c]] for p, c in dag.edges]
 
         values = data.to_numpy(dtype="float32")
-        dm = DataModule(values, batch_size=self.batch_size)
-        model = _DECAFModel(
-            input_dim=len(columns), dag_seed=dag_seed, h_dim=self.h_dim
-        )
-        trainer = pl.Trainer(
-            max_epochs=self.max_epochs,
-            accelerator="cpu",
-            logger=False,
-            enable_progress_bar=False,
-            enable_checkpointing=False,
-            enable_model_summary=False,
-        )
-        trainer.fit(model, dm)
+        model = self._fit_model(values, dag_seed, len(columns), seed)
+
+        # Re-seed before generation so a cache hit samples the same way a
+        # fresh train-then-generate would have.
+        if seed is not None:
+            pl.seed_everything(seed)
 
         biased_edges_by_name = fairness_mechanism.select_biased_edges(dag, roles)
         biased_edges = {

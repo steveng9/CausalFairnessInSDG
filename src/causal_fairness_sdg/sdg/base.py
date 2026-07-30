@@ -22,6 +22,12 @@ class SDGMethod(ABC):
 
     name: str
 
+    #: Whether `epsilon`/`delta` actually mean anything for this method. False
+    #: for non-private baselines (DECAF), which accept them only for interface
+    #: parity -- the runner logs NULL epsilon for those so `experiments.db`
+    #: never implies a privacy guarantee that wasn't provided.
+    is_private: bool = True
+
     @abstractmethod
     def fit_generate(
         self,

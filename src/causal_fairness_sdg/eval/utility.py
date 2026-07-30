@@ -115,15 +115,24 @@ def downstream_accuracy(
 
 
 def compute_utility_metrics(
-    real: pd.DataFrame, synth: pd.DataFrame, outcome: str
+    real: pd.DataFrame,
+    synth: pd.DataFrame,
+    outcome: str,
+    include_downstream: bool = True,
 ) -> Dict[str, float]:
+    """Marginal-fidelity metrics plus (optionally) train-on-synthetic /
+    test-on-real accuracy for each classifier. Set `include_downstream=False`
+    when the synthetic outcome column is degenerate (a single class), where no
+    classifier can be fitted -- the fidelity metrics are still meaningful and
+    worth recording."""
     metrics = {
         "tvd_1way": one_way_tvd(real, synth),
         "tvd_2way": two_way_tvd(real, synth),
         "avg_correlation_diff": average_correlation_difference(real, synth),
     }
-    for clf in _CLASSIFIERS:
-        metrics[f"downstream_accuracy_{clf}"] = downstream_accuracy(
-            synth, real, outcome, classifier=clf
-        )
+    if include_downstream:
+        for clf in _CLASSIFIERS:
+            metrics[f"downstream_accuracy_{clf}"] = downstream_accuracy(
+                synth, real, outcome, classifier=clf
+            )
     return metrics

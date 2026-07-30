@@ -33,3 +33,4 @@ experiments.db
 .idea/
 .vscode/
 *.swp
+logs/
