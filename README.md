@@ -1,7 +1,8 @@
 # Causal Fairness in SDG
 
 Applying causal-graph fairness mechanisms (à la DECAF) to graphical/marginal-based
-differentially private synthetic data generators (MST, PrivBayes, AIM, MWEM-PGM, ...).
+differentially private synthetic data generators (MST, PrivBayes, AIM, PrivSyn), plus a
+faithful DECAF baseline for comparison.
 
 ## The idea
 
@@ -102,23 +103,43 @@ fairness edge-surgery on PrivBayes, AIM, or MWEM-PGM. PreFair remains the only
 implemented graphical/marginal fair-SDG method, and only for MST with one fairness
 definition.
 
-## Candidate graphical/marginal SDG targets
+## Implemented SDG targets
 
-| Method | Notes | Local code available |
+| Method | Notes | Where |
 |---|---|---|
-| MST (Marginals-MST) | McKenna et al. 2021; what PreFair targets | `../SyntheticData_MIA/reprosyn-main/src/reprosyn/methods/mbi/mst.py` |
-| PrivBayes | Zhang et al. 2014 Bayes-net synthesizer | `../SyntheticData_MIA/reprosyn-main/src/reprosyn/methods/mbi/privbayes.py` (+ Cython `privBayesSelect`) |
-| AIM | McKenna et al. 2022; current SOTA marginal-based DP synthesizer | not present locally — pull from [ryan112358/private-pgm](https://github.com/ryan112358/private-pgm) or the AIM repo |
-| MWEM-PGM | McKenna et al. 2019; PreFair explicitly names it as extensible | check `private-pgm` |
-| PrivSyn / PrivTree | Zhang et al. 2021 / 2016 | not present locally |
+| MST (Marginals-MST) | McKenna et al. 2021; what PreFair targets | `sdg/mst.py`, vendor-adapted from `private-pgm`/reprosyn |
+| PrivBayes | Zhang et al. 2014 Bayes-net synthesizer | `sdg/privbayes.py` + `sdg/_privbayes_vendor.py`, vendor-adapted from `DataResponsibly/DataSynthesizer` |
+| AIM | McKenna et al. 2022; current SOTA marginal-based DP synthesizer | `sdg/aim.py` + `sdg/_aim_vendor.py`, adapted from `ryan112358/private-pgm/mechanisms/aim.py` (pairwise workload only) |
+| PrivSyn | Zhang et al. 2021 | `sdg/privsyn.py` + `sdg/_privsyn_gum.py`, built from the paper's description (no importable official implementation found) |
+| DECAF | Kyono et al. 2021 (the paper this whole project ports fairness mechanisms *from*) | `sdg/decaf.py`, wraps the real `decaf-synthetic-data` PyPI package directly (optional `decaf` extra) — a non-private baseline, not a DP synthesizer |
+| PrivTree | Zhang et al. 2016 | not implemented — partitions the joint value domain hierarchically rather than building an attribute graph, so it doesn't fit the edge-removal fairness abstraction without a separate design pass |
 
-Given AIM is the current SOTA marginal method and PreFair explicitly calls it out as an
-intended-but-untested extension target, it (alongside PrivBayes) is a strong second
-target beyond MST — don't feel constrained to reuse the `reprosyn` MST/PrivBayes
-implementations if `private-pgm`'s versions (which AIM is built on) prove easier to
-extend consistently across methods.
+All four DP methods (MST/PrivBayes/AIM/PrivSyn) share the same modular `FairnessMechanism`
+hooks (`fairness/base.py`): a static `filter_candidates` pass plus an incremental
+`allow_edge` check during structure search, with multi-attribute candidates (PrivBayes'
+parent sets) reusing the single-edge interface via `edges_allowed`. DECAF is architecturally
+different — it needs a full ground-truth causal DAG as input rather than discovering one
+privately (see `data/causal_graphs.py`) and applies fairness via `select_biased_edges`
+(shuffling parent contributions at generation time) instead of restricting what gets
+measured.
+
+## Environment
+
+Development happens in the conda env named `sdg` (Python 3.10), which already has
+`causal-fairness-sdg` installed editable plus `private-pgm` and (if the `decaf` extra is
+installed) `decaf-synthetic-data`/`torch`/`pytorch-lightning`:
+
+```
+source <conda-base>/bin/activate sdg
+pip install -e '.[dev,decaf]'   # decaf extra optional; pulls in torch + pytorch-lightning
+pytest tests/ -m "not slow"     # excludes DECAF's real-GAN-training tests
+```
 
 ## Status
 
-Early-stage. No experiments yet. See `initial_ideas.txt` for the original brainstorm
-this project grew from.
+Core SDG methods (MST, PrivBayes, AIM, PrivSyn, DECAF) and all four fairness mechanisms
+(FTU/DP/CF/DF) are implemented and tested on Adult and COMPAS; `scripts/run_smoke_test.py`
+runs the full grid end-to-end. See `initial_ideas.txt` for the original brainstorm this
+project grew from. Not yet done: PrivTree, final dataset/metric/settings decisions for the
+paper's actual experiments, and the DP-budget-savings research question from the original
+notes.

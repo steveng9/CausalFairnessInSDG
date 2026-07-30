@@ -1,8 +1,8 @@
-from typing import FrozenSet
+from typing import Dict, FrozenSet, List
 
 import networkx as nx
 
-from .base import AttributeRoles, Edge, FairnessMechanism
+from .base import AttributeRoles, Edge, FairnessMechanism, biased_edges_from_paths
 
 
 def path_blocked(graph: nx.Graph, a: str, b: str, admissible: FrozenSet[str]) -> bool:
@@ -47,4 +47,14 @@ class CFFairness(FairnessMechanism):
             path_blocked(merged, p, o, roles.admissible)
             for p in protected_in
             for o in outcome_in
+        )
+
+    def select_biased_edges(
+        self, dag: nx.DiGraph, roles: AttributeRoles
+    ) -> Dict[str, List[str]]:
+        # A path is blocked (left alone) iff some interior node is admissible.
+        return biased_edges_from_paths(
+            dag,
+            roles,
+            path_is_blocked=lambda interior: any(n in roles.admissible for n in interior),
         )

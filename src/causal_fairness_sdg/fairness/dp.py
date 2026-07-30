@@ -1,6 +1,8 @@
+from typing import Dict, List
+
 import networkx as nx
 
-from .base import AttributeRoles, Edge, FairnessMechanism
+from .base import AttributeRoles, Edge, FairnessMechanism, biased_edges_from_paths
 
 
 class DPFairness(FairnessMechanism):
@@ -34,3 +36,10 @@ class DPFairness(FairnessMechanism):
             nx.node_connected_component(graph, b)
         )
         return not (component & roles.protected and component & roles.outcome)
+
+    def select_biased_edges(
+        self, dag: nx.DiGraph, roles: AttributeRoles
+    ) -> Dict[str, List[str]]:
+        # DP's admissible set is empty -- no path is ever blocked, so every
+        # protected->outcome path gets cut.
+        return biased_edges_from_paths(dag, roles, path_is_blocked=lambda interior: False)

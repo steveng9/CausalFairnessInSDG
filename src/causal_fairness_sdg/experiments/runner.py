@@ -18,11 +18,23 @@ from sklearn.model_selection import train_test_split
 from ..data.datasets import DATASETS
 from ..eval import fairness_metrics, utility
 from ..fairness import EvalReference, get_fairness_mechanism
+from ..sdg.aim import AIM
 from ..sdg.base import SDGMethod
 from ..sdg.mst import MST
+from ..sdg.privbayes import PrivBayes
+from ..sdg.privsyn import PrivSyn
 from . import db
 
-SDG_METHODS: Dict[str, SDGMethod] = {"mst": MST()}
+try:
+    from ..sdg.decaf import DECAFMethod
+except ImportError:
+    DECAFMethod = None  # decaf extra not installed
+
+SDG_METHODS: Dict[str, SDGMethod] = {
+    "mst": MST(), "privbayes": PrivBayes(), "aim": AIM(), "privsyn": PrivSyn(),
+}
+if DECAFMethod is not None:
+    SDG_METHODS["decaf"] = DECAFMethod()
 
 
 @dataclass
@@ -86,6 +98,7 @@ def run_single(conn: sqlite3.Connection, config: RunConfig) -> int:
             delta=config.delta,
             n_synth=synth_size,
             seed=config.seed,
+            dataset_name=config.dataset,
         )
         synth = result.synthetic_data
 

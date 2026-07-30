@@ -33,7 +33,15 @@ class SDGMethod(ABC):
         delta: float,
         n_synth: int,
         seed: Optional[int] = None,
+        dataset_name: Optional[str] = None,
     ) -> SDGResult:
         """Fit the private graphical model under the given fairness mechanism
-        and return the synthetic data plus the structure (edges) selected."""
+        and return the synthetic data plus the structure (edges) selected.
+
+        `dataset_name` (the key into `data.datasets.DATASETS`) is unused by
+        methods that discover their own structure privately (MST, PrivBayes,
+        AIM, PrivSyn). DECAF needs it to look up its ground-truth causal DAG
+        from `data.causal_graphs.CAUSAL_GRAPHS`, since -- unlike the others --
+        it doesn't discover a structure at all, it requires one as input.
+        """
         raise NotImplementedError

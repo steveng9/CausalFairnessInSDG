@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from abc import ABC
 from dataclasses import dataclass
-from typing import FrozenSet, Iterable, List, Tuple
+from typing import Dict, FrozenSet, Iterable, List, Tuple
 
 import networkx as nx
 
@@ -72,3 +72,62 @@ class FairnessMechanism(ABC):
 
     def allow_edge(self, edge: Edge, graph: nx.Graph, roles: AttributeRoles) -> bool:
         return True
+
+    def select_biased_edges(
+        self, dag: nx.DiGraph, roles: AttributeRoles
+    ) -> Dict[str, List[str]]:
+        """For SDG methods that start from a *whole, fixed* causal DAG (DECAF)
+        rather than incrementally building one (MST/PrivBayes/AIM), decide
+        which edges bias the outcome and should be shuffled ("surrogate value
+        substitution") at generation time.
+
+        Returns `{child: [parents whose contribution should be shuffled]}`.
+        Default: no-op (nothing biased), matching `NoFairness`.
+        """
+        return {}
+
+
+def edges_allowed(
+    edges: List[Edge], graph: nx.Graph, roles: AttributeRoles, mechanism: "FairnessMechanism"
+) -> bool:
+    """True iff every pairwise edge in `edges` survives both of `mechanism`'s
+    hooks against the graph built so far. Lets multi-parent (PrivBayes) and
+    multi-attribute-clique (AIM) candidates reuse the existing single-edge
+    `FairnessMechanism` interface unchanged, rather than each mechanism
+    needing its own multi-edge-aware logic."""
+    survivors = mechanism.filter_candidates(edges, roles)
+    if len(survivors) != len(edges):
+        return False
+    return all(mechanism.allow_edge(e, graph, roles) for e in edges)
+
+
+def biased_edges_from_paths(
+    dag: nx.DiGraph,
+    roles: AttributeRoles,
+    path_is_blocked,
+) -> Dict[str, List[str]]:
+    """Shared `select_biased_edges` implementation for FTU/DP/CF: enumerate
+    every simple directed path from a protected attribute to an outcome
+    attribute, keep the ones `path_is_blocked(interior_nodes)` says are
+    *not* blocked, and cut each such path by shuffling the edge nearest the
+    outcome node (matches DECAF's own convention -- see e.g. its toy example
+    `bias_dict = {6: [3]}`, which cuts the edge immediately upstream of the
+    affected node rather than the one nearest the protected attribute).
+
+    `path_is_blocked(interior)` receives the path's interior nodes (protected
+    and outcome endpoints excluded) and returns whether that path should be
+    left alone. FTU/DP/CF differ only in this predicate.
+    """
+    biased: Dict[str, set] = {}
+    for p in roles.protected:
+        if p not in dag:
+            continue
+        for o in roles.outcome:
+            if o not in dag or p == o:
+                continue
+            for path in nx.all_simple_paths(dag, p, o):
+                interior = path[1:-1]
+                if path_is_blocked(interior):
+                    continue
+                biased.setdefault(o, set()).add(path[-2])
+    return {child: sorted(parents) for child, parents in biased.items()}

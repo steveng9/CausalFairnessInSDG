@@ -128,6 +128,7 @@ class MST(SDGMethod):
         delta: float,
         n_synth: int,
         seed: Optional[int] = None,
+        dataset_name: Optional[str] = None,
     ) -> SDGResult:
         if seed is not None:
             np.random.seed(seed)

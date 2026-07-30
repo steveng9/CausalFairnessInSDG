@@ -1,6 +1,8 @@
-from typing import List
+from typing import Dict, List
 
-from .base import AttributeRoles, Edge, FairnessMechanism
+import networkx as nx
+
+from .base import AttributeRoles, Edge, FairnessMechanism, biased_edges_from_paths
 
 
 def _is_direct_protected_outcome_edge(edge: Edge, roles: AttributeRoles) -> bool:
@@ -29,3 +31,11 @@ class FTUFairness(FairnessMechanism):
         return [
             e for e in candidates if not _is_direct_protected_outcome_edge(e, roles)
         ]
+
+    def select_biased_edges(
+        self, dag: nx.DiGraph, roles: AttributeRoles
+    ) -> Dict[str, List[str]]:
+        # Only the direct protected->outcome edge counts (empty interior);
+        # any path with intermediate nodes is left alone, same narrow rule
+        # as `filter_candidates` above.
+        return biased_edges_from_paths(dag, roles, path_is_blocked=lambda interior: len(interior) > 0)

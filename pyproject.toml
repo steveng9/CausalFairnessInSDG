@@ -16,6 +16,11 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = ["pytest"]
+# DECAF is a non-private GAN baseline (see sdg/decaf.py), conceptually
+# separate from the core graphical/marginal DP-synthesizer family this
+# project targets -- kept optional since it pulls in torch + pytorch-
+# lightning, a much heavier footprint than the rest of the project.
+decaf = ["decaf-synthetic-data"]
 
 [build-system]
 requires = ["setuptools>=68"]
@@ -23,3 +28,8 @@ build-backend = "setuptools.build_meta"
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[tool.pytest.ini_options]
+markers = [
+    "slow: exercises real model training (DECAF/PrivBayes/AIM/PrivSyn GAN or structure-search fits)",
+]
