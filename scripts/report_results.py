@@ -85,11 +85,26 @@ def _fmt(df: pd.DataFrame, floatfmt: str = "%.4f") -> str:
     return df.to_string(float_format=lambda v: floatfmt % v) + "\n"
 
 
-def _agg(df: pd.DataFrame, by: List[str], cols: List[str]) -> pd.DataFrame:
+def _agg(
+    df: pd.DataFrame, by: List[str], cols: List[str], spread: bool = True
+) -> pd.DataFrame:
+    """Mean over replicates, plus `n` (how many runs went into the cell) and
+    `gap_sd` (standard deviation of the headline fairness gap across them).
+
+    With more than one seed per cell those two columns are what separates a
+    real effect from sampling noise -- a difference smaller than `gap_sd` is
+    not a difference. `n` is shown even at one seed so it is obvious when a
+    cell is a single unreplicated measurement."""
     cols = [c for c in cols if c in df.columns]
     if df.empty or not cols:
         return pd.DataFrame()
-    return df.groupby(by, dropna=False)[cols].mean().round(4)
+    grouped = df.groupby(by, dropna=False)
+    out = grouped[cols].mean().round(4)
+    if spread:
+        out.insert(0, "n", grouped.size())
+        if "fairness_gap" in cols:
+            out["gap_sd"] = grouped["fairness_gap"].std().round(4)
+    return out
 
 
 def build_markdown(df: pd.DataFrame, batch: Optional[str]) -> str:
@@ -180,21 +195,34 @@ def build_markdown(df: pd.DataFrame, batch: Optional[str]) -> str:
 
     # Best configurations: low gap AND high accuracy. Ranked on the real
     # reference only, since the synthetic reference is trivially gameable.
+    #
+    # Ranked over *cells* (means across seeds), not over individual runs: with
+    # several trials per cell, ranking raw runs would just surface whichever
+    # seed happened to land lowest, which is exactly the cherry-pick the extra
+    # trials were added to eliminate.
     scored = ok.dropna(subset=["fairness_gap", "downstream_accuracy_mlp"])
     if not scored.empty:
-        show = [
+        cell_keys = [
             "dataset", "role_config", "sdg_method", "fairness_mechanism", "epsilon",
-            "fairness_gap", "cond_fairness_gap", "tvd_1way", "downstream_accuracy_mlp",
         ]
-        best = scored.sort_values(
+        cells = _agg(
+            scored, cell_keys,
+            ["fairness_gap", "cond_fairness_gap", "tvd_1way",
+             "downstream_accuracy_mlp"],
+        ).reset_index()
+        best = cells.sort_values(
             ["fairness_gap", "downstream_accuracy_mlp"], ascending=[True, False]
-        ).head(20)[show]
-        acc_floor = scored["downstream_accuracy_mlp"].quantile(0.5)
-        useful = scored[scored["downstream_accuracy_mlp"] >= acc_floor].sort_values(
+        ).head(20)
+        acc_floor = cells["downstream_accuracy_mlp"].quantile(0.5)
+        useful = cells[cells["downstream_accuracy_mlp"] >= acc_floor].sort_values(
             "fairness_gap"
-        ).head(20)[show]
+        ).head(20)
         lines += [
             "## Lowest fairness gap overall",
+            "",
+            "Per-cell means across seeds. `n` = trials in the cell, `gap_sd` = spread "
+            "of `fairness_gap` across them; a cell whose lead is smaller than its "
+            "`gap_sd` is not actually ahead.",
             "",
             "```",
             _fmt(best.reset_index(drop=True)),

@@ -52,7 +52,14 @@ from report_results import write_report  # noqa: E402
 
 DEFAULT_BATCH = "overnight-2026-07-30"
 
-PRIVATE_METHODS = ["mst", "privbayes", "privsyn"]
+#: Default grid: the three DP graphical synthesizers plus the published DECAF
+#: baseline. The DECAF GAN-backbone variants (`decaf_dpgan`, `decaf_ctgan`,
+#: `decaf_dpctgan`) are deliberately *not* here -- select them explicitly with
+#: `--methods`, so re-running or resuming an existing batch never silently
+#: grows the grid underneath it.
+DEFAULT_METHODS = ["mst", "privbayes", "privsyn", "decaf"]
+GAN_BACKBONE_METHODS = ["decaf_dpgan", "decaf_ctgan", "decaf_dpctgan"]
+
 MECHANISMS = ["none", "ftu", "dp", "cf"]
 EPSILONS = [1.0, 10.0, 1000.0]
 SEEDS = [0]
@@ -135,14 +142,42 @@ ROLE_CONFIGS: Dict[str, List[RoleConfig]] = {
 }
 
 
-def build_configs(batch: str) -> List[RunConfig]:
+def _is_gan(method: str) -> bool:
+    """GAN-backed methods cache one trained model per (data, seed, epsilon)."""
+    return method == "decaf" or method in GAN_BACKBONE_METHODS
+
+
+def build_configs(
+    batch: str,
+    seeds: Sequence[int] = SEEDS,
+    methods: Sequence[str] = tuple(DEFAULT_METHODS),
+) -> List[RunConfig]:
     """Ordered so that (a) COMPAS -- the fast dataset -- finishes completely
-    first, giving a full readable result set early, and (b) all of a dataset's
-    DECAF cells are contiguous, so DECAF's train cache is hit instead of
-    retraining the same GAN 12 times."""
+    first, giving a full readable result set early, and (b) every GAN-backed
+    method's cells are grouped so its train cache is hit instead of retraining
+    the same network for each role config and mechanism.
+
+    Loop nesting differs by method family, and only for cache reasons:
+
+      - **Marginal methods** (MST/PrivBayes/PrivSyn/AIM) hold no cache, so
+        seeds vary innermost. Adding trials to an existing batch then keeps a
+        cell's replicates adjacent, and an interrupted sweep leaves whole
+        cells rather than a ragged seed frontier.
+      - **GAN methods** cache one trained model keyed on (data, seed, epsilon)
+        -- not on role config or mechanism, since DECAF-style fairness is
+        applied at generation time only. So seed and epsilon go *outermost*
+        and all 12 role x mechanism cells run underneath one training. With
+        seeds innermost instead, every run would evict the cache: 60 GAN
+        trainings per dataset instead of 5.
+    """
     configs: List[RunConfig] = []
+    marginal = [m for m in methods if not _is_gan(m)]
+    gan = [m for m in methods if _is_gan(m)]
+
     for dataset in ("compas", "adult"):
-        for role_name, protected, admissible in ROLE_CONFIGS[dataset]:
+        roles_for_dataset = ROLE_CONFIGS[dataset]
+
+        for role_name, protected, admissible in roles_for_dataset:
             common = dict(
                 dataset=dataset,
                 role_config=role_name,
@@ -152,9 +187,9 @@ def build_configs(batch: str) -> List[RunConfig]:
                 extra_params={"batch": batch},
             )
             for epsilon in EPSILONS:
-                for method in PRIVATE_METHODS:
+                for method in marginal:
                     for mechanism in MECHANISMS:
-                        for seed in SEEDS:
+                        for seed in seeds:
                             configs.append(
                                 RunConfig(
                                     sdg_method=method,
@@ -164,30 +199,40 @@ def build_configs(batch: str) -> List[RunConfig]:
                                     **common,
                                 )
                             )
-        if "decaf" in SDG_METHODS:
-            for role_name, protected, admissible in ROLE_CONFIGS[dataset]:
-                for mechanism in MECHANISMS:
-                    for seed in SEEDS:
-                        configs.append(
-                            RunConfig(
-                                dataset=dataset,
-                                role_config=role_name,
-                                protected=protected,
-                                admissible=admissible,
-                                eval_reference=EVAL_REFERENCE_BOTH,
-                                # Record which DECAF variant produced the row,
-                                # since the settings differ per dataset.
-                                extra_params={
-                                    "batch": batch, **DECAF_SETTINGS[dataset]
-                                },
-                                sdg_method="decaf",
-                                fairness_mechanism=mechanism,
-                                # Placeholder only: `run_single` writes NULL
-                                # epsilon/delta for non-private methods.
-                                epsilon=float("nan"),
-                                seed=seed,
+
+        for method in gan:
+            if method not in SDG_METHODS:
+                continue
+            private = SDG_METHODS[method].is_private
+            # Non-private backbones ignore epsilon entirely, so sweeping it
+            # would just re-run an identical configuration three times.
+            epsilons = EPSILONS if private else [float("nan")]
+            extra = {"batch": batch}
+            if method == "decaf":
+                # The published baseline's knobs differ per dataset; record
+                # which variant produced the row.
+                extra.update(DECAF_SETTINGS[dataset])
+            for seed in seeds:
+                for epsilon in epsilons:
+                    for role_name, protected, admissible in roles_for_dataset:
+                        for mechanism in MECHANISMS:
+                            configs.append(
+                                RunConfig(
+                                    dataset=dataset,
+                                    role_config=role_name,
+                                    protected=protected,
+                                    admissible=admissible,
+                                    eval_reference=EVAL_REFERENCE_BOTH,
+                                    extra_params=dict(extra),
+                                    sdg_method=method,
+                                    fairness_mechanism=mechanism,
+                                    # For non-private methods this is a
+                                    # placeholder: `run_single` writes NULL
+                                    # epsilon/delta for those.
+                                    epsilon=epsilon,
+                                    seed=seed,
+                                )
                             )
-                        )
     return configs
 
 
@@ -214,7 +259,11 @@ def _completed_keys(conn, batch: str) -> set:
 
 
 def _key(config: RunConfig) -> tuple:
-    epsilon = None if config.sdg_method == "decaf" else round(config.epsilon, 6)
+    # Non-private methods are logged with NULL epsilon, so their resume key
+    # must be NULL too or nothing would ever match and every relaunch would
+    # redo the whole GAN grid.
+    private = SDG_METHODS[config.sdg_method].is_private
+    epsilon = round(config.epsilon, 6) if private else None
     return (
         config.dataset, config.sdg_method, config.fairness_mechanism,
         config.role_config, epsilon, config.seed,
@@ -224,6 +273,18 @@ def _key(config: RunConfig) -> tuple:
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--batch", default=DEFAULT_BATCH)
+    parser.add_argument(
+        "--seeds", default=",".join(str(s) for s in SEEDS),
+        help="comma-separated trial seeds. Adding seeds to a batch that "
+             "already has results is safe -- completed (cell, seed) pairs are "
+             "skipped, so only the new trials run.",
+    )
+    parser.add_argument(
+        "--methods", default=",".join(DEFAULT_METHODS),
+        help="comma-separated SDG methods. The DECAF GAN-backbone variants "
+             f"({', '.join(GAN_BACKBONE_METHODS)}) are opt-in so that "
+             "resuming an existing batch never grows its grid.",
+    )
     parser.add_argument("--dry-run", action="store_true")
     parser.add_argument("--results-dir", default=str(REPO_ROOT / "results"))
     parser.add_argument("--db-path", default=str(db.DEFAULT_DB_PATH))
@@ -234,7 +295,14 @@ def main() -> int:
     )
     args = parser.parse_args()
 
-    configs = build_configs(args.batch)
+    seeds = [int(s) for s in args.seeds.split(",") if s.strip() != ""]
+    methods = [m.strip() for m in args.methods.split(",") if m.strip()]
+    unknown = [m for m in methods if m not in SDG_METHODS]
+    if unknown:
+        parser.error(
+            f"unknown method(s) {unknown}; available: {sorted(SDG_METHODS)}"
+        )
+    configs = build_configs(args.batch, seeds, methods)
     if args.only:
         configs = [
             c for c in configs
@@ -257,17 +325,21 @@ def main() -> int:
 
     started = time.time()
     print(f"[{datetime.now(timezone.utc).isoformat()}] batch={args.batch} "
-          f"pid={os.getpid()} total={len(configs)} already_done={len(done)} "
-          f"todo={len(todo)}", flush=True)
+          f"pid={os.getpid()} seeds={seeds} total={len(configs)} "
+          f"already_done={len(done)} todo={len(todo)}", flush=True)
 
     n_ok = n_failed = 0
     for i, config in enumerate(todo, start=1):
         if config.sdg_method == "decaf":
             for attr, value in DECAF_SETTINGS[config.dataset].items():
                 setattr(SDG_METHODS["decaf"], attr, value)
-        eps = "n/a" if config.sdg_method == "decaf" else f"{config.epsilon:g}"
+        eps = (
+            f"{config.epsilon:g}"
+            if SDG_METHODS[config.sdg_method].is_private
+            else "n/a"
+        )
         label = (f"{config.dataset}/{config.role_config}/{config.sdg_method}/"
-                 f"{config.fairness_mechanism}/eps={eps}")
+                 f"{config.fairness_mechanism}/eps={eps}/seed={config.seed}")
         t0 = time.time()
         try:
             run_single(conn, config)

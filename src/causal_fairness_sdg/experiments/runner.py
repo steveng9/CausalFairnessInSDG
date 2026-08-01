@@ -31,11 +31,27 @@ try:
 except ImportError:
     DECAFMethod = None  # decaf extra not installed
 
+try:
+    from ..sdg.decaf_variants import (
+        DECAFCTGANMethod,
+        DECAFDPCTGANMethod,
+        DECAFDPGANMethod,
+    )
+except ImportError:
+    DECAFCTGANMethod = DECAFDPCTGANMethod = DECAFDPGANMethod = None
+
 SDG_METHODS: Dict[str, SDGMethod] = {
     "mst": MST(), "privbayes": PrivBayes(), "aim": AIM(), "privsyn": PrivSyn(),
 }
 if DECAFMethod is not None:
     SDG_METHODS["decaf"] = DECAFMethod()
+if DECAFDPGANMethod is not None:
+    # DECAF's causal generator with its GAN backbone swapped: `decaf_dpgan`
+    # and `decaf_dpctgan` are genuinely private (DP-SGD on the critic) and so
+    # do carry an epsilon, unlike the `decaf`/`decaf_ctgan` baselines.
+    SDG_METHODS["decaf_dpgan"] = DECAFDPGANMethod()
+    SDG_METHODS["decaf_ctgan"] = DECAFCTGANMethod()
+    SDG_METHODS["decaf_dpctgan"] = DECAFDPCTGANMethod()
 
 
 #: `eval_reference` value meaning "compute fairness metrics against *both*
@@ -169,6 +185,13 @@ def run_single(conn: sqlite3.Connection, config: RunConfig) -> int:
                 holdout_df, synth, outcome=outcome_attr, include_downstream=not degenerate
             ),
         }
+        # Method-specific diagnostics -- currently the DP-SGD noise multiplier,
+        # step count and realized epsilon from the DECAF GAN backbones. Logged
+        # as metrics so the privacy calibration behind a row is recoverable
+        # from the database rather than only from the code that produced it.
+        metrics.update(
+            {k: float(v) for k, v in result.extra.items() if v is not None}
+        )
 
         if not degenerate:
             model, feature_cols = utility.fit_classifier(

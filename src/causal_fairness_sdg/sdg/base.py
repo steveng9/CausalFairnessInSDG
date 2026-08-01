@@ -1,8 +1,8 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from dataclasses import dataclass
-from typing import Dict, List, Optional, Tuple
+from dataclasses import dataclass, field
+from typing import Any, Dict, List, Optional, Tuple
 
 import pandas as pd
 
@@ -13,6 +13,12 @@ from ..fairness.base import AttributeRoles, FairnessMechanism
 class SDGResult:
     synthetic_data: pd.DataFrame
     graph_edges: List[Tuple[str, str]]
+
+    #: Method-specific diagnostics to record alongside the run, e.g. the DP-SGD
+    #: noise multiplier and step count for the DP-GAN backbones. Merged into
+    #: the run's `extra_params`, so the privacy calibration that produced a row
+    #: is recoverable from `experiments.db` rather than only from the code.
+    extra: Dict[str, Any] = field(default_factory=dict)
 
 
 class SDGMethod(ABC):

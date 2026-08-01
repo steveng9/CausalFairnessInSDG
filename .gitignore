@@ -27,6 +27,10 @@ env/
 results/
 outputs/
 experiments.db
+# sqlite's write-ahead/rollback sidecars, present while a batch is running
+experiments.db-journal
+experiments.db-wal
+experiments.db-shm
 
 # OS / editor
 .DS_Store
