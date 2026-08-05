@@ -88,9 +88,21 @@ SEEDS = [0]
 # "good enough and measured" rather than a full hyperparameter search --
 # Adult's fidelity (TVD 0.395) remains clearly worse than the DP synthesizers'
 # and is worth a dedicated tuning pass before it goes in a paper.
+#   SNAKE/SBO both span wide code ranges like Adult (SNAKE's `statefips` is
+#           0-50 against a binary outcome; SBO's `SECTOR` is 0-19), so they
+#           take Adult's bounded-head configuration for the same reason. Epoch
+#           counts are placeholders pending their own sweep -- see the
+#           `epoch_sweep_all` protocol; do not read them as tuned.
+# Re-tuned 2026-08-04 by the same sweep: COMPAS 200 -> 1000 (TVD2 0.330 ->
+# 0.091, lift +0.064 -> +0.083, no collapse; 500 was better still on lift but
+# collapsed in 1 of 3 seeds). Adult 30 -> 300 improves TVD2 0.707 -> 0.548 at
+# unchanged lift -- but note Adult DECAF never beats the trivial predictor at
+# any epoch count, so read those rows as "this baseline does not work here".
 DECAF_SETTINGS = {
-    "adult": {"max_epochs": 30, "output_activation": "sigmoid"},
-    "compas": {"max_epochs": 200, "output_activation": None},
+    "adult": {"max_epochs": 300, "output_activation": "sigmoid"},
+    "compas": {"max_epochs": 1000, "output_activation": None},
+    "snake": {"max_epochs": 30, "output_activation": "sigmoid"},
+    "sbo": {"max_epochs": 30, "output_activation": "sigmoid"},
 }
 
 # Protected/admissible role splits. The first entry for each dataset is the
@@ -139,6 +151,49 @@ ROLE_CONFIGS: Dict[str, List[RoleConfig]] = {
         # reading, and should cost the most utility.
         ("sex_race_age_narrow_adm", ["sex", "race", "age_cat"], ["c_charge_degree"]),
     ],
+    "snake": [
+        # Closest analogue to Adult's `prefair` split: all three ascribed
+        # characteristics protected, the whole labour-market chain admissible.
+        (
+            "prefair_like",
+            ["female", "wbhaom", "citistat"],
+            ["gradeatn", "mocc10", "mind16", "cow1", "hoursut", "ftptstat"],
+        ),
+        # The classic wage-gap setup: sex alone, with education and hours as
+        # the legitimate explanations.
+        ("sex_only_broad_adm", ["female"], ["gradeatn", "mocc10", "hoursut", "ftptstat"]),
+        # Occupation and industry removed from the admissible set. Occupational
+        # segregation is itself one of the main channels of the wage gap, so
+        # treating it as non-admissible is the strict reading and should make
+        # CF behave much more like DP.
+        ("sex_race_narrow_adm", ["female", "wbhaom"], ["gradeatn", "hoursut"]),
+    ],
+    "sbo": [
+        # Everything the survey asks about the owner is protected; everything
+        # about how the firm is set up and run is admissible.
+        (
+            "owner_demographics",
+            ["SEX1", "RACE1", "ETH1", "VET1", "BORNUS1"],
+            ["EDUC1", "AGE1", "HOURS1", "PRMINC1", "SELFEMP1",
+             "SECTOR", "ESTABLISHED", "NUMOWNERS"],
+        ),
+        # Sex and race only, with sector admissible -- the standard "is this
+        # just industry mix?" question in the business-lending literature.
+        (
+            "sex_race_broad_adm",
+            ["SEX1", "RACE1"],
+            ["SECTOR", "EDUC1", "ESTABLISHED", "HOURS1", "NUMOWNERS", "EMPLOYMENT_NOISY"],
+        ),
+        # Sector removed from the admissible set. On this graph SECTOR is the
+        # highest-degree mediator, so denying it to CF is the sharpest
+        # available test of whether CF's advantage over DP is really coming
+        # from routing through admissible attributes.
+        (
+            "sex_race_no_sector",
+            ["SEX1", "RACE1", "ETH1"],
+            ["EDUC1", "HOURS1", "ESTABLISHED"],
+        ),
+    ],
 }
 
 
@@ -147,10 +202,56 @@ def _is_gan(method: str) -> bool:
     return method == "decaf" or method in GAN_BACKBONE_METHODS
 
 
+def _apply_device(device: str) -> None:
+    """Point every GAN-backed method at `device`.
+
+    The two families take it differently: the DECAF variants pass `device`
+    straight through to their torch trainers, while the published DECAF
+    baseline goes through PyTorch Lightning and wants an accelerator plus an
+    index. Both are set through the same knobs the grid already records, so
+    the choice shows up in `extra_params` rather than being invisible.
+    """
+    for name in GAN_BACKBONE_METHODS:
+        method = SDG_METHODS.get(name)
+        if method is not None:
+            method.overrides["device"] = device
+
+    decaf = SDG_METHODS.get("decaf")
+    if decaf is not None and device.startswith("cuda"):
+        index = int(device.split(":")[1]) if ":" in device else 0
+        decaf.accelerator, decaf.devices = "gpu", [index]
+        DECAF_SETTINGS_DEVICE.update(accelerator="gpu", devices=[index])
+
+
+#: Device knobs merged into every `decaf` row's provenance, empty on CPU.
+DECAF_SETTINGS_DEVICE: Dict[str, object] = {}
+
+
+def _training_settings(method: str, dataset: str) -> Dict[str, object]:
+    """The training knobs that will actually be in force for this cell.
+
+    `decaf` keeps its own per-dataset table here in the script; the backbone
+    variants carry theirs on the method object (`settings` + any constructor
+    `overrides`), which `_settings_for` already resolves in the same order the
+    trainer will see them.
+    """
+    if method == "decaf":
+        return {**DECAF_SETTINGS[dataset], **DECAF_SETTINGS_DEVICE}
+    settings_for = getattr(SDG_METHODS.get(method), "_settings_for", None)
+    return dict(settings_for(dataset)) if settings_for else {}
+
+
+#: Datasets in the default grid. `snake` and `sbo` are opt-in via --datasets
+#: for the same reason the GAN backbones are opt-in via --methods: resuming an
+#: existing batch must never silently grow it.
+DEFAULT_DATASETS = ["compas", "adult"]
+
+
 def build_configs(
     batch: str,
     seeds: Sequence[int] = SEEDS,
     methods: Sequence[str] = tuple(DEFAULT_METHODS),
+    datasets: Sequence[str] = tuple(DEFAULT_DATASETS),
 ) -> List[RunConfig]:
     """Ordered so that (a) COMPAS -- the fast dataset -- finishes completely
     first, giving a full readable result set early, and (b) every GAN-backed
@@ -174,7 +275,7 @@ def build_configs(
     marginal = [m for m in methods if not _is_gan(m)]
     gan = [m for m in methods if _is_gan(m)]
 
-    for dataset in ("compas", "adult"):
+    for dataset in datasets:
         roles_for_dataset = ROLE_CONFIGS[dataset]
 
         for role_name, protected, admissible in roles_for_dataset:
@@ -207,11 +308,12 @@ def build_configs(
             # Non-private backbones ignore epsilon entirely, so sweeping it
             # would just re-run an identical configuration three times.
             epsilons = EPSILONS if private else [float("nan")]
-            extra = {"batch": batch}
-            if method == "decaf":
-                # The published baseline's knobs differ per dataset; record
-                # which variant produced the row.
-                extra.update(DECAF_SETTINGS[dataset])
+            # Record the *effective* training settings on every GAN row. Without
+            # this a row cannot be attributed to an epoch count, and epoch count
+            # is exactly what the 4.3b sweep showed to be outcome-determining --
+            # the original `gan-backbones-2026-07-30` rows carry no trace of the
+            # 20/30/60/100/200 epochs that produced them.
+            extra = {"batch": batch, **_training_settings(method, dataset)}
             for seed in seeds:
                 for epsilon in epsilons:
                     for role_name, protected, admissible in roles_for_dataset:
@@ -285,6 +387,18 @@ def main() -> int:
              f"({', '.join(GAN_BACKBONE_METHODS)}) are opt-in so that "
              "resuming an existing batch never grows its grid.",
     )
+    parser.add_argument(
+        "--datasets", default=",".join(DEFAULT_DATASETS),
+        help="comma-separated datasets. `snake` and `sbo` are opt-in so that "
+             "resuming an existing batch never grows its grid.",
+    )
+    parser.add_argument(
+        "--device", default=None,
+        help="torch device for the GAN-backed methods, e.g. 'cuda:0'. Measured "
+             "3x faster than CPU for the CTGAN backbone (2.33 vs 6.99 s/epoch "
+             "on Adult) and, on a box whose CPUs are saturated by other users, "
+             "also the politer choice. Marginal methods ignore it.",
+    )
     parser.add_argument("--dry-run", action="store_true")
     parser.add_argument("--results-dir", default=str(REPO_ROOT / "results"))
     parser.add_argument("--db-path", default=str(db.DEFAULT_DB_PATH))
@@ -302,7 +416,20 @@ def main() -> int:
         parser.error(
             f"unknown method(s) {unknown}; available: {sorted(SDG_METHODS)}"
         )
-    configs = build_configs(args.batch, seeds, methods)
+    if args.device:
+        # Set before build_configs so `_training_settings` records the device
+        # on every row -- a run on GPU is not bit-identical to one on CPU (the
+        # sweep found a config that survived on CPU and inverted on GPU under
+        # the same seeds), so it belongs in the provenance.
+        _apply_device(args.device)
+
+    datasets = [d.strip() for d in args.datasets.split(",") if d.strip()]
+    unknown_ds = [d for d in datasets if d not in ROLE_CONFIGS]
+    if unknown_ds:
+        parser.error(
+            f"unknown dataset(s) {unknown_ds}; available: {sorted(ROLE_CONFIGS)}"
+        )
+    configs = build_configs(args.batch, seeds, methods, datasets)
     if args.only:
         configs = [
             c for c in configs

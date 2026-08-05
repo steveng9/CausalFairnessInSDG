@@ -152,9 +152,24 @@ class DECAFDPGANMethod(_BaseDECAFVariant):
     #            that avoids single-class collapse at both budgets. Read the
     #            Adult DP-GAN rows as "this architecture does not work here",
     #            not as a tuned number.
+    # SNAKE and SBO are registered so the grid can reach them, but their
+    # epoch counts are NOT tuned -- they are Adult's, carried over on the
+    # grounds that both are wide mixed-cardinality tables like Adult. Run
+    # the epoch sweep before quoting any number from these two.
     settings = {
+        # Re-tuned 2026-08-04. Epochs stay fixed across epsilon (see above);
+        # the count is chosen at eps=1000 where noise is negligible.
+        #   ADULT   60 and 300 collapse in 2 of 3 seeds at eps=1000; 120 is the
+        #           only count that never collapses. Every Adult DP-GAN cell is
+        #           still bad (TVD2 0.84) -- this is damage control, not tuning.
+        #   COMPAS  100 keeps the best lift (+0.066, all seeds positive); 500
+        #           buys TVD2 0.193 vs 0.228 but drops a seed below baseline.
+        #           At eps=1 COMPAS collapses at 100/200/500 alike -- a result
+        #           about DP-GANs on small tables, not a setting to fix.
         "compas": {"max_epochs": 100, "batch_size": 256},
-        "adult": {"max_epochs": 60, "batch_size": 256},
+        "adult": {"max_epochs": 120, "batch_size": 256},
+        "snake": {"max_epochs": 60, "batch_size": 256},
+        "sbo": {"max_epochs": 60, "batch_size": 256},
     }
 
     def fit_generate(
@@ -237,9 +252,30 @@ class DECAFCTGANMethod(_BaseDECAFVariant):
     #           is the headline -- published DECAF on Adult is TVD2 0.658, so
     #           the CTGAN representation is a ~3.8x fidelity improvement at
     #           *higher* downstream accuracy (0.756 vs 0.695).
+    # SNAKE and SBO are registered so the grid can reach them, but their
+    # epoch counts are NOT tuned -- they are Adult's, carried over on the
+    # grounds that both are wide mixed-cardinality tables like Adult. Run
+    # the epoch sweep before quoting any number from these two.
     settings = {
-        "compas": {"max_epochs": 20, "batch_size": 500},
-        "adult": {"max_epochs": 30, "batch_size": 500},
+        # Re-tuned 2026-08-04 by `epoch_sweep_all`, 3 seeds, ranked on 2-way TVD
+        # among settings where *every* seed beats the trivial predictor. The
+        # previous 20/30 were selected on single-seed 1-way TVD and both
+        # produced models that lose to always-guessing-the-majority.
+        #   ADULT   30 -> lift -0.125 (one seed inverts, acc 0.45)
+        #           120 -> lift +0.023 | 300 -> lift -0.134 (seed 0 inverts,
+        #           pos_rate 0.83 vs true 0.25) | 600 -> lift +0.046, TVD2
+        #           0.171, pos_rate 0.18-0.23 across seeds. 300 is NOT stable:
+        #           it survived a CPU sweep and inverted on GPU with the same
+        #           seeds, i.e. it was a lucky RNG draw. 600 is where the
+        #           outcome marginal actually converges.
+        #   COMPAS  20 -> TVD2 0.070 but lift -0.006 (below baseline);
+        #           500 -> TVD2 0.160, lift +0.085. Fidelity is genuinely
+        #           worse at 500 -- we take that trade because a generator
+        #           that cannot beat guessing has no usable fairness signal.
+        "compas": {"max_epochs": 500, "batch_size": 500},
+        "adult": {"max_epochs": 600, "batch_size": 500},
+        "snake": {"max_epochs": 30, "batch_size": 500},
+        "sbo": {"max_epochs": 30, "batch_size": 500},
     }
 
     #: Subclass hook -- the DP variant flips this.
@@ -316,11 +352,25 @@ class DECAFDPCTGANMethod(DECAFCTGANMethod):
     is_private = True
     _dp = True
 
+    # SNAKE and SBO are registered so the grid can reach them, but their
+    # epoch counts are NOT tuned -- they are Adult's, carried over on the
+    # grounds that both are wide mixed-cardinality tables like Adult. Run
+    # the epoch sweep before quoting any number from these two.
     settings = {
+        # Re-tuned 2026-08-04: COMPAS 200 -> 400 (TVD2 0.164 -> 0.161 and lift
+        # +0.023 -> +0.084 at eps=1000). Adult stays at 60 -- it never clears
+        # the trivial baseline at any count tried (lift ~= 0.000 at 60/120/300),
+        # so the cheapest is the honest choice; see Section 7.2's null result.
         "compas": {
-            "max_epochs": 200, "batch_size": 256, "pac": 1, "use_conditional": False,
+            "max_epochs": 400, "batch_size": 256, "pac": 1, "use_conditional": False,
         },
         "adult": {
+            "max_epochs": 60, "batch_size": 256, "pac": 1, "use_conditional": False,
+        },
+        "snake": {
+            "max_epochs": 60, "batch_size": 256, "pac": 1, "use_conditional": False,
+        },
+        "sbo": {
             "max_epochs": 60, "batch_size": 256, "pac": 1, "use_conditional": False,
         },
     }

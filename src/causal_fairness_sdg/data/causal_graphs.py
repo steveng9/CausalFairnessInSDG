@@ -89,7 +89,149 @@ ADULT_DAG: List[Edge] = [
     ("race", "income"),
 ]
 
-CAUSAL_GRAPHS: Dict[str, List[Edge]] = {"adult": ADULT_DAG, "compas": COMPAS_DAG}
+# SNAKE (CPS extract): the standard status-attainment chain from the
+# stratification literature -- ascribed characteristics (sex, race,
+# citizenship, age) shape educational attainment, education sorts people into
+# occupations and industries, and occupation plus hours worked determine
+# earnings. Family structure enters as a parallel path: age/sex/marriage drive
+# the presence and number of children, which suppress hours worked. State is a
+# root affecting industry mix and earnings directly (cost of living, local
+# labour market). Direct `female`/`wbhaom` -> outcome edges represent the
+# residual wage gap that the occupation- and hours-mediated paths do not
+# explain -- the empirically robust part of that literature, and the thing FTU
+# is allowed to cut.
+SNAKE_DAG: List[Edge] = [
+    ("female", "gradeatn"),
+    ("wbhaom", "gradeatn"),
+    ("citistat", "gradeatn"),
+    ("age", "gradeatn"),
+    ("age", "married"),
+    ("female", "married"),
+    ("wbhaom", "married"),
+    ("age", "agechild"),
+    ("married", "agechild"),
+    ("female", "agechild"),
+    ("agechild", "ownchild"),
+    ("married", "ownchild"),
+    ("gradeatn", "mocc10"),
+    ("female", "mocc10"),
+    ("wbhaom", "mocc10"),
+    ("citistat", "mocc10"),
+    ("mocc10", "mind16"),
+    ("gradeatn", "mind16"),
+    ("statefips", "mind16"),
+    ("mind16", "cow1"),
+    ("mocc10", "cow1"),
+    ("mocc10", "hoursut"),
+    ("ownchild", "hoursut"),
+    ("female", "hoursut"),
+    ("married", "hoursut"),
+    ("hoursut", "ftptstat"),
+    ("mocc10", "ftptstat"),
+    ("ownchild", "ftptstat"),
+    ("gradeatn", "high_income"),
+    ("mocc10", "high_income"),
+    ("mind16", "high_income"),
+    ("cow1", "high_income"),
+    ("hoursut", "high_income"),
+    ("ftptstat", "high_income"),
+    ("married", "high_income"),
+    ("age", "high_income"),
+    ("statefips", "high_income"),
+    ("female", "high_income"),
+    ("wbhaom", "high_income"),
+]
+
+# SBO: 25 nodes, the largest graph here, and structurally different from the
+# other three -- the protected attributes describe the business *owner* while
+# the outcome describes the *business*, so every protected -> outcome path runs
+# through the firm rather than through the person. Four layers: owner
+# demographics -> owner characteristics (education, hours, whether this is
+# their primary income) -> firm structure (sector, age of firm, home-based,
+# franchise, ownership) -> firm practice and scale -> receipts.
+#
+# This is the graph the fairness mechanisms have the most room to act on: on
+# COMPAS almost every protected -> outcome path is one or two edges, so DP and
+# CF have little to distinguish them. Here the paths are four and five edges
+# long and most of them run through admissible attributes, which is exactly
+# the regime where CF should separate from DP.
+SBO_DAG: List[Edge] = [
+    ("ETH1", "BORNUS1"),
+    ("RACE1", "BORNUS1"),
+    ("SEX1", "EDUC1"),
+    ("RACE1", "EDUC1"),
+    ("ETH1", "EDUC1"),
+    ("BORNUS1", "EDUC1"),
+    ("AGE1", "EDUC1"),
+    ("VET1", "EDUC1"),
+    ("AGE1", "VET1"),
+    ("SEX1", "VET1"),
+    ("EDUC1", "SECTOR"),
+    ("SEX1", "SECTOR"),
+    ("RACE1", "SECTOR"),
+    ("ETH1", "SECTOR"),
+    ("AGE1", "ESTABLISHED"),
+    ("SECTOR", "ESTABLISHED"),
+    ("SEX1", "HOURS1"),
+    ("AGE1", "HOURS1"),
+    ("SECTOR", "HOURS1"),
+    ("HOURS1", "PRMINC1"),
+    ("SECTOR", "PRMINC1"),
+    ("EDUC1", "PRMINC1"),
+    ("PRMINC1", "SELFEMP1"),
+    ("SECTOR", "SELFEMP1"),
+    ("SEX1", "FAMILYBUS"),
+    ("ETH1", "FAMILYBUS"),
+    ("FAMILYBUS", "NUMOWNERS"),
+    ("SECTOR", "NUMOWNERS"),
+    ("SECTOR", "HOMEBASED"),
+    ("ESTABLISHED", "HOMEBASED"),
+    ("PRMINC1", "HOMEBASED"),
+    ("SECTOR", "FRANCHISE"),
+    ("ESTABLISHED", "FRANCHISE"),
+    ("SECTOR", "WEBSITE"),
+    ("EDUC1", "WEBSITE"),
+    ("ESTABLISHED", "WEBSITE"),
+    ("WEBSITE", "ECOMMERCE"),
+    ("SECTOR", "ECOMMERCE"),
+    ("SECTOR", "EXPORTS"),
+    ("ECOMMERCE", "EXPORTS"),
+    ("FIPST", "EXPORTS"),
+    ("SECTOR", "EMPLOYMENT_NOISY"),
+    ("ESTABLISHED", "EMPLOYMENT_NOISY"),
+    ("HOMEBASED", "EMPLOYMENT_NOISY"),
+    ("NUMOWNERS", "EMPLOYMENT_NOISY"),
+    ("FIPST", "EMPLOYMENT_NOISY"),
+    ("EMPLOYMENT_NOISY", "PAYROLL_NOISY"),
+    ("SECTOR", "PAYROLL_NOISY"),
+    ("FIPST", "PAYROLL_NOISY"),
+    ("EMPLOYMENT_NOISY", "HEALTHINS"),
+    ("SECTOR", "HEALTHINS"),
+    ("EMPLOYMENT_NOISY", "RETIREMENT"),
+    ("HEALTHINS", "RETIREMENT"),
+    ("EMPLOYMENT_NOISY", "high_receipts"),
+    ("PAYROLL_NOISY", "high_receipts"),
+    ("SECTOR", "high_receipts"),
+    ("ESTABLISHED", "high_receipts"),
+    ("HOMEBASED", "high_receipts"),
+    ("FRANCHISE", "high_receipts"),
+    ("WEBSITE", "high_receipts"),
+    ("ECOMMERCE", "high_receipts"),
+    ("EXPORTS", "high_receipts"),
+    ("HOURS1", "high_receipts"),
+    ("PRMINC1", "high_receipts"),
+    ("NUMOWNERS", "high_receipts"),
+    ("FIPST", "high_receipts"),
+    ("SEX1", "high_receipts"),
+    ("RACE1", "high_receipts"),
+]
+
+CAUSAL_GRAPHS: Dict[str, List[Edge]] = {
+    "adult": ADULT_DAG,
+    "compas": COMPAS_DAG,
+    "snake": SNAKE_DAG,
+    "sbo": SBO_DAG,
+}
 
 
 def as_digraph(edges: List[Edge], columns: List[str]) -> nx.DiGraph:

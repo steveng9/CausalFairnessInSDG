@@ -9,6 +9,7 @@ of fairness mechanisms, SDG methods, and metrics all grow independently.
 
 from __future__ import annotations
 
+import hashlib
 import json
 import sqlite3
 import subprocess
@@ -62,8 +63,23 @@ CREATE TABLE IF NOT EXISTS graph_edges (
 
 
 def get_connection(db_path: "str | Path" = DEFAULT_DB_PATH) -> sqlite3.Connection:
-    conn = sqlite3.connect(str(db_path))
+    """Connection tuned for several batches writing at once.
+
+    Batches are now routinely run in parallel -- one shard per GPU, plus a
+    separate dataset batch on CPU -- and they all land in this one file. The
+    default 5 s lock timeout and rollback journal are not enough for that:
+    `log_metric` commits once per metric, so three writers produce a steady
+    stream of short transactions that would otherwise start raising
+    "database is locked" mid-sweep and lose whole runs.
+
+    WAL lets readers (the report writer, any analysis script) run without
+    blocking the writers at all.
+    """
+    conn = sqlite3.connect(str(db_path), timeout=120.0)
     conn.execute("PRAGMA foreign_keys = ON")
+    conn.execute("PRAGMA journal_mode = WAL")
+    conn.execute("PRAGMA busy_timeout = 120000")
+    conn.execute("PRAGMA synchronous = NORMAL")
     init_db(conn)
     return conn
 
@@ -74,17 +90,35 @@ def init_db(conn: sqlite3.Connection) -> None:
 
 
 def _git_commit() -> Optional[str]:
-    try:
-        out = subprocess.run(
-            ["git", "rev-parse", "--short", "HEAD"],
-            capture_output=True,
-            text=True,
-            cwd=Path(__file__).resolve().parents[3],
-            timeout=2,
-        )
-        return out.stdout.strip() or None
-    except Exception:
+    """Code fingerprint for the run, as `<short-sha>` or `<short-sha>-dirty:<h>`.
+
+    HEAD alone is not enough to identify what actually ran. The GAN backbones
+    were developed in the working tree and only committed afterwards, so 227
+    rows in `gan-backbones-2026-07-30` carry a HEAD that *predates the
+    existence of the code that produced them*. Appending a hash of the
+    uncommitted diff makes that case self-evident instead of silently wrong:
+    two runs agree on the fingerprint only if they agree on the source.
+    """
+    root = Path(__file__).resolve().parents[3]
+
+    def _git(*args: str) -> Optional[str]:
+        try:
+            out = subprocess.run(
+                ["git", *args], capture_output=True, text=True, cwd=root, timeout=5
+            )
+            return out.stdout if out.returncode == 0 else None
+        except Exception:
+            return None
+
+    head = (_git("rev-parse", "--short", "HEAD") or "").strip()
+    if not head:
         return None
+    # Tracked-file changes only; untracked files are noise (logs, results, data).
+    diff = _git("diff", "HEAD")
+    if diff:
+        digest = hashlib.sha1(diff.encode("utf-8", "replace")).hexdigest()[:8]
+        return f"{head}-dirty:{digest}"
+    return head
 
 
 def insert_run(
