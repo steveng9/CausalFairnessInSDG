@@ -34,11 +34,14 @@ except ImportError:
 try:
     from ..sdg.decaf_variants import (
         DECAFCTGANMethod,
+        DECAFDiffusionMethod,
         DECAFDPCTGANMethod,
+        DECAFDPDiffusionMethod,
         DECAFDPGANMethod,
     )
 except ImportError:
     DECAFCTGANMethod = DECAFDPCTGANMethod = DECAFDPGANMethod = None
+    DECAFDiffusionMethod = DECAFDPDiffusionMethod = None
 
 SDG_METHODS: Dict[str, SDGMethod] = {
     "mst": MST(), "privbayes": PrivBayes(), "aim": AIM(), "privsyn": PrivSyn(),
@@ -52,6 +55,11 @@ if DECAFDPGANMethod is not None:
     SDG_METHODS["decaf_dpgan"] = DECAFDPGANMethod()
     SDG_METHODS["decaf_ctgan"] = DECAFCTGANMethod()
     SDG_METHODS["decaf_dpctgan"] = DECAFDPCTGANMethod()
+if DECAFDiffusionMethod is not None:
+    # Diffusion backbone: `decaf_dpdiffusion` is genuinely private (DP-SGD on
+    # the whole denoiser); `decaf_diffusion` is not, like `decaf_ctgan`.
+    SDG_METHODS["decaf_diffusion"] = DECAFDiffusionMethod()
+    SDG_METHODS["decaf_dpdiffusion"] = DECAFDPDiffusionMethod()
 
 
 #: `eval_reference` value meaning "compute fairness metrics against *both*

@@ -98,10 +98,48 @@ A search of work from the last 3 years (below) turned up nothing that fills gaps
 - **Quantitative Auditing of AI Fairness with DP Synthetic Data** (arXiv 2504.21634) —
   uses DP synthetic data to *audit* fairness of other models, not to generate fair data.
 
-Net: no paper in this window builds and evaluates DECAF-style, multi-definition causal
-fairness edge-surgery on PrivBayes, AIM, or MWEM-PGM. PreFair remains the only
-implemented graphical/marginal fair-SDG method, and only for MST with one fairness
-definition.
+### Diffusion backbones (search conducted 2026-08-12)
+
+Relevant to the `decaf_diffusion`/`decaf_dpdiffusion` backbone work (see
+`notes/2026-08-12-decaf-diffusion-backbone.md`): does anyone already put a DECAF-style
+causal generator, or its edge-removal fairness mechanism, on a diffusion backbone?
+
+- **CausalDiffTab** (arXiv 2506.14206, June 2025) — mixed-type tabular diffusion
+  conditioned on a causal DAG, generating column-by-column in topological order much
+  like DECAF's masked sub-networks. Targets generation **fidelity/causal-fit**, not
+  fairness — no edge-removal, no surrogate substitution, no protected attribute at all.
+- **TabSCM** (arXiv 2604.22337, 2026) — same causal-DAG-first decomposition: conditional
+  diffusion for continuous parents-conditioned variables, gradient-boosted trees for
+  categorical ones, KDE/frequency for roots. ~583x faster to train than joint diffusion
+  baselines because each per-variable model is small. Also fidelity/validity-focused
+  (privacy evaluated only via DCR, not a DP mechanism); no fairness notion.
+- **TableDiffusion** (github.com/gianlucatruda/TableDiffusion) and **DP-TLDM**
+  (arXiv 2403.07842) and **DP-FinDiff** — DP-SGD-trained diffusion models for tabular
+  data. None are causal-DAG-structured; they denoise the whole row jointly (or a latent
+  encoding of it), so there is no per-edge object to cut for fairness.
+- **FLIP** (arXiv 2508.21815, already listed above) — transformer VAE + latent diffusion
+  with HSIC/CKA independence penalties under RDP. The closest existing
+  fairness+DP+diffusion combination, but fairness is an HSIC independence penalty on
+  learned latents, not DECAF's causal edge-removal/surrogate-substitution mechanism, and
+  there's no explicit DAG.
+- **Privacy-Preserving Fair Synthetic Tabular Data** (arXiv 2503.02968) — combines
+  privacy and fairness constraints, explicitly framed as unexplored territory by its own
+  authors, but the backbone is WGAN-GP (not diffusion) and it doesn't use a causal DAG
+  or DECAF's mechanism.
+
+Net (diffusion): the causal-DAG-conditioned-diffusion idea itself is not novel
+(CausalDiffTab, TabSCM already do it, for fidelity). DP diffusion for tabular data is
+not novel (TableDiffusion, DP-TLDM, DP-FinDiff). But **DECAF's specific per-attribute
+masked generator plus FTU/DP/CF edge-removal and surrogate substitution, implemented on
+a diffusion backbone — DP-SGD-trained or not — has not been published.** It also isn't
+a drop-in swap of a stock joint TabDDPM: fairness surgery needs a per-edge input to cut,
+which only the CausalDiffTab/TabSCM-style per-attribute conditional decomposition
+provides, not a model that denoises every column at once.
+
+Net (overall): no paper in either search window builds and evaluates DECAF-style,
+multi-definition causal fairness edge-surgery on PrivBayes, AIM, or MWEM-PGM, nor on a
+diffusion generator. PreFair remains the only implemented graphical/marginal fair-SDG
+method, and only for MST with one fairness definition.
 
 ## Implemented SDG targets
 
@@ -140,6 +178,10 @@ pytest tests/ -m "not slow"     # excludes DECAF's real-GAN-training tests
 Core SDG methods (MST, PrivBayes, AIM, PrivSyn, DECAF) and all four fairness mechanisms
 (FTU/DP/CF/DF) are implemented and tested on Adult and COMPAS; `scripts/run_smoke_test.py`
 runs the full grid end-to-end. See `initial_ideas.txt` for the original brainstorm this
-project grew from. Not yet done: PrivTree, final dataset/metric/settings decisions for the
-paper's actual experiments, and the DP-budget-savings research question from the original
-notes.
+project grew from. Beyond the original GAN backbone, DECAF now also has DP-GAN and CTGAN
+backbones (`notes/2026-07-30-decaf-gan-backbones.md`) and a diffusion backbone is in
+progress (`notes/2026-08-12-decaf-diffusion-backbone.md`), so the DECAF side of the grid
+is becoming a backbone sweep (GAN / DP-GAN / CTGAN / diffusion / DP-diffusion) in its own
+right, in addition to the graphical-method side (MST/PrivBayes/AIM/PrivSyn). Not yet done:
+PrivTree, final dataset/metric/settings decisions for the paper's actual experiments, and
+the DP-budget-savings research question from the original notes.

@@ -1,27 +1,31 @@
-"""DECAF with its GAN backbone swapped out.
+"""DECAF with its generative backbone swapped out.
 
-Three `SDGMethod`s, all keeping DECAF's causal generator structure and its
+Five `SDGMethod`s, all keeping DECAF's causal generator structure and its
 generation-time fairness mechanism (`biased_edges` surrogate-value
 substitution) so FTU/DP/CF mean exactly what they mean for the baseline, and
 all varying only *how the generator is trained or parameterized*:
 
-  `decaf_dpgan`    stock DECAF's causal generator, trained with DP-SGD on the
-                   discriminator. **Private** -- this is the only DECAF variant
-                   with a real epsilon, so it is the one that can be compared
-                   against MST/PrivBayes/PrivSyn at matched privacy budgets.
-  `decaf_ctgan`    CTGAN's representation and training procedure (one-hot
-                   blocks, gumbel-softmax heads, conditional vectors,
-                   training-by-sampling, PacGAN critic). **Not private** --
-                   this variant exists to fix DECAF's fidelity, not its privacy.
-  `decaf_dpctgan`  both: the CTGAN representation trained under DP-SGD.
+  `decaf_dpgan`       stock DECAF's causal generator, trained with DP-SGD on
+                      the discriminator. **Private**.
+  `decaf_ctgan`       CTGAN's representation and training procedure. **Not
+                      private** -- exists to fix DECAF's fidelity.
+  `decaf_dpctgan`     both: the CTGAN representation trained under DP-SGD.
+  `decaf_diffusion`   a per-attribute conditional DDPM instead of a GAN
+                      sub-network, trained by plain supervised noise-
+                      prediction regression. **Not private**.
+  `decaf_dpdiffusion` the same DDPM trained under DP-SGD. **Private** -- and
+                      structurally simpler than `decaf_dpgan`'s DP story,
+                      since there's no discriminator/post-processing split
+                      to reason about (see `_decaf_diffusion.py`).
 
 Why the baseline in `decaf.py` is untouched: its rows in `experiments.db` are
 the published-DECAF reference point, and they need to stay reproducible. These
 are additive.
 
-See `_decaf_dp.py` for the privacy argument and the three deviations DP-SGD
-forces on the WGAN training loop, and `_decaf_ctgan.py` for the block-level
-lift of the causal generator.
+See `_decaf_dp.py` for the GAN privacy argument and the three deviations
+DP-SGD forces on the WGAN training loop, `_decaf_ctgan.py` for the
+block-level lift of the causal generator, and `_decaf_diffusion.py` for the
+diffusion backbone and its own (simpler) DP argument.
 """
 
 from __future__ import annotations
@@ -38,6 +42,7 @@ from .base import SDGMethod, SDGResult
 
 try:
     from ._decaf_ctgan import ColumnBlocks, CTGANCausalTrainer
+    from ._decaf_diffusion import DDPMCausalTrainer
     from ._decaf_dp import DPCausalGANTrainer
 except ImportError as exc:  # pragma: no cover - only without the decaf extra
     _IMPORT_ERROR: Optional[ImportError] = exc
@@ -373,4 +378,109 @@ class DECAFDPCTGANMethod(DECAFCTGANMethod):
         "sbo": {
             "max_epochs": 60, "batch_size": 256, "pac": 1, "use_conditional": False,
         },
+    }
+
+
+class DECAFDiffusionMethod(_BaseDECAFVariant):
+    """DECAF's causal structure over a per-attribute conditional DDPM.
+
+    Not private -- like `decaf`/`decaf_ctgan`, `epsilon`/`delta` are accepted
+    only for interface parity and logged as NULL.
+
+    Settings below are an untuned starting point, not a measured setting --
+    unlike the GAN backbones' tables, no epoch/timestep sweep has been run
+    yet. Sweep before quoting any number from this method (see
+    `notes/2026-08-12-decaf-diffusion-backbone.md`).
+    """
+
+    name = "decaf_diffusion"
+    is_private = False
+
+    settings = {
+        "compas": {"max_epochs": 100, "batch_size": 128, "timesteps": 50},
+        "adult": {"max_epochs": 100, "batch_size": 256, "timesteps": 50},
+        "snake": {"max_epochs": 100, "batch_size": 256, "timesteps": 50},
+        "sbo": {"max_epochs": 100, "batch_size": 256, "timesteps": 50},
+    }
+
+    #: Subclass hook -- the DP variant flips this.
+    _dp = False
+
+    def fit_generate(
+        self,
+        data: pd.DataFrame,
+        domain: Dict[str, int],
+        roles: AttributeRoles,
+        fairness_mechanism: FairnessMechanism,
+        epsilon: float,
+        delta: float,
+        n_synth: int,
+        seed: Optional[int] = None,
+        dataset_name: Optional[str] = None,
+    ) -> SDGResult:
+        self._require_backend()
+        columns, col_index, dag, dag_seed = self._dag(data, dataset_name)
+        cfg = self._settings_for(dataset_name)
+        codes = data.to_numpy()
+        blocks = ColumnBlocks(columns, domain)
+
+        key = (
+            "dpdiffusion" if self._dp else "diffusion",
+            hashlib.sha1(np.ascontiguousarray(codes).tobytes()).hexdigest(),
+            tuple(tuple(e) for e in dag_seed),
+            seed,
+            round(float(epsilon), 6) if self._dp else None,
+            round(float(delta), 12) if self._dp else None,
+            tuple(sorted(cfg.items())),
+        )
+
+        def build():
+            trainer = DDPMCausalTrainer(blocks, dag_seed, **cfg)
+            if self._dp:
+                trainer.fit_dp(codes, epsilon=epsilon, delta=delta, seed=seed or 0)
+            else:
+                trainer.fit(codes, seed=seed or 0)
+            return trainer
+
+        trainer = self._cached(key, build)
+
+        biased_edges = self._biased_edges(fairness_mechanism, dag, roles, col_index)
+        rng = np.random.default_rng(seed)
+        out = trainer.generate(n_synth, biased_edges=biased_edges, rng=rng)
+
+        synth = pd.DataFrame(out, columns=columns)
+        for col in columns:
+            synth[col] = synth[col].clip(0, domain[col] - 1).astype(int)
+        extra = {}
+        if self._dp:
+            extra = {
+                "noise_multiplier": trainer.noise_multiplier,
+                "dp_steps": trainer.steps_taken,
+                "spent_epsilon": getattr(trainer, "spent_epsilon", None),
+            }
+        return SDGResult(
+            synthetic_data=synth, graph_edges=list(dag.edges), extra=extra
+        )
+
+
+class DECAFDPDiffusionMethod(DECAFDiffusionMethod):
+    """The per-attribute DDPM trained under DP-SGD.
+
+    Unlike `decaf_dpgan`/`decaf_dpctgan`, this needs none of the GAN privacy
+    deviations (no gradient penalty vs. weight clipping tradeoff, no disabled
+    ADS-GAN term, no conditional-vector soundness gap) -- there is one
+    network and one supervised loss, so the whole per-sample gradient is
+    clipped and noised every step. See `_decaf_diffusion.py` for the argument.
+    """
+
+    name = "decaf_dpdiffusion"
+    is_private = True
+    _dp = True
+
+    # Same caveat as the non-private settings: untuned starting point.
+    settings = {
+        "compas": {"max_epochs": 100, "batch_size": 128, "timesteps": 50},
+        "adult": {"max_epochs": 100, "batch_size": 256, "timesteps": 50},
+        "snake": {"max_epochs": 100, "batch_size": 256, "timesteps": 50},
+        "sbo": {"max_epochs": 100, "batch_size": 256, "timesteps": 50},
     }

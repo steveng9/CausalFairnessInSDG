@@ -53,12 +53,15 @@ from report_results import write_report  # noqa: E402
 DEFAULT_BATCH = "overnight-2026-07-30"
 
 #: Default grid: the three DP graphical synthesizers plus the published DECAF
-#: baseline. The DECAF GAN-backbone variants (`decaf_dpgan`, `decaf_ctgan`,
-#: `decaf_dpctgan`) are deliberately *not* here -- select them explicitly with
-#: `--methods`, so re-running or resuming an existing batch never silently
-#: grows the grid underneath it.
+#: baseline. The DECAF backbone-swap variants (GAN and diffusion) are
+#: deliberately *not* here -- select them explicitly with `--methods`, so
+#: re-running or resuming an existing batch never silently grows the grid
+#: underneath it.
 DEFAULT_METHODS = ["mst", "privbayes", "privsyn", "decaf"]
 GAN_BACKBONE_METHODS = ["decaf_dpgan", "decaf_ctgan", "decaf_dpctgan"]
+#: Untuned as of 2026-08-12 -- run an epoch/timestep sweep before trusting
+#: numbers from these two (see notes/2026-08-12-decaf-diffusion-backbone.md).
+DIFFUSION_BACKBONE_METHODS = ["decaf_diffusion", "decaf_dpdiffusion"]
 
 MECHANISMS = ["none", "ftu", "dp", "cf"]
 EPSILONS = [1.0, 10.0, 1000.0]
@@ -198,12 +201,16 @@ ROLE_CONFIGS: Dict[str, List[RoleConfig]] = {
 
 
 def _is_gan(method: str) -> bool:
-    """GAN-backed methods cache one trained model per (data, seed, epsilon)."""
-    return method == "decaf" or method in GAN_BACKBONE_METHODS
+    """Torch-trained methods cache one trained model per (data, seed, epsilon).
+
+    Name kept from when the GAN backbones were the only such family;
+    diffusion trainers cache identically.
+    """
+    return method == "decaf" or method in GAN_BACKBONE_METHODS or method in DIFFUSION_BACKBONE_METHODS
 
 
 def _apply_device(device: str) -> None:
-    """Point every GAN-backed method at `device`.
+    """Point every torch-backed DECAF variant at `device`.
 
     The two families take it differently: the DECAF variants pass `device`
     straight through to their torch trainers, while the published DECAF
@@ -211,7 +218,7 @@ def _apply_device(device: str) -> None:
     index. Both are set through the same knobs the grid already records, so
     the choice shows up in `extra_params` rather than being invisible.
     """
-    for name in GAN_BACKBONE_METHODS:
+    for name in (*GAN_BACKBONE_METHODS, *DIFFUSION_BACKBONE_METHODS):
         method = SDG_METHODS.get(name)
         if method is not None:
             method.overrides["device"] = device
@@ -383,8 +390,9 @@ def main() -> int:
     )
     parser.add_argument(
         "--methods", default=",".join(DEFAULT_METHODS),
-        help="comma-separated SDG methods. The DECAF GAN-backbone variants "
-             f"({', '.join(GAN_BACKBONE_METHODS)}) are opt-in so that "
+        help="comma-separated SDG methods. The DECAF backbone-swap variants "
+             f"(GAN: {', '.join(GAN_BACKBONE_METHODS)}; diffusion: "
+             f"{', '.join(DIFFUSION_BACKBONE_METHODS)}) are opt-in so that "
              "resuming an existing batch never grows its grid.",
     )
     parser.add_argument(
