@@ -31,6 +31,7 @@ diffusion backbone and its own (simpler) DP argument.
 from __future__ import annotations
 
 import hashlib
+import math
 from typing import Any, Dict, List, Optional, Sequence, Tuple
 
 import numpy as np
@@ -451,13 +452,30 @@ class DECAFDiffusionMethod(_BaseDECAFVariant):
         synth = pd.DataFrame(out, columns=columns)
         for col in columns:
             synth[col] = synth[col].clip(0, domain[col] - 1).astype(int)
-        extra = {}
+        extra: Dict[str, Any] = {}
         if self._dp:
-            extra = {
+            extra.update({
                 "noise_multiplier": trainer.noise_multiplier,
                 "dp_steps": trainer.steps_taken,
                 "spent_epsilon": getattr(trainer, "spent_epsilon", None),
-            }
+            })
+        # Training-health provenance -- every row sharing this cached trainer
+        # (all role configs x mechanisms for this dataset/seed/epsilon) gets
+        # the same numbers, same convention as the epoch-count provenance
+        # above. A flat/NaN loss here means the model never learned anything
+        # and every fidelity/fairness number downstream of it is noise, not
+        # signal -- see notes/2026-08-12-decaf-diffusion-backbone.md.
+        loss_hist = getattr(trainer, "loss_history", None)
+        if loss_hist:
+            extra.update({
+                "diffusion_initial_loss": loss_hist[0],
+                "diffusion_final_loss": loss_hist[-1],
+                "diffusion_min_loss": min(loss_hist),
+                "diffusion_loss_has_nan": float(
+                    any(not math.isfinite(v) for v in loss_hist)
+                ),
+                "diffusion_loss_improved": float(loss_hist[-1] < loss_hist[0]),
+            })
         return SDGResult(
             synthetic_data=synth, graph_edges=list(dag.edges), extra=extra
         )

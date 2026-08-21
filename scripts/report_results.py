@@ -239,6 +239,44 @@ def build_markdown(df: pd.DataFrame, batch: Optional[str]) -> str:
             "",
         ]
 
+    diffusion = df[df["sdg_method"].isin(["decaf_diffusion", "decaf_dpdiffusion"])]
+    if not diffusion.empty and "diffusion_final_loss" in diffusion.columns:
+        health_cols = [
+            "dataset", "sdg_method", "epsilon", "seed",
+            "diffusion_initial_loss", "diffusion_final_loss", "diffusion_min_loss",
+            "diffusion_loss_improved", "diffusion_loss_has_nan",
+        ]
+        health = (
+            diffusion[health_cols]
+            .drop_duplicates(subset=["dataset", "sdg_method", "epsilon", "seed"])
+            .sort_values(["dataset", "sdg_method", "epsilon", "seed"])
+        )
+        bad = health[
+            (health["diffusion_loss_has_nan"] > 0)
+            | (health["diffusion_loss_improved"] < 1)
+        ]
+        lines += [
+            "## Diffusion training health",
+            "",
+            "One row per trained model (a role config x mechanism cell shares the same "
+            "cached trainer and so the same loss curve). `diffusion_loss_improved` = 0 "
+            "means final-epoch loss did not beat first-epoch loss -- the model did not "
+            "converge. `diffusion_loss_has_nan` = 1 means the loss diverged outright. "
+            "Either flags every row trained from that model as untrustworthy.",
+            "",
+            "```",
+            _fmt(health.reset_index(drop=True)),
+            "```",
+            "",
+        ]
+        if not bad.empty:
+            lines += [
+                f"**{len(bad)} of {len(health)} trained models show a training-health "
+                "problem (no improvement or NaN loss) -- treat their fidelity/fairness "
+                "numbers as unreliable until investigated.**",
+                "",
+            ]
+
     failed = df[df["status"] == "failed"]
     if not failed.empty:
         lines += [

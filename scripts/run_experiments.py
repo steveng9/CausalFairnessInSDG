@@ -407,6 +407,14 @@ def main() -> int:
              "on Adult) and, on a box whose CPUs are saturated by other users, "
              "also the politer choice. Marginal methods ignore it.",
     )
+    parser.add_argument(
+        "--breadth-first", action="store_true",
+        help="stable-sort the grid by seed so every cell's trial 0 runs before "
+             "any cell's trial 1, etc. -- full grid coverage as early as "
+             "possible, at the cost of re-hitting the train cache boundary "
+             "once per seed instead of once per (dataset, method). Off by "
+             "default so existing batches keep their original run order.",
+    )
     parser.add_argument("--dry-run", action="store_true")
     parser.add_argument("--results-dir", default=str(REPO_ROOT / "results"))
     parser.add_argument("--db-path", default=str(db.DEFAULT_DB_PATH))
@@ -438,6 +446,11 @@ def main() -> int:
             f"unknown dataset(s) {unknown_ds}; available: {sorted(ROLE_CONFIGS)}"
         )
     configs = build_configs(args.batch, seeds, methods, datasets)
+    if args.breadth_first:
+        # Stable sort: within a seed, the original (dataset, method, role,
+        # mechanism) ordering -- and therefore train-cache locality -- is
+        # preserved; only the seed grouping moves to the outermost position.
+        configs.sort(key=lambda c: c.seed)
     if args.only:
         configs = [
             c for c in configs

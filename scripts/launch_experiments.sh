@@ -12,21 +12,29 @@
 #   - 2 threads per BLAS/OMP/torch pool: without this, numpy and torch each
 #     grab all 48 cores and thrash against everyone else's jobs. Must be set
 #     before numpy/torch are imported, hence here rather than in Python.
-#   - CPU only, no CUDA: DECAF benchmarked the same speed on CPU as on GPU
-#     (17.8s vs 16.3s per Adult epoch), so there's no reason to occupy a GPU
-#     someone else could use.
+#   - GPUs are left visible (no CUDA_VISIBLE_DEVICES override) -- this
+#     reversed on 2026-08-03: under load, the torch-backed DECAF variants are
+#     2-3x faster on GPU than CPU, and it takes nothing from the saturated
+#     CPUs everyone else is competing for. Pass `--device cuda:N` (through
+#     "$@") to actually place a run on GPU N; both RTX 6000 Adas belong to
+#     everyone, so pick an idle one (`nvidia-smi`) and don't claim both
+#     without checking. Marginal methods (MST/PrivBayes/PrivSyn/AIM) ignore
+#     `--device` and stay on CPU regardless.
 #
 # The run is resumable: re-running this script skips configs that already
-# have a done/partial row for the batch tag.
+# have a done/partial row for the batch tag. Set LOG_SUFFIX to give a shard
+# its own log file while sharing one BATCH tag with other shards (e.g. one
+# process per GPU/dataset, all writing into the same batch in the DB).
 set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 CONDA_BASE="${CONDA_BASE:-/home/golobs/miniconda3}"
 CONDA_ENV="${CONDA_ENV:-sdg}"
 BATCH="${BATCH:-overnight-2026-07-30}"
+LOG_SUFFIX="${LOG_SUFFIX:-}"
 
 mkdir -p "$REPO_ROOT/logs" "$REPO_ROOT/results"
-LOG="$REPO_ROOT/logs/${BATCH}.log"
+LOG="$REPO_ROOT/logs/${BATCH}${LOG_SUFFIX:+-$LOG_SUFFIX}.log"
 
 export OMP_NUM_THREADS=2
 export MKL_NUM_THREADS=2
@@ -34,7 +42,6 @@ export OPENBLAS_NUM_THREADS=2
 export NUMEXPR_NUM_THREADS=2
 export VECLIB_MAXIMUM_THREADS=2
 export TORCH_NUM_THREADS=2
-export CUDA_VISIBLE_DEVICES=""
 export PYTHONUNBUFFERED=1
 export TOKENIZERS_PARALLELISM=false
 

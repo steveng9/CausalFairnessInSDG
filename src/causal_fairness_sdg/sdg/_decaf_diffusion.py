@@ -51,7 +51,7 @@ import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from torch.func import functional_call, grad, vmap
+from torch.func import functional_call, grad_and_value, vmap
 
 from ._decaf_ctgan import ColumnBlocks, topological_order
 
@@ -247,6 +247,11 @@ class DDPMCausalTrainer:
 
         self.noise_multiplier: Optional[float] = None
         self.steps_taken = 0
+        #: Per-epoch mean noise-prediction MSE, the only training-health
+        #: signal this trainer had zero visibility into before -- a diverging
+        #: or NaN loss here means the DDPM never learned anything useful and
+        #: every downstream fidelity/fairness number from it is noise.
+        self.loss_history: List[float] = []
 
     def _column_loss(
         self,
@@ -277,6 +282,7 @@ class DDPMCausalTrainer:
         steps_per_epoch = max(1, n // self.batch_size)
 
         for _ in range(self.max_epochs):
+            epoch_losses = []
             for _ in range(steps_per_epoch):
                 idx = rng.integers(0, n, size=self.batch_size)
                 real = data[torch.as_tensor(idx, device=self.device)]
@@ -290,10 +296,13 @@ class DDPMCausalTrainer:
                 self.opt.zero_grad(set_to_none=True)
                 loss.backward()
                 self.opt.step()
+                epoch_losses.append(loss.item())
+            if epoch_losses:
+                self.loss_history.append(float(np.mean(epoch_losses)))
 
     def _private_grads(
         self, real: torch.Tensor, t: torch.Tensor, noise_flat: torch.Tensor
-    ) -> Dict[str, torch.Tensor]:
+    ) -> Tuple[Dict[str, torch.Tensor], float]:
         """Per-sample-clipped, Gaussian-noised gradient of the *whole* column
         loss w.r.t. every model parameter -- the entire network reads private
         data (there is no free discriminator half here), so the entire
@@ -325,8 +334,14 @@ class DDPMCausalTrainer:
                 total = total + F.mse_loss(pred, eps)
             return total / len(spans)
 
-        per_sample = vmap(
-            grad(loss_one), in_dims=(None, None, 0, 0, 0, 0, 0), randomness="different"
+        # `grad_and_value` gets the per-sample loss for free out of the same
+        # forward pass already needed for the per-sample gradient -- pure
+        # training-health diagnostics (see `loss_history`), not part of the
+        # privatized release: it is never clipped, noised, or written
+        # anywhere the accountant tracks, only averaged for logging.
+        per_sample, per_sample_loss = vmap(
+            grad_and_value(loss_one), in_dims=(None, None, 0, 0, 0, 0, 0),
+            randomness="different",
         )(params, buffers, real, t, sab, somab, noise_flat)
 
         n = real.shape[0]
@@ -341,7 +356,7 @@ class DDPMCausalTrainer:
             summed = (g * scale.view(-1, *([1] * (g.dim() - 1)))).sum(dim=0)
             noise = torch.normal(0.0, sigma, size=summed.shape, device=summed.device)
             out[name] = (summed + noise) / n
-        return out
+        return out, float(per_sample_loss.mean().item())
 
     def fit_dp(
         self, codes: np.ndarray, epsilon: float, delta: float, seed: int = 0
@@ -365,6 +380,7 @@ class DDPMCausalTrainer:
 
         step = 0
         for _ in range(self.max_epochs):
+            epoch_losses = []
             for _ in range(steps_per_epoch):
                 # Poisson-style subsampling is what the accountant assumes; a
                 # uniform-without-replacement batch is the standard stand-in
@@ -378,11 +394,15 @@ class DDPMCausalTrainer:
                     real.shape[0], self.blocks.total, device=self.device
                 )
 
+                grads, batch_loss = self._private_grads(real, t, noise_flat)
                 self.opt.zero_grad(set_to_none=False)
-                for name, g in self._private_grads(real, t, noise_flat).items():
+                for name, g in grads.items():
                     dict(self.model.named_parameters())[name].grad = g
                 self.opt.step()
+                epoch_losses.append(batch_loss)
                 step += 1
+            if epoch_losses:
+                self.loss_history.append(float(np.mean(epoch_losses)))
 
         self.steps_taken = step
         self.spent_epsilon = spent_epsilon(self.noise_multiplier, sample_rate, step, delta)
