@@ -24,7 +24,7 @@ Every section heading is collapsible — click the triangle to fold away what yo
 
 | File | What it is |
 |---|---|
-| `data/all_runs.csv` | One row per experiment run (3,000 rows × 187 columns). 2,040 are **active**; 960 are superseded and used only by Section 4.3c. |
+| `data/all_runs.csv` | One row per experiment run (3,480 rows × 195 columns). 2,520 are **active**; 960 are superseded and used only by Section 4.3c. |
 | `data/real_baselines.csv` | Reference accuracies measured on the **real** data. |
 | `data/adult_ctgan_epoch_sweep.csv` | First sweep, diagnosing the DECAF+CTGAN training-length bug (Section 4.3b). |
 | `data/gan_epoch_sweep_all.csv` | Full sweep: all 8 GAN method x dataset combinations, 114 fits (Section 4.3c). |
@@ -45,7 +45,10 @@ the two views as `runs` (active) and `superseded`.
 **What was measured** — fidelity (`tvd_1way`, `tvd_2way`, `avg_correlation_diff`), utility
 (`downstream_accuracy_mlp` / `_lr` / `_rf`), fairness (`fairness_gap`, `cond_fairness_gap`,
 and the per-attribute `dp_gap__*`, `tprb__*`, `tnrb__*`, `cdp_gap__*`, `ctprb__*`, `ctnrb__*`),
-privacy accounting (`spent_epsilon`, `noise_multiplier`, `dp_steps`).
+privacy accounting (`spent_epsilon`, `noise_multiplier`, `dp_steps`), and — for the two
+diffusion methods only — training health (`diffusion_initial_loss`, `diffusion_final_loss`,
+`diffusion_min_loss`, `diffusion_loss_improved`, `diffusion_loss_has_nan`; NaN for every
+other method).
 
 **The Distributional Fairness axis** — every fairness metric appears twice: bare (scored
 against the real holdout) and prefixed `synthref__` (scored against the synthetic data
@@ -61,14 +64,19 @@ Section 2 of the notebook defines all of these in plain language, with worked ex
 | `gan-backbones-2026-07-30` | 840 | DECAF+CTGAN, DECAF+DP-GAN, DECAF+DP-CTGAN (Adult, COMPAS) |
 | `newdata-2026-08-03` | 216 | MST, PrivBayes, PrivSyn on **SNAKE and SBO**, 1 seed. Complete, 0 failures. |
 | `gan-retuned-2026-08-04` | 960 | The GAN family re-run at the swept epoch settings. **Complete** — Adult 480/480, COMPAS 479/480. |
+| `diffusion-fairness-2026-08-21` | 480 | DECAF+Diffusion, DECAF+DP-Diffusion (Adult, COMPAS), 5 seeds, ε ∈ {1, 10, 1000} for the DP variant. **Complete, 0 failures.** Adult and COMPAS only — not run on SNAKE/SBO. |
 
-`all_runs.csv` holds the three Adult/COMPAS batches; the new datasets are in
+`all_runs.csv` holds the four Adult/COMPAS batches; the new datasets are in
 `newdata_runs.csv` because their metric columns differ (different protected attributes).
 `gan-retuned-2026-08-04` supersedes the GAN rows of the first two batches — see `superseded`.
+The diffusion batch is never superseded.
 
-316 runs are `partial` — the generator collapsed to a single outcome class, so downstream
-metrics are undefined. In the active set all of them are DECAF+DP-GAN (168 of 360, 47%); that
-collapse rate is itself the main result of Section 8.
+168 active runs are `partial` — the generator collapsed to a single outcome class, so
+downstream metrics are undefined. All of them are DECAF+DP-GAN (168 of 360, 47%); that
+collapse rate is itself the main result of Section 8. **DECAF+DP-Diffusion has zero partial
+runs (0 of 360)** — the single supervised loss that makes it DP-SGD-able (no discriminator
+split) also makes it not collapse the way DP-GAN's adversarial training does, at any of the
+three ε values tried. See Section 8 of the notebook.
 
 One run failed outright: `compas/prefair/decaf_dpctgan/dp/eps=1/seed=3`, with *"the least
 populated class in y has only 1 member"*. That is a near-total collapse rather than an

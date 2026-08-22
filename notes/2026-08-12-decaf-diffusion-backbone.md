@@ -153,3 +153,15 @@ cuda` reaches their torch trainers the same way it does the GAN backbones.
    for Adult's wide `native-country`), implement proper multinomial diffusion for
    categoricals per TabDDPM/TabSCM instead of the current Gaussian-on-one-hot
    simplification.
+4. **Manuscript TODO: run CausalDiffTab and TabSCM proper (their actual published
+   implementations, not our reimplementation) as an ablation.** §0 above classifies them as
+   "causal-DAG diffusion for fidelity, no fairness mechanism" based on reading the papers,
+   not on running their code. Before that classification goes in the manuscript's related-work
+   table, run each on Adult/COMPAS (or their released code's own benchmark datasets, if that's
+   easier) with no fairness mechanism attached, and compare fidelity (TVD) and downstream
+   accuracy against our `decaf_diffusion`'s `none`-mechanism rows. Two things this settles:
+   (a) confirms the literature survey's classification is accurate rather than a
+   misreading of the papers, and (b) gives an honest fidelity ablation — if a
+   fairness-agnostic causal diffusion model from the literature already matches or beats our
+   `none`-mechanism baseline, that bounds how much of our fidelity result is "diffusion is a
+   good backbone" versus "our specific architecture choices are a good backbone."
