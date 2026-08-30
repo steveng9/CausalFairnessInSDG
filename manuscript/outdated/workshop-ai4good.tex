@@ -1,0 +1,123 @@
+% =====================================================================
+%  AI4Good workshop variant.
+%  Defines everything main.tex pulls in: title, venue string, abstract,
+%  introduction, discussion. Nothing else in the paper changes.
+% =====================================================================
+
+\newcommand{\wkTitle}{Portable Causal Fairness: Graph Surgery for Private
+Synthetic Data \st{I'm just concerned that, despite "fairness" in the first clause, that it might signal privacy on synthetic as the key focus of this paper, which I would think is less applicable to AI4Good, and seems already solved.}}
+
+\newcommand{\wkVenue}{AI for Good}
+
+% ---------------------------------------------------------------- abstract
+\newcommand{\wkAbstract}{%
+Releasing synthetic data in place of real records gives an institution a lever it
+never had over the real thing: it chooses the process that generates the table, and
+can build that process so the unfair pathways are absent. DECAF made this concrete
+by wiring a GAN's generator to a causal graph and severing the edges that carry
+disparity from a protected attribute to an outcome, turning three fairness
+definitions into three sets of edge cuts. The mechanism has never left that one
+architecture, which is a practical problem: an organisation cannot adopt it without
+adopting DECAF's GAN, and that GAN offers neither a privacy guarantee nor
+competitive data quality. Moving it is not a matter of swapping backbones. DECAF cuts edges in a graph
+somebody handed it, after training --- pure post-processing. The differentially
+private synthesizers that dominate real tabular releases have no supplied graph;
+they must buy one from the privacy budget, so the same definition has to be
+enforced \emph{inside} the private structure search. \st{That last DP sentence is perhaps too much detail for the abstract, and not necessarily true (RAP for example, or private-pgm are given graphs. Please stop overstating things. We can sit back a little more.} These are two different
+operations meeting one definition. We implement both and attach all three
+definitions to nine generators from three families (marginals-based, GAN-based and
+diffusion-based, each with differentially private variants) over 2{,}520
+matched-pair runs. The definitions transfer: cutting edges reduces downstream
+disparity in every family, dataset and privacy level, on Adult by $0.055$ of parity
+gap  \st{this is a bad, unintroduced, unimpactful metric for the abstract. Just say something for the result like "we show that the fairness mechanism works well across all generation paradigms, and has <X> general consequences for privacy and <Y> general consequences for utility." That's it. } for under one accuracy point, with no loss at the strongest privacy level we
+test. How much they remove does not, and the cause is structural: a cut can only
+remove disparity the generator's graph encoded, and a graph bought under noise
+encodes less of it \st{remove this. It's just too abstract and specific and nuanced and unsubstantiated for the paper, much less the abstract.}. On Adult, the cut removes $89\%$ of a causal diffusion
+backbone's parity gap but $29\%$ of a marginals synthesizer's. That difference
+decides where the intervention is worth placing. It is also the only fairness
+intervention that ships with the released table, and so the only one the publisher
+can guarantee. \st{this doesn't make sense. Please just simplify the abstract to not have these fabulous, unsubstantiated, speculative details.}%
+}
+
+% ------------------------------------------------------------------- intro
+\newcommand{\wkIntro}{%
+Institutions holding sensitive records increasingly publish a synthetic substitute
+rather than the records themselves: a hospital, a lending regulator or a
+statistical agency fits a generative model and releases a table drawn from it.
+That substitution is usually justified on privacy grounds, but it carries a
+second, less-exploited consequence. Whoever generates the data chooses the
+generating process, and a process can be edited. A disparity that exists in the
+world because of a pathway running from a protected attribute, such as national
+origin, to an outcome, such as whether a loan is approved, need not exist in the
+released table. \st{this is a good paragraph. thank you.}
+
+This is an unusually good place to intervene. Downstream fairness corrections have
+to be applied again by every analyst who touches the release, and a public table
+has consumers its publisher will never meet; an edit to the generating process
+ships with the data \st{didn't find this sentence clear or necessarily true}. But the one mechanism that performs such an edit, DECAF
+\citep{vanbreugel2021decaf}, arrives welded to a GAN that offers no privacy
+guarantee, which is the opposite of what institutions in this position actually
+deploy. An agency already running a differentially private marginals-based
+pipeline cannot adopt causal fairness without replacing its infrastructure with an
+architecture that would degrade both its data quality and its privacy posture. \st{can perhaps mention the high utility of diffusion briefly here, since the intro should be broad.} The capability and the deployment setting have never been in the same system. \st{not sure what this sentence means.}
+
+We ask three questions. Is edge surgery a property of DECAF, or of causal
+factorisation itself --- does the mechanism still work when the generator is not a
+GAN? If a synthesizer is not handed a causal graph but must infer one under a
+privacy budget, what does the same fairness definition even mean, and what does it
+still accomplish \st{make this second question more general, and less making the unnecessary point about how marginals-based have to do something differently to get the graph, like "can this causal graph fairness mechanism be applied to undirected graphs" or "can any generator with features related via a graph have this fairness mechanism applied to it, (directed or undirected)"}? And how does an intervention placed inside the generator compare
+with the established practice of correcting fairness downstream, on identical data?
+\S\ref{sec:related} places these against what exists, \S\ref{sec:method} states
+what we built, and \S\ref{sec:results} answers them.%
+}
+
+% -------------------------------------------------------------- discussion
+\newcommand{\wkDiscussion}{%
+\textbf{The cut is only as strong as the graph it is given.} DECAF severs edges in
+a causal DAG \st{I know DAG is a common acronym among some, but for the AI4good venue, can we spell it out in the intro when we first mention it?} that somebody supplied, at sampling time  \st{are you doubly-sure that DECAF doesn't have some mechanism to choose / build the graph?}. A differentially private
+marginals-based synthesizer is supplied with nothing: it buys a structure out of
+the privacy budget, so the same definition has to be enforced during structure
+selection, against whatever graph the noise could afford. That is why the
+definitions port cleanly while what they accomplish does not, and the limiting
+case is stark \st{this whole sentence is weirdly imprecise and confusing. I would think the definitions are ported differently depending on the way the generator engages with / builds a graph, but the definition is similar.}. Fairness through unawareness (FTU) on MST is a literal no-op in all $45$ matched
+Adult pairs, because the direct protected-to-income edge \st{I'm saying this again: we need to offer more clearly what the features are classified as and what the graph connections tend to be, so that we can see this in action.} is one the private
+structure search never buys; the constraint is satisfied before it is imposed.
+This reframes what an audit should ask for. Knowing which generator produced a
+release tells you little. Knowing the graph it sampled along, and which attributes
+were nominated admissible, tells you almost everything \st{I don't think our results substantiate this... geeze. Please be more careful, and precise and less vague.}, and on Adult moving
+between our three role splits changes what conditional fairness accomplishes by
+$0.033$, against $0.002$ for moving between architectures \st{what is this sentence??}. The decisive choice is
+the one a person makes about which explanations are legitimate, not the one an
+engineer makes about an objective \st{what??}.
+
+\textbf{A cut inside the generator competes with downstream mitigation, and is the
+only one the publisher can guarantee.} We ran an existing benchmark of eight
+fairness mitigators \citep{angelozzi2026where} on the same synthesizer, splits,
+privacy levels, classifier and metric, and added our in-generator cut as a stage it
+does not have. Where the generator encoded the disparity in the first place, the
+cut is the strongest intervention available: on Adult at $\varepsilon{=}1$ it
+removes $89\%$ of the parity gap, more than any of the eight that leaves a usable
+model behind --- calibrated equalised odds, the nearest such competitor, removes
+$71\%$ and keeps $2.6$ more points of accuracy. (Two of the eight score better on
+paper only by destroying the model, which is the subject of the next point.) Where the generator did not encode it --- COMPAS, where the privately
+selected structure barely carries the protected-to-outcome dependence --- there is
+little to sever and downstream mitigators do better, exactly as the argument above
+predicts. So the honest summary is that the two are complements whose relative
+value depends on what the graph captured. What is not symmetric is enforceability:
+a downstream mitigator is applied by whoever trains a model, and a released table
+is trained on by analysts the publisher will never meet, whereas a cut inside the
+generator ships with the table. Fairness that depends on every future consumer
+doing the right thing is not a property of the release.
+
+\textbf{A fairness number without a utility number beside it is unfalsifiable.} \st{This conclusion feels a little weak and uninteresting + unsubstantiated... It's perhaps too niche to be of interest. Anything else revealing / impactful / novel beyond what DECAF shows?}
+Every metric here rewards a table for containing no disparity, and a table that
+teaches a classifier nothing contains none. This is not a hypothetical: in the
+benchmark above, learned fair representations score a perfect parity gap of
+exactly $0.000$ on Adult by predicting a single class for every row --- zero
+recall, accuracy equal to the majority-class rate --- at both privacy levels, and
+the fairness metric alone cannot tell that apart from a genuine success. Nor is the
+trap ours to point at from a safe distance: our own most fairness-favourable cell
+falls into it too, which is how we found it. Reporting utility beside every
+fairness number is what makes the fairness number mean anything, and it costs one
+extra evaluation on data the publisher already holds.%
+}

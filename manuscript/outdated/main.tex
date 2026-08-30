@@ -1,0 +1,410 @@
+\documentclass{article}
+
+% =====================================================================
+%  WORKSHOP SWITCH -- uncomment exactly ONE of the two lines below.
+%  Everything that differs between the two submissions (title, venue
+%  string, abstract, intro, discussion) lives in that file; the rest of
+%  this document is shared verbatim.
+% =====================================================================
+\newcommand{\WKFILE}{workshop-ai4good}
+%\newcommand{\WKFILE}{workshop-privacy}
+% =====================================================================
+
+% ---------------------------------------------------------------------
+%  ANONYMITY SWITCH.  `dblblindworkshop` prints "Anonymous Author(s)"
+%  and ignores the \author block below entirely, so the real names can
+%  stay in the source at all times.  For a single-blind venue or the
+%  camera-ready, swap in `sglblindworkshop` and the block prints.
+% ---------------------------------------------------------------------
+\usepackage[dblblindworkshop]{neurips_2026}
+%\usepackage[sglblindworkshop]{neurips_2026}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{hyperref}
+\usepackage{url}
+\usepackage{booktabs}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{nicefrac}
+\usepackage{microtype}
+\usepackage{xcolor}
+\usepackage{graphicx}
+
+\input{\WKFILE}
+
+\title{\wkTitle}
+\workshoptitle{\wkVenue}
+
+\author{%
+  Steven Golob\thanks{Corresponding author.} \\
+  University of Washington Tacoma \\
+  \texttt{golobs@uw.edu} \\
+  \And
+  Sikha Pentyala \\
+  University of Washington Tacoma \\
+  \And
+  Martine De Cock \\
+  University of Washington Tacoma \\
+}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+\wkAbstract
+\end{abstract}
+
+% =====================================================================
+\section{Introduction}
+% =====================================================================
+\wkIntro
+
+% =====================================================================
+\section{Background and related work}
+\label{sec:related}
+% =====================================================================
+
+\paragraph{DECAF: fairness as graph surgery.}
+DECAF \citep{vanbreugel2021decaf} generates fair synthetic tables from a GAN whose
+generator is \emph{factored} along a causal DAG: the joint distribution over
+columns is written as a product of conditionals, $P(X) = \prod_i P(X_i \mid
+\mathrm{pa}(X_i))$, with $\mathrm{pa}(X_i)$ the columns the graph draws as parents
+of column $X_i$. It is \st{"similar to" (since marginals-based and MST don't always use conditionals. } the decomposition a marginals-based synthesizer such as MST
+is also fitting. DECAF gives each column its own sub-network reading only
+$\mathrm{pa}(X_i)$. The $d$ sub-networks share hidden layers and are trained
+jointly against a \emph{single} \st{why is this emphasized, italisized, or even elaborated on?? This is not important to the point of this work.} sdiscriminator that scores the assembled row: DECAF's
+objective is a minimax game between the set $\{G_i\}_{i=1}^{d}$ and one $D$, so
+there is no per-column critic. A parent can therefore be severed at generation time
+by substituting an independently drawn surrogate, leaving the generator
+structurally unable to use that pathway and requiring no retraining.
+
+Which edges to sever turns a fairness \emph{definition} into an \emph{algorithm},
+and DECAF supplies three (Figure~\ref{fig:pruning}). \textbf{FTU} (fairness through
+unawareness) cuts only the direct edge $S \rightarrow Y$; \textbf{DemPar}
+(demographic parity)\footnote{DECAF abbreviates demographic parity as ``DP''. We
+write \textbf{DemPar} throughout and reserve \textbf{DP} for differential privacy.} cuts every
+directed path $S \rightsquigarrow Y$; \textbf{CF} (conditional fairness) cuts only
+paths avoiding an \emph{admissible} attribute, sparing disparity routed through a
+factor deemed legitimate. DECAF's own illustration is the clearest:
+$\textit{Education} \rightarrow \textit{Resume} \rightarrow \textit{Job}$ is
+worth keeping \st{say that resume is the "admissible feature" to keep that language prominant to be helpful to the reader.}, $\textit{Race} \rightarrow \textit{Postcode} \rightarrow
+\textit{Loan}$ is redlining and is not. The machinery is unusually clean and
+unusually confined: DECAF is a single GAN trained on the standard minimax
+objective, and it carries no privacy guarantee \st{what the heck does that second clause, after the colon, have to do with the first?? Why do you keep emphasizing the architecture of the GAN? This can be just simplified to "The graph-cutting machinary is unusually clean" or something else that fits nicer.}.
+
+\paragraph{Related approaches.}
+PreFair \citep{pujol2023prefair} attacks the other half, adapting
+\emph{justifiable fairness} \st{where did this come from? Can you actually relate it back (or just use instead) the fairness definitions / verbage from the previous paragraph (and the accompanying figure)?} to MST \citep{mckenna2021mst} by excluding offending
+edges from candidacy \emph{before} the private structure search runs, so no budget
+is spent \st{again, this is too detailed and not necessarily relevant. It might be okay to say later this point somewhere, since those familiar with DP could find it useful.  But here, you haven't even introduced DP yet, so it's kindof a meaningless point / wasted text in this particular spot? You could perhaps add one very brief para inbetween this and the previous DECAF / edge surgery mechanisms paras on DP?} measuring a marginal that will be discarded; it implements one coarse
+condition \st{use "one fairness definition / mechanism" instead. Please try to use consistent language throughout and stay clear, and not reference things unclearly.}, and is neither built nor evaluated for any synthesizer other than MST.
+Causal-DAG diffusion generates column-by-column much as DECAF does but targets
+fidelity, with no protected attribute and no edge removal
+\citep{zhang2025causaldifftab,jacob2026tabscm}, while private tabular diffusion
+denoises the row jointly \st{why is "denoises the row jointly" in here?? Doesn't really add anything useful / relevant.}, leaving no per-edge object to cut \st{it's clearer and more direct to just say that these are not based on causal graphs, and so cannot have this particular fairness mechanism applied.} \citep{zhu2024dptldm}.
+Work that does combine privacy with fairness enforces it on a learned
+\emph{representation} \st{I have no idea what you are emphasizing "representation" for, or even what you mean by "representation"... this is not clear to a reader.} \citep{hyrup2025flip,sarmin2025pfwgan}, with an LLM backbone
+\citep{nagesh2025faircausesyn}, on a structure learned without a fairness
+objective \citep{jia2025pradagan}, or \emph{downstream} of the synthesizer
+\citep{angelozzi2026where}. None exposes an explicit edge.
+
+\paragraph{The gap.}
+Nobody has asked whether DECAF's edge surgery is a property of \emph{DECAF} or of
+\emph{causal factorisation}. DECAF conjectures the latter twice, calling the
+method ``directly
+extendable to the more stable WGAN-GP \citep{gulrajani2017wgangp} and other
+generative models'', but does not test this claim. If this holds, the mechanism should transfer to any generator
+factored along a graph, including the marginals-based synthesizers that dominate
+private tabular data \citep{mckenna2021mst,zhang2014privbayes,zhang2021privsyn,
+mckenna2022aim} and including diffusion, the current tabular quality leader and
+reported superior to GAN and VAE alternatives \citep{kotelnikov2023tabddpm}.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\textwidth]{figs/pruning.pdf}
+  \caption{Three fairness definitions as three sets of severed edges, acting on the
+  graph the data is \emph{generated} from, not on the model trained afterwards.
+  $S$ is the protected attribute, $Y$ the outcome, $A$ an \emph{admissible}
+  attribute whose influence is deemed legitimate, and $Z$ a proxy. Dashed red edges
+  are severed. DemPar removes every directed $S \rightsquigarrow Y$ path; CF removes
+  only those that avoid $A$, so the route $S \rightarrow A \rightarrow Y$ survives. \st{in the figure, it's not clear that, for DemPar and CF, that while the path S ~ Y needs to be removed, are we sure that it's the EARLIER edges in the path that get cut (i.e. SA, SZ, rather than AY, ZY)? Just making sure.}}
+  \label{fig:pruning}
+\end{figure}
+
+% =====================================================================
+\section{Porting the mechanisms}
+\label{sec:method}
+% =====================================================================
+
+We implement FTU, DemPar and CF against one interface and attach it to nine
+generators from three unrelated families.
+
+\textbf{Marginals-based} synthesizers (MST, PrivBayes, PrivSyn) measure low-order
+marginals under differential privacy and fit a graphical model to the noisy
+counts \st{this sentence needs to be clearer to a social-good, non-statistics-educated audience, like "MB synthesizers measure marginals between features of the real data, and a graph forms with thise marginals as edges. Which marginals get chosen, and how noisy / perturbed to make those marginals, depends on how strong the DP budget" or something to that effect / level of detail.}. A fairness definition becomes a \emph{constraint on structure search} \st{italics not needed. "constraint on the search for which marginals to choose".}: a
+filter over candidate marginals, plus a check applied at each selection step. It
+must be incremental because admissibility is a property of paths, not edges, so
+whether a candidate creates a forbidden protected-to-outcome path depends on what
+is already selected. A severed edge is therefore never measured, making the
+constraint free in the privacy accounting rather than merely cheap. \st{need a comment (maybe only here, and not in the previous section as suggested by me earlier) about how the edge cuts apply whether the edge is directed or undirected. Since this is the protocol / method section, we can be precise.d}
+\textbf{Causal GANs} (DECAF, plus CTGAN-based \citep{xu2019ctgan} and DP-SGD
+\citep{abadi2016dpsgd} variants) use DECAF's surrogate substitution unchanged.
+\textbf{Causal diffusion} keeps the factorisation and replaces each sub-network
+with a small denoiser trained by supervised noise prediction; the cut is the same
+code path, because what exposes an edge is that $X_i$ has its own network reading
+only $\mathrm{pa}(X_i)$, true whether that network is trained adversarially or by
+denoising.
+
+\paragraph{Protocol.} \st{Is protocol the right word here? It could be. I just don't know if it's commonly used to mean like "settings" or "experiment setup" or the type of things being described here.}
+The Adult \citep{becker1996adult} and COMPAS \citep{angwin2016machinebias}
+datasets; nine
+generators; four mechanisms (\textsc{none}/FTU/DemPar/CF); $\varepsilon \in
+\{1,10,1000\}$ at $\delta = 10^{-9}$ for the six generators carrying a
+differential-privacy guarantee \citep{dwork2006calibrating}; three
+protected/admissible role splits per dataset; five seeds; 2{,}520 completed runs.
+One Adult split reproduces DECAF's own setup (protected \texttt{sex}; admissible
+\texttt{occupation}, \texttt{hours-per-week}, \texttt{workclass},
+\texttt{education}), one follows PreFair's Table~1, and one is deliberately
+strict; COMPAS is absent from DECAF's evaluation, so its splits follow PreFair and
+two variants.  \st{not sure what the rest of this paragraph is about, and seems to not be true for the marginals-based methods, which I thought select the graph automatically, not by hand... "nothing depends on that graph being correct" doesn't make any sense to me... I have no idea what you're saying about "provenance".} The causal DAG for each dataset is \emph{asserted by hand} from
+domain knowledge rather than learned from the data --- the standard practice in this
+literature, and the one DECAF, \citet{kusner2017counterfactual} and
+\citet{zhang2017causalframework} all follow. Nothing below depends on that graph
+being correct, only on it being held fixed across the runs being compared;
+\S\ref{sec:discussion} returns to what the graph's provenance means for an audit.
+
+\paragraph{Metrics.}
+Fidelity is \st{"measured using"} 1-way and 2-way \st{x-way what??} total variation distance to the real table \st{is TVD averaged over every single possible 2-way feature pair in the set of features? When you add this explaination (among others) to add clarity, do not convolute with a ton of detail, but try to be concise and efficient in how you present it, since this will be a spot where readers come to get the details they need to understand what we measured, how we measured it, rather than reading linearly to get an overall idea.}. Utility
+is the accuracy of an MLP trained on synthetic data and tested on a real held-out
+30\%, reported as lift over the \st{"simply predicting the"} majority-class rate so that a generator with no
+signal scores zero \st{what is the MLP doing? Are you predicting some outcome / label feature?}. Fairness is that MLP's worst-case demographic-parity gap over
+the protected attributes, evaluated against real held-out people, which is DECAF's
+DF-\textsc{original} reference; conditional parity and positive/negative-rate
+balance are also recorded, and every fairness result below reproduces on all four \st{this fairness stuff still doesn't make sense to me, how it's being explained. Very poor, unclear. What does parity mean? Too many liberties are taken here, and this is the most important part. I think maybe give a quick concrete example of "parity gap" (for an AI4Good reader) since it is used over and over.}.
+
+Throughout, \textbf{parity-gap reduction} means the amount of that fairness gap a
+mechanism removes, in gap units \st{gap units? what??}, and \textbf{fraction removed} means that
+reduction divided by the gap the same generator left with no mechanism. We keep
+the two separate because they disagree, and \S\ref{sec:results} turns on the
+disagreement. Neither is a statement about fidelity, utility or privacy; those are
+reported separately. Seed
+noise rivals the parity-gap reductions themselves (median within-cell SD $0.031$
+on Adult, $0.092$ on COMPAS), so every number below is a \textbf{matched-pairs}
+difference:
+each run is differenced against the run identical in dataset, generator,
+$\varepsilon$, role split \emph{and seed} but with no \st{"fairness"} mechanism.
+
+% =====================================================================
+\section{Results}
+\label{sec:results}
+% =====================================================================
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\textwidth]{figs/results.pdf}
+  \caption{\textbf{(a,\,b)} every generator with no fairness mechanism, averaged
+  over $\varepsilon$, role splits and seeds. A bar at zero in (b) means the data
+  taught a model nothing, and a table with no signal has no disparity left to
+  remove. \textbf{(c)} the matched-pairs parity-gap reduction from CF at each
+  privacy level, for the two families present in every cell; more negative is
+  fairer. The reduction does not decay as $\varepsilon$ tightens.}
+  \label{fig:results}
+\end{figure}
+
+\subsection{Fidelity and utility}
+
+\st{need to explicitly reference the figure. You just say "panel (b)"}
+Marginals-based synthesizers dominate on fidelity, MST reaching
+2-way TVD $0.048$ on Adult and $0.030$ on COMPAS, which is expected since they
+optimise almost exactly that quantity; among causal generators \st{this contradicts our whole premise that marginals-based can be considered "causal" too! don't differentiate diffusion and GANs from MB like this! Revise accordingly. Edit: I do see a nice description laid out in figure 3 (a). That's nice, and should be strongly referenced when these distinctions are talked about. The figure could also make explicit the difference between when the graph is directed and undirected, without being more complex than it already is, somehow.}, diffusion is
+strongest ($0.103$ on Adult against plain DECAF's $0.544$) and stays ahead of every
+GAN variant once DP-SGD is on ($0.346$ against $0.439$ and $0.830$). Panel (b) is essential context for what follows: on Adult, MST sits at $-0.000$ lift, so its headline
+$0.747$ accuracy is exactly the trivial predictor's, and several private causal
+generators land at or below baseline. A table that teaches a classifier nothing
+has no disparity to remove and is scored as perfectly fair. Every claim below is a
+difference \emph{between mechanisms holding the generator fixed}, so this does not
+confound them; it does mean an absolute fairness number is uninterpretable without
+the utility beside it. \st{{this is so weird to me... Can we recheck the results, or use a quick randomforest of the same utility experiments, so that we can find more meaningful utility. These models should not be producing accuracy on par with the majority-0class.... something is going wrong here. Especially the marginals-based and diffusion-based generators (which are good utility)... maybe we need to choose a different label  feature? These experiments need to be quickly run because the paper is due today. But the fact that accuracy is not above the baseline is extremely suspicious and should be easily fixed, and whole paper adjusted accoringly.}
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\textwidth]{figs/porting.pdf}
+  \caption{\textbf{Why porting is not a port. \st{I think this headlining caption sentence is really dumb sounding.}} \textbf{(a)} The same fairness
+  definition compiles to two different operations. Where a causal DAG is supplied,
+  the cut is applied after training and is pure post-processing; where the graph
+  itself must be bought from the privacy budget, the cut has to be enforced inside
+  the private structure search, against whatever structure the noise could afford.
+  \textbf{(b)} The consequence, as the fraction of the parity gap that conditional
+  fairness removes, over matched pairs with disparity to remove and a model that
+  learned something. The definition transfers everywhere; the potency does not.}
+  \label{fig:porting}
+\end{figure}
+
+\subsection{Fairness: the definitions transfer, the potency does not}
+
+\input{table1}
+
+\textbf{The parity-gap reduction is portable in direction and significance.} \st{this paragraph leading statement is a little vacuous and ostensibly contradicts the subsection header about potency. Be clear and substantiated.} In
+every \st{"generator"} family, on both datasets, at every privacy level, cutting edges reduces the
+downstream parity gap, and the reduction is many times its own standard error \st{this sentence is good. Just make sure parity gap is better explained earlier (as mentioned in another comment by me). I don't think the bit about standard error is needed.}.
+DECAF's conjecture
+is correct in the sense that matters first: nothing about the three definitions
+requires a GAN. \st{This sentence is important enough that you should reference the results / figures / etc. here, for this basic, important, strong finding. Then "not portable in magnitude" is a secondary conclusion, and doesn't feel as critical.}
+
+\st{Could you provide a concrete example of what figure 3b is showing... something like "the synthetic data that was released had a 89% reduction in correlation between race and income that the real data had" or something tangible like that, based on our experiment's chosen admissible, protected, outcome, etc.}
+
+\textbf{It is not portable in magnitude.} Pooled over Adult in raw gap units \st{this is just a weird unusual phrase; "raw gap units" and is confusing}, \st{Here, say "the CF fairness mechanism"} CF
+removes $0.056 \pm 0.020$ \st{0.056 of what??} from marginals, $0.055 \pm 0.019$ from causal GANs and
+$0.055 \pm 0.017$ from causal diffusion --- \st{keep all em-dashes out of the text, if possible.} apparent invariance that is an artifact
+of composition \st{"composition" of what?? This is getting so exhausting as a reader. Very vaguely written... Can you try to fix the whole paper of these, even if I didn't explicitly point more out after this? Please use good judgement. Right now, it just sounds and feels like random words are being put on a page that sound good on the surface, but have no real meaning. There is a lot of meaning in  our experiments that I want clearly discussed better here.}, not a property of the mechanism. Each family contains both
+generators that reproduce the disparity and generators \st{WHAT collapses to no signal?? OMG. Not clear.} that collapse to no signal,
+pulling the family means to a common value; the nine per-generator reductions \st{reduction in what??} on
+Adult span $0.002$ (MST) to $0.173$ (DECAF). The fraction removed asks the
+scale-free \st{not sure what the hell "scale-free" means, or is even doing here...} question: of whatever disparity a generator produced, how much does the
+cut take away \st{I don't know what tangible measurements we're talking about throughout this sentence}? Restricted to pairs where there is disparity to remove (baseline gap
+$>0.05$) and a model that learned something (lift $>0.02$), CF removes $89\%$ of
+the gap for causal diffusion and $75\%$ for causal GANs, against $29\%$ for
+marginals (Adult; $43\%$, $32\%$ and $22\%$ on COMPAS; plotted in
+Figure~\ref{fig:porting}b). Family explains none of the variance in raw gap
+reduction ($\eta^2 = 0.000$) and a quarter of it in fraction removed ($\eta^2 =
+0.25$). \st{this last sentence is terrible? What does the quarter thing mean? What is n? Family DOES in fact seem to explain the size of the gap removed...?}
+
+\st{could there be a nice graph that explains either fairness improved vs privacy, or fairness improved vs. utility of each of the families? You can make 2 or 3 attempts at different types of graphics to show this, put them in here, and I will pick one.}
+
+\textbf{The gap has a structural cause: it is not one mechanism but two} \st{I haven't yet decided whether this is a worthwhile thing to fixate on in this workshop paper. But regardless, it should all be one one place; I think the explanaitions about the differences in generator family graph makeup alluded to in an earlier seciton but almost explained passively as if this section had already gone by, when it needs to be the other way around. The key point is that some graphs are directly causal with directed edges, and others are undirected edges with marginals and that the mechanism can work on both. Possibly with different results. But I do not thin kwe have the experiments to conclusively say that the graph type is the cause for different results. But we can suggest it strongly. Having said all that, I think this para is mostly good. I don't know if the pre / post aspect is as important or interesting, and can be reduced.}
+(Figure~\ref{fig:porting}a). DECAF is handed a causal DAG and severs edges by
+surrogate substitution at sampling time, after training, so the cut is pure
+post-processing on a graph somebody supplied. A private marginals-based
+synthesizer is handed no DAG; it buys a structure out of the privacy budget, so
+the same definition has to be enforced upstream, inside structure selection, where
+it binds a graph that noise chose rather than one a domain expert supplied. The
+definitions are portable because they are stated over graphs. The potency is not,
+because the two families do not have the same graph to operate on. This is why
+porting the mechanism is a research question \st{I appreciate you calling it back to why this is the big question of the project.} rather than an engineering exercise:
+the second implementation is not DECAF's mechanism moved to a new backbone, it is
+a different operation that satisfies the same definition \st{good}.
+
+That constraint is free in the privacy accounting --- a severed edge is never
+measured, so no $\varepsilon$ is spent on it --- \st{more em dashes to remove} but the freed budget does not buy
+the release anything back. Across the marginals-based generators, matched-pair
+2-way TVD is \emph{worse} under the cut, by $0.008$ for DemPar, $0.003$ for CF and
+$0.001$ for FTU, ordered exactly by how much structure each removes. \st{the spirit of this paragraph is good, and so is it's length. But it's explanation is vacuous. It should be more like 1. the cut for marginals-based is simply restricting the set of edges that the graph is built from. 2. the same number of edges is ultimately chosen, so the privacy budget is unchanged. 3. Yet, we find that the fidelity is slightly worse, likely because the edges chosen were from the restricted set, and thus suboptimal... something like that. I like how you relate the ordering of fidelity to the ordering of each mechanism by its amount of edges removed. By the way, we need to have in here a table or something about the number of edges cut under each mechanism. A reader will want to see that, for the two datasets, and the different feature-protection-variations we tried. It should be small. Edit: I see now that the following paragraph can be greatly reduced and combined with this one. Its intrigue is not worth more than one small para.} 
+
+The reason is visible in the algorithm. MST spends its structure budget over a
+fixed number of rounds, one per edge a spanning tree needs, and sets the per-round
+$\varepsilon$ from that count \emph{before} selection begins --- so it does not
+depend on how many candidates survive the fairness filter. Excluding edges
+therefore leaves no more budget for the edges that remain. It only shrinks the pool
+each round draws from, and the exponential mechanism settles for a lower-scoring
+edge. Prune hard enough and a round has no admissible candidate at all: selection
+stops early and the model is a spanning \emph{forest} rather than a tree, which is
+strictly less structure for the same $\varepsilon$. Free in the privacy accounting
+is not free in fidelity. \st{I appreciate the attempt to keep sentence length heterogeneous, but definitive, vague statements like this just make the paper sound unthoughtful, and overly bold.}
+
+\textbf{The predicted ordering holds.} Ranked by parity gap left behind,
+\textsc{none} $>$ FTU $>$ CF $>$ DemPar holds in five of six (dataset $\times$
+family) cells; in the sixth, CF and DemPar swap by $0.005$, inside both intervals \st{this post-semi-colon clause feels more like a footnote, or can be abstracted away entirely. Stating it here is distracting.}.
+CF landing between the other two is a substantive check: it is \emph{designed} to
+spare admissible disparity, so wherever a role split gives DemPar a mediator to cut
+and CF one to spare, CF must remove strictly less \st{good}. Wherever the two separate by
+more than noise, it does.
+
+\textbf{FTU is weak, and on Adult barely acts.} Pooled over Adult, FTU moves the
+gap by $-0.013$, leaving it exactly unchanged in $41\%$ of pairs, improving it in
+$37\%$ and worsening it in $23\%$ \st{this feels like a non-result, and is again, distracting. It's not going to be worse. Just remove this finding, and others like it that aren't interesting.}. For MST the mechanism is a no-op in all $45$
+pairs, because the direct protected-to-income marginal is one the private structure
+search never buys --- there is nothing to exclude \st{that's a good detail to highlight / include for FTU. Just remove the em dash.}. Where FTU does change the gap, it
+is near-symmetric, the influence rerouting through proxies. This is the textbook
+criticism of unawareness confirmed constructively: the cheap cut fails \st{good finding} where the two
+path-based cuts, on the same generators and seeds, work.
+
+\textbf{Utility cost.} The accuracy cost tracks the aggressiveness of the cut and
+is modest for the cut worth making: pooled over Adult, DemPar costs $1.7$ points
+and CF $0.6$; on COMPAS, $5.0$ and $1.7$. CF stays under two points in five of six
+cells.
+
+\subsection{How this compares to intervening downstream}
+
+\input{table2}
+
+Everything above measures the mechanism against itself. To place it against the
+alternatives an institution actually has, we ran the benchmark of
+\citet{angelozzi2026where} \st{"as discussed in section <related works>"}, which asks where in a differentially private synthetic
+pipeline a fairness intervention should go and answers with three downstream
+stages --- repairing the released table, constraining the classifier, and
+post-processing its predictions --- \st{get rid of all em dashes if possible} and added ours as a fourth \st{this is getting a little complicated, as is. Isn't ours akin to "constraining the classifier"?}. Their \st{"We us their"} harness \st{"method" / "code"} is
+used unmodified: their preprocessed data, their splits, their classifier and their
+aif360 metrics. The only change is that our arm's training table is generated by
+our synthesizer under a fairness mechanism \st{which one??}. We report the AIM arm, AIM being the
+synthesizer here whose data clears the majority-class rate on both datasets \st{again, maybe we have a problem with generation if we can barely even clear majority class baseline. Also, why AIM? Is that from these "interveneing downstream" method? Aren't we introducing more complexity? We didn't mention AIM earlier, just MST, PRivBayes and Privsyn, for marginals-based...}.
+
+The in-generator cut is competitive exactly where the generator encoded the
+disparity in the first place \st{Unclear! Are we talking about our method or the other? what does "generator encoded the diparity" mean? }. On Adult at $\varepsilon{=}1$, DemPar removes $89\%$
+of the parity gap that the same generator leaves with no fairness mechanism,
+$0.187$ to $0.020$ --- the largest reduction of any interpretable intervention in
+the panel. The best downstream alternative, calibrated equalised odds \st{not clear what this is. A reader will likely surmise that it's from the other method we compare against. I don't think we need to arduously explain all eight alternatives from "pre"/"in"/"post", but perhaps a tiny bit more detail / factual, double-checked citation about it?}, reaches
+$0.057$ while keeping $2.6$ more points of accuracy, so the two sit on one
+frontier rather than either dominating. On COMPAS the cut is weak: $0.212$ to
+$0.175$ at $\varepsilon{=}10$, against $0.071$ for the exponentiated-gradient
+reduction at the same accuracy. The reason is the same structural gap: the privately selected structure barely
+encodes the protected-to-outcome dependence, so there is little for a cut to sever,
+whereas a mitigator acting on the trained model is not subject to that limit. (At
+$\varepsilon{=}10$ on Adult the cut overshoots into the degenerate regime ---
+accuracy below the majority-class rate --- so that cell is greyed.) \st{can probably expidite this para a little bit . What are the general, one-point differences between the \citet{angelozzi2026where} and ours? From a fairness, privacy, and utility perspective? Simple. Also, there are issues again with presenting distracting, perhaps malformed accuracy results below baseline accuracy.}
+
+\st{Do you reference table 2 somewhere?}
+
+\st{do we have definitive results for how our methods on marginals-based or diffusion-based does against these downstream methods, versus how GAN-based does against the doewnstream methods? I.e. I'm wondering if we can make the claim that, while downstream is better than CF or DemPar on GAN-based, they're not as good as what we introduce---the CF and DemPar on marginals- and diffusion-based... or something to that effect? }
+
+We therefore do not claim the in-generator cut dominates downstream mitigation; on
+this evidence it does not. What survives the comparison is not the size of the
+reduction but who can guarantee it happened. A downstream mitigator is applied by
+whoever trains a model, and a published table has consumers the publisher will
+never meet, whereas a cut inside the generator ships with the table.
+
+\subsection{Privacy and fairness are nearly independent}
+
+\st{We need to cite / reference the bagdasaryan on DP's disparate impact here, somehow, since it shows that we know how our results fits into that widely-known DP-shortcoming... i.e. how our result complements it rather than contradicts it.}
+The standard expectation is a trade-off: DP noise falls hardest on the smallest
+groups, so tightening $\varepsilon$ ought to widen gaps and blunt any correction \st{this is well said.}.
+We do not see it. The mechanism removes at least as much gap at the defensible
+$\varepsilon{=}1$ as at the nominal \st{"nominal"?} $\varepsilon{=}1000$ in nine of twelve
+(family $\times$ dataset $\times$ \{CF, DemPar\}) cells, and two of the three
+exceptions are COMPAS GAN cells where the backbone has already collapsed at
+$\varepsilon{=}1$ and has no disparity left to remove. For marginals methods on
+Adult, CF removes $0.105$ against $0.026$ \st{I don't know what "CF removes $0.105$ against $0.026$" means...}, and on COMPAS $0.147$ against $0.108$.
+Part of that is DP noise inflating the base gap and so leaving more to remove \st{This is worded extremely confusingly and makes no sense.}, but
+the relative reduction moves the same way ($68\%$ against $18\%$ on Adult). For
+causal diffusion the parity-gap reduction is flat: on Adult, CF removes $0.030$,
+$0.050$ and $0.046$ across the three privacy levels, intervals overlapping. One
+deviation we cannot explain is visible in Figure~\ref{fig:results}c, the reduction \st{need to explain somewhere why no gans in figure fig:results.c}
+at $\varepsilon{=}10$
+being weaker than at either neighbour in both families and both datasets; we
+report it rather than smooth it \st{don't even say that last clause. pointless.}. Fidelity does pay for privacy, but least where
+it matters: for marginals methods, $\varepsilon{=}1000 \rightarrow 1$ costs 2-way TVD
+only $0.045 \rightarrow 0.137$ on Adult and $0.025 \rightarrow 0.035$ on COMPAS. \st{I don't want us to spend any time / space expaining privacy vs. fidelity or usefulness. We should really bank on fairness vs privacy and fairness vs. utility/fidelity.}
+
+One private generator fails outright, on a claim DECAF makes. DECAF argues from
+the post-processing theorem that it ``can be directly used for generating private
+synthetic data by replacing the standard discriminator by a differentially private
+discriminator.'' The accounting is correct; the output is not. Doing exactly that
+collapses the synthetic outcome to a single class in $168$ of $360$ runs ($47\%$),
+every one of them on COMPAS at $\varepsilon{=}1$ included. Two independent changes
+each remove the failure: a CTGAN representation under the same adversarial
+training ($1/360$), and DECAF's representation with diffusion in place of the
+critic ($0/360$). Two unrelated repairs locate the cause in DP-SGD on a
+weight-clipped critic, not in private causal generation. \st{this is a good finding, but the whole para is poorly, convolutedly said. Which DP-GAN is this a result about epsilon for?}
+
+% =====================================================================
+\section{Discussion}
+\label{sec:discussion}
+% =====================================================================
+\wkDiscussion
+
+\bibliographystyle{plainnat}
+\bibliography{refs}
+
+\end{document}

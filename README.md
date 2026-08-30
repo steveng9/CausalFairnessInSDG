@@ -4,6 +4,21 @@ Applying causal-graph fairness mechanisms (à la DECAF) to graphical/marginal-ba
 differentially private synthetic data generators (MST, PrivBayes, AIM, PrivSyn), plus a
 faithful DECAF baseline for comparison.
 
+## Citation
+
+If you use this code or build on this work, please cite (author names are withheld
+for anonymous review and will be added on acceptance):
+
+```bibtex
+@misc{anonymous2026portable,
+  title        = {Portable Causal Fairness Across Synthetic Data Generator Families},
+  author       = {Anonymous},
+  year         = {2026},
+  note         = {NeurIPS 2026 AI for Good Workshop (non-archival), under review},
+  howpublished = {\url{https://anonymous.4open.science/r/CausalFairnessInSDG-55EC/}}
+}
+```
+
 ## The idea
 
 [DECAF](https://arxiv.org/abs/2110.12884) (van Breugel et al., NeurIPS 2021) generates

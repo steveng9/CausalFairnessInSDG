@@ -38,3 +38,8 @@ experiments.db-shm
 .vscode/
 *.swp
 logs/
+
+# Upstream baseline clone (2.3 GB of shipped synthetic data) and its outputs.
+baselines/dp-fair-intervention-benchmark/
+baselines/output/
+baselines/logs/
