@@ -8,6 +8,24 @@ import pandas as pd
 
 from ..fairness.base import AttributeRoles, FairnessMechanism
 
+#: Datasets whose torch-backbone training settings have not been tuned. Each
+#: trainer runs them on its SNAKE settings (SNAKE being the same kind of wide,
+#: mixed-cardinality table) until an epoch sweep says otherwise. To retire a
+#: name from this list, give it its own entry in every `settings` table in
+#: `decaf_variants.py` and in `run_experiments.DECAF_SETTINGS`.
+UNTUNED_DATASETS = (
+    "acsincome_ca", "acsincome_tx", "acspubcov_ca", "acspubcov_tx", "cdc_diabetes",
+    "hmda_ca", "hmda_tx",
+)
+UNTUNED_SETTINGS_SOURCE = "snake"
+
+
+def borrow_untuned_settings(settings: Dict[str, Dict[str, Any]]) -> None:
+    """Fill `settings` for every untuned dataset that has no entry of its own."""
+    if UNTUNED_SETTINGS_SOURCE in settings:
+        for name in UNTUNED_DATASETS:
+            settings.setdefault(name, dict(settings[UNTUNED_SETTINGS_SOURCE]))
+
 
 @dataclass
 class SDGResult:

@@ -27,6 +27,21 @@ env/
 results/
 outputs/
 experiments.db
+# ...except the flat result tables the paper reads (see report/data/README.md)
+!/report/data/*.csv
+!/report/data/facct/**/*.csv
+# Sweep working state: per-shard databases, synthetic tables, locks, raw
+# scores. Large, rewritten while a sweep runs; `scripts/collect_results.py`
+# folds what the paper needs into report/data/facct/.
+/sweeps/*/db/
+/sweeps/*/synth/
+/sweeps/*/locks/
+/sweeps/*/fairpfn_baseline/inputs/
+/sweeps/*/fairpfn_baseline/preds/
+/sweeps/*.log
+/sweeps/*/*.out
+manuscript/build/
+*.partial-bak
 # sqlite's write-ahead/rollback sidecars, present while a batch is running
 experiments.db-journal
 experiments.db-wal

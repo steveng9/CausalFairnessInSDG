@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import sqlite3
 import time
+from pathlib import Path
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional, Sequence
 
@@ -43,6 +44,11 @@ except ImportError:
     DECAFCTGANMethod = DECAFDPCTGANMethod = DECAFDPGANMethod = None
     DECAFDiffusionMethod = DECAFDPDiffusionMethod = None
 
+try:
+    from ..sdg.decaf_tabpfn import DECAFTabPFNMethod
+except ImportError:
+    DECAFTabPFNMethod = None
+
 SDG_METHODS: Dict[str, SDGMethod] = {
     "mst": MST(), "privbayes": PrivBayes(), "aim": AIM(), "privsyn": PrivSyn(),
 }
@@ -60,6 +66,12 @@ if DECAFDiffusionMethod is not None:
     # the whole denoiser); `decaf_diffusion` is not, like `decaf_ctgan`.
     SDG_METHODS["decaf_diffusion"] = DECAFDiffusionMethod()
     SDG_METHODS["decaf_dpdiffusion"] = DECAFDPDiffusionMethod()
+if DECAFTabPFNMethod is not None:
+    # Foundation-model backbone: TabPFN in context as every attribute's
+    # conditional. Not private. Registered whether or not `tabpfn` is
+    # installed, so every environment agrees on what the grid contains; it
+    # raises at fit time (and `run_experiments.py` refuses up front) without it.
+    SDG_METHODS["decaf_tabpfn"] = DECAFTabPFNMethod()
 
 
 #: `eval_reference` value meaning "compute fairness metrics against *both*
@@ -87,6 +99,11 @@ class RunConfig:
     #: Label for the protected/admissible role split below, so runs sharing a
     #: split are groupable in `experiments.db` without re-parsing JSON columns.
     role_config: str = "default"
+    #: Where to write this run's synthetic table, as
+    #: `<synth_dir>/run_<run_id>.parquet`. Left None the release is scored and
+    #: discarded, which is what the first sweeps did -- and why adding a
+    #: fidelity metric afterwards meant regenerating everything. Set it.
+    synth_dir: Optional[str] = None
     #: Optional overrides of the dataset's built-in roles. Any left as None
     #: falls back to what `data/datasets.py` defines for that dataset.
     protected: Optional[Sequence[str]] = None
@@ -190,15 +207,23 @@ def run_single(conn: sqlite3.Connection, config: RunConfig) -> int:
         metrics: Dict[str, Optional[float]] = {
             "synth_outcome_n_classes": float(n_outcome_classes),
             **utility.compute_utility_metrics(
-                holdout_df, synth, outcome=outcome_attr, include_downstream=not degenerate
+                holdout_df, synth, outcome=outcome_attr,
+                include_downstream=not degenerate, real_train=train_df,
             ),
         }
         # Method-specific diagnostics -- currently the DP-SGD noise multiplier,
         # step count and realized epsilon from the DECAF GAN backbones. Logged
         # as metrics so the privacy calibration behind a row is recoverable
         # from the database rather than only from the code that produced it.
+        # Text-valued diagnostics (e.g. a checkpoint file's name and hash) are
+        # provenance rather than measurements, and join the run's parameters.
+        text = {k: v for k, v in result.extra.items() if isinstance(v, str)}
+        db.merge_run_params(conn, run_id, text)
         metrics.update(
-            {k: float(v) for k, v in result.extra.items() if v is not None}
+            {
+                k: float(v) for k, v in result.extra.items()
+                if v is not None and k not in text
+            }
         )
 
         if not degenerate:
@@ -238,6 +263,11 @@ def run_single(conn: sqlite3.Connection, config: RunConfig) -> int:
                 metrics.update(
                     {f"{prefix}{k.replace('_bin_', '')}": v for k, v in raw.items()}
                 )
+
+        if config.synth_dir:
+            out_dir = Path(config.synth_dir)
+            out_dir.mkdir(parents=True, exist_ok=True)
+            synth.to_parquet(out_dir / f"run_{run_id}.parquet", index=False)
 
         db.log_metrics(conn, run_id, metrics)
         db.log_edges(conn, run_id, result.graph_edges)

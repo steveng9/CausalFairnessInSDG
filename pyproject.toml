@@ -30,6 +30,8 @@ build-backend = "setuptools.build_meta"
 where = ["src"]
 
 [tool.pytest.ini_options]
+# Not the code snapshots that sweeps keep under `sweeps/<batch>/code/`.
+testpaths = ["tests"]
 markers = [
     "slow: exercises real model training (DECAF/PrivBayes/AIM/PrivSyn GAN or structure-search fits)",
 ]

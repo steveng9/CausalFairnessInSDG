@@ -42,6 +42,7 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO_ROOT / "scripts"))
 
 from causal_fairness_sdg.experiments import db  # noqa: E402
+from causal_fairness_sdg.sdg.base import borrow_untuned_settings  # noqa: E402
 from causal_fairness_sdg.experiments.runner import (  # noqa: E402
     EVAL_REFERENCE_BOTH,
     SDG_METHODS,
@@ -62,6 +63,14 @@ GAN_BACKBONE_METHODS = ["decaf_dpgan", "decaf_ctgan", "decaf_dpctgan"]
 #: Untuned as of 2026-08-12 -- run an epoch/timestep sweep before trusting
 #: numbers from these two (see notes/2026-08-12-decaf-diffusion-backbone.md).
 DIFFUSION_BACKBONE_METHODS = ["decaf_diffusion", "decaf_dpdiffusion"]
+#: Nothing to train or tune; needs the `sdg_tabpfn` environment (see
+#: `sdg/decaf_tabpfn.py`).
+FOUNDATION_BACKBONE_METHODS = ["decaf_tabpfn"]
+#: Every DECAF backbone swap: one fitted model per (data, seed, epsilon),
+#: settings and device carried on the method object.
+BACKBONE_METHODS = [
+    *GAN_BACKBONE_METHODS, *DIFFUSION_BACKBONE_METHODS, *FOUNDATION_BACKBONE_METHODS,
+]
 
 MECHANISMS = ["none", "ftu", "dp", "cf"]
 EPSILONS = [1.0, 10.0, 1000.0]
@@ -107,6 +116,8 @@ DECAF_SETTINGS = {
     "snake": {"max_epochs": 30, "output_activation": "sigmoid"},
     "sbo": {"max_epochs": 30, "output_activation": "sigmoid"},
 }
+# Datasets not tuned yet run on SNAKE's entry -- see `sdg.base.UNTUNED_DATASETS`.
+borrow_untuned_settings(DECAF_SETTINGS)
 
 # Protected/admissible role splits. The first entry for each dataset is the
 # PreFair Table 1 split (comparable to published numbers); the others vary
@@ -115,7 +126,101 @@ DECAF_SETTINGS = {
 # narrow admissible set should make CF behave much more like DP.
 RoleConfig = Tuple[str, Sequence[str], Sequence[str]]
 
+# ACSIncome's three splits mirror Adult's and SNAKE's one for one, so the same
+# role config can be compared across all the income datasets. Shared by every
+# state: the split is a statement about the attributes, not the population.
+ACSINCOME_ROLE_CONFIGS: List[RoleConfig] = [
+    (
+        "prefair_like",
+        ["SEX", "RAC1P", "HISP", "WAOB"],
+        ["SCHL", "OCCP", "COW", "WKHP"],
+    ),
+    ("sex_only_broad_adm", ["SEX"], ["SCHL", "OCCP", "COW", "WKHP"]),
+    # Occupation and class of worker removed from the admissible set, as in
+    # SNAKE's narrow split: occupational sorting is itself a channel of the gap.
+    ("sex_race_narrow_adm", ["SEX", "RAC1P", "HISP"], ["SCHL", "WKHP"]),
+]
+
+# ACSPublicCoverage: what counts as admissible is close to a statutory
+# question here, since public programmes are written in terms of income,
+# employment, disability, age and pregnancy.
+ACSPUBCOV_ROLE_CONFIGS: List[RoleConfig] = [
+    # Demographics protected; the statutory eligibility categories admissible.
+    (
+        "eligibility_adm",
+        ["SEX", "RAC1P", "HISP", "NATIVITY"],
+        ["PINCP", "ESR", "DIS", "AGEP", "FER"],
+    ),
+    # Race and ethnicity alone, with citizenship (itself an eligibility rule,
+    # and the main channel from nativity), marital status and schooling also
+    # admissible -- the most permissive reading.
+    (
+        "race_only_broad_adm",
+        ["RAC1P", "HISP"],
+        ["PINCP", "ESR", "DIS", "AGEP", "FER", "CIT", "MAR", "SCHL"],
+    ),
+    # Disability moved from admissible to protected: it is both a protected
+    # class and an eligibility criterion, and this is the split where the two
+    # readings collide. Only income and age remain admissible.
+    (
+        "disability_protected_narrow_adm",
+        ["SEX", "RAC1P", "HISP", "DIS"],
+        ["PINCP", "AGEP"],
+    ),
+]
+
+# HMDA: the admissible set is what an underwriter may lawfully weigh. The
+# tract variables are never in it -- where the property is, is the redlining
+# channel -- and neither is the co-applicant, which stands in for marital
+# status.
+HMDA_ROLE_CONFIGS: List[RoleConfig] = [
+    # The four prohibited bases the file records; income, the two underwriting
+    # ratios and the size and length of the loan admissible.
+    (
+        "ecoa_underwriting_adm",
+        ["sex", "race", "ethnicity", "age"],
+        ["income", "dti", "ltv", "loan_amount", "loan_term"],
+    ),
+    # Sex alone, with the loan programme and purpose admissible too.
+    (
+        "sex_only_broad_adm",
+        ["sex"],
+        ["income", "dti", "ltv", "loan_amount", "loan_term", "loan_type",
+         "loan_purpose", "jumbo"],
+    ),
+    # Race and ethnicity, strict reading: income and loan size are themselves
+    # racially patterned, so only the two ratios an underwriter computes stay
+    # admissible.
+    ("race_narrow_adm", ["race", "ethnicity"], ["dti", "ltv"]),
+]
+
 ROLE_CONFIGS: Dict[str, List[RoleConfig]] = {
+    "hmda_ca": HMDA_ROLE_CONFIGS,
+    "hmda_tx": HMDA_ROLE_CONFIGS,
+    "acsincome_ca": ACSINCOME_ROLE_CONFIGS,
+    "acsincome_tx": ACSINCOME_ROLE_CONFIGS,
+    "acspubcov_ca": ACSPUBCOV_ROLE_CONFIGS,
+    "acspubcov_tx": ACSPUBCOV_ROLE_CONFIGS,
+    "cdc_diabetes": [
+        # Sex and socioeconomic status protected; the clinical risk factors a
+        # screening guideline names, and age, admissible.
+        (
+            "ses_clinical_adm",
+            ["Sex", "Income", "Education"],
+            ["Age", "BMI", "HighBP", "HighChol", "HeartDiseaseorAttack", "Stroke"],
+        ),
+        # Sex alone, with health behaviours and self-rated health admissible too.
+        (
+            "sex_only_broad_adm",
+            ["Sex"],
+            ["Age", "BMI", "HighBP", "HighChol", "HeartDiseaseorAttack", "Stroke",
+             "PhysActivity", "Smoker", "Fruits", "Veggies", "HvyAlcoholConsump",
+             "GenHlth", "DiffWalk"],
+        ),
+        # Strict reading: blood pressure, cholesterol and heart disease are
+        # themselves socially patterned, so only age and BMI stay admissible.
+        ("ses_narrow_adm", ["Sex", "Income", "Education"], ["Age", "BMI"]),
+    ],
     "adult": [
         (
             "prefair",
@@ -206,7 +311,7 @@ def _is_gan(method: str) -> bool:
     Name kept from when the GAN backbones were the only such family;
     diffusion trainers cache identically.
     """
-    return method == "decaf" or method in GAN_BACKBONE_METHODS or method in DIFFUSION_BACKBONE_METHODS
+    return method == "decaf" or method in BACKBONE_METHODS
 
 
 def _apply_device(device: str) -> None:
@@ -218,7 +323,7 @@ def _apply_device(device: str) -> None:
     index. Both are set through the same knobs the grid already records, so
     the choice shows up in `extra_params` rather than being invisible.
     """
-    for name in (*GAN_BACKBONE_METHODS, *DIFFUSION_BACKBONE_METHODS):
+    for name in BACKBONE_METHODS:
         method = SDG_METHODS.get(name)
         if method is not None:
             method.overrides["device"] = device
@@ -228,6 +333,40 @@ def _apply_device(device: str) -> None:
         index = int(device.split(":")[1]) if ":" in device else 0
         decaf.accelerator, decaf.devices = "gpu", [index]
         DECAF_SETTINGS_DEVICE.update(accelerator="gpu", devices=[index])
+
+
+def _apply_overrides(overrides: Dict[str, object], datasets: Sequence[str]) -> None:
+    """Force training settings (e.g. `max_epochs`) for every torch method, for
+    tuning sweeps. Goes through the same two channels as `_apply_device`, so
+    `_training_settings` records the overridden values on every row."""
+    for name in BACKBONE_METHODS:
+        method = SDG_METHODS.get(name)
+        if method is not None:
+            method.overrides.update(overrides)
+    for dataset in datasets:
+        DECAF_SETTINGS[dataset].update(overrides)
+
+
+def _parse_overrides(pairs: Sequence[str]) -> Dict[str, object]:
+    overrides: Dict[str, object] = {}
+    for pair in pairs:
+        key, _, raw = pair.partition("=")
+        try:
+            overrides[key] = json.loads(raw)
+        except ValueError:
+            overrides[key] = raw
+    return overrides
+
+
+def filter_only(configs: List[RunConfig], only: Optional[str]) -> List[RunConfig]:
+    """Keep configs whose '<dataset>/<role_config>/<method>/<mechanism>' label
+    contains `only`."""
+    if not only:
+        return configs
+    return [
+        c for c in configs
+        if only in f"{c.dataset}/{c.role_config}/{c.sdg_method}/{c.fairness_mechanism}"
+    ]
 
 
 #: Device knobs merged into every `decaf` row's provenance, empty on CPU.
@@ -259,6 +398,9 @@ def build_configs(
     seeds: Sequence[int] = SEEDS,
     methods: Sequence[str] = tuple(DEFAULT_METHODS),
     datasets: Sequence[str] = tuple(DEFAULT_DATASETS),
+    epsilons: Sequence[float] = tuple(EPSILONS),
+    classifier: str = "mlp",
+    synth_dir: Optional[str] = None,
 ) -> List[RunConfig]:
     """Ordered so that (a) COMPAS -- the fast dataset -- finishes completely
     first, giving a full readable result set early, and (b) every GAN-backed
@@ -292,9 +434,11 @@ def build_configs(
                 protected=protected,
                 admissible=admissible,
                 eval_reference=EVAL_REFERENCE_BOTH,
-                extra_params={"batch": batch},
+                classifier=classifier,
+                synth_dir=synth_dir,
+                extra_params={"batch": batch, "classifier": classifier},
             )
-            for epsilon in EPSILONS:
+            for epsilon in epsilons:
                 for method in marginal:
                     for mechanism in MECHANISMS:
                         for seed in seeds:
@@ -314,15 +458,18 @@ def build_configs(
             private = SDG_METHODS[method].is_private
             # Non-private backbones ignore epsilon entirely, so sweeping it
             # would just re-run an identical configuration three times.
-            epsilons = EPSILONS if private else [float("nan")]
+            gan_epsilons = list(epsilons) if private else [float("nan")]
             # Record the *effective* training settings on every GAN row. Without
             # this a row cannot be attributed to an epoch count, and epoch count
             # is exactly what the 4.3b sweep showed to be outcome-determining --
             # the original `gan-backbones-2026-07-30` rows carry no trace of the
             # 20/30/60/100/200 epochs that produced them.
-            extra = {"batch": batch, **_training_settings(method, dataset)}
+            extra = {
+                "batch": batch, "classifier": classifier,
+                **_training_settings(method, dataset),
+            }
             for seed in seeds:
-                for epsilon in epsilons:
+                for epsilon in gan_epsilons:
                     for role_name, protected, admissible in roles_for_dataset:
                         for mechanism in MECHANISMS:
                             configs.append(
@@ -340,6 +487,8 @@ def build_configs(
                                     # epsilon/delta for those.
                                     epsilon=epsilon,
                                     seed=seed,
+                                    classifier=classifier,
+                                    synth_dir=synth_dir,
                                 )
                             )
     return configs
@@ -415,6 +564,34 @@ def main() -> int:
              "once per seed instead of once per (dataset, method). Off by "
              "default so existing batches keep their original run order.",
     )
+    parser.add_argument(
+        "--epsilons", default=",".join(str(e) for e in EPSILONS),
+        help="comma-separated privacy budgets for the private methods. "
+             "Non-private backbones ignore it and run once regardless.",
+    )
+    parser.add_argument(
+        "--classifier", default="mlp", choices=["mlp", "rf", "lr"],
+        help="downstream model the fairness gaps are measured on. Accuracy, "
+             "AUC and macro-F1 are recorded for all three either way; this "
+             "picks which one's predictions the parity gap is computed from.",
+    )
+    parser.add_argument(
+        "--synth-dir", default=None,
+        help="directory to write each run's synthetic table to, as "
+             "run_<run_id>.parquet. Off by default; set it so a metric added "
+             "later can be computed without regenerating the sweep.",
+    )
+    parser.add_argument(
+        "--set", action="append", default=[], metavar="KEY=VALUE", dest="overrides",
+        help="override a training setting of the torch methods selected by "
+             "--methods, e.g. --set max_epochs=100. Repeatable. For tuning "
+             "sweeps; the value in force is recorded on every row.",
+    )
+    parser.add_argument(
+        "--no-report", action="store_true",
+        help="skip the per-run markdown report. For shards of a sharded sweep, "
+             "whose results are read from the merged databases instead.",
+    )
     parser.add_argument("--dry-run", action="store_true")
     parser.add_argument("--results-dir", default=str(REPO_ROOT / "results"))
     parser.add_argument("--db-path", default=str(db.DEFAULT_DB_PATH))
@@ -432,6 +609,17 @@ def main() -> int:
         parser.error(
             f"unknown method(s) {unknown}; available: {sorted(SDG_METHODS)}"
         )
+    if not args.dry_run:
+        # Refuse here, before a single row is written, when a method's backend
+        # is not importable in this environment -- otherwise the whole shard
+        # would be recorded as failed runs.
+        for name in methods:
+            require = getattr(SDG_METHODS[name], "_require_backend", None)
+            if require is not None:
+                try:
+                    require()
+                except ImportError as exc:
+                    parser.error(f"{name}: {exc}")
     if args.device:
         # Set before build_configs so `_training_settings` records the device
         # on every row -- a run on GPU is not bit-identical to one on CPU (the
@@ -445,17 +633,20 @@ def main() -> int:
         parser.error(
             f"unknown dataset(s) {unknown_ds}; available: {sorted(ROLE_CONFIGS)}"
         )
-    configs = build_configs(args.batch, seeds, methods, datasets)
+    if args.overrides:
+        # Before build_configs, for the same reason as the device above.
+        _apply_overrides(_parse_overrides(args.overrides), datasets)
+    epsilons = [float(e) for e in args.epsilons.split(",") if e.strip() != ""]
+    configs = build_configs(
+        args.batch, seeds, methods, datasets,
+        epsilons=epsilons, classifier=args.classifier, synth_dir=args.synth_dir,
+    )
     if args.breadth_first:
         # Stable sort: within a seed, the original (dataset, method, role,
         # mechanism) ordering -- and therefore train-cache locality -- is
         # preserved; only the seed grouping moves to the outermost position.
         configs.sort(key=lambda c: c.seed)
-    if args.only:
-        configs = [
-            c for c in configs
-            if args.only in f"{c.dataset}/{c.role_config}/{c.sdg_method}/{c.fairness_mechanism}"
-        ]
+    configs = filter_only(configs, args.only)
     results_dir = Path(args.results_dir)
     results_dir.mkdir(parents=True, exist_ok=True)
 
@@ -501,15 +692,20 @@ def main() -> int:
         print(f"[{i}/{len(todo)}] {label} -> {status} "
               f"({time.time() - t0:.0f}s; elapsed {elapsed / 60:.0f}m; "
               f"eta {rate * (len(todo) - i) / 60:.0f}m)", flush=True)
-        try:
-            write_report(conn, args.batch, results_dir)
-        except Exception as exc:  # noqa: BLE001 - never let reporting kill the sweep
-            print(f"  [report] skipped: {exc}", flush=True)
+        if not args.no_report:
+            try:
+                write_report(conn, args.batch, results_dir)
+            except Exception as exc:  # noqa: BLE001 - never let reporting kill the sweep
+                print(f"  [report] skipped: {exc}", flush=True)
 
     print(f"\nFinished batch {args.batch}: {n_ok} ok, {n_failed} failed, "
           f"{(time.time() - started) / 60:.0f} minutes total.", flush=True)
-    write_report(conn, args.batch, results_dir)
-    print(f"Report written to {results_dir}", flush=True)
+    if not args.no_report:
+        try:
+            write_report(conn, args.batch, results_dir)
+            print(f"Report written to {results_dir}", flush=True)
+        except Exception as exc:  # noqa: BLE001 - the runs are in the DB either way
+            print(f"[report] final report skipped: {exc}", flush=True)
     conn.close()
     return 0
 

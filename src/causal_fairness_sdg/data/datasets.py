@@ -10,14 +10,21 @@ from __future__ import annotations
 import os
 import urllib.request
 from pathlib import Path
-from typing import Callable, Dict, Tuple
+from typing import Callable, Dict
 
 import pandas as pd
 
 from ..fairness.base import AttributeRoles
-
-RAW_DIR = Path(__file__).resolve().parents[3] / "data" / "raw"
-RAW_DIR.mkdir(parents=True, exist_ok=True)
+from ._encoding import (
+    RAW_DIR,
+    LoadedDataset,
+    _discretize,
+    _recode,
+    _subsample,
+)
+from .acs import ACS_DATASETS
+from .cdc_diabetes import CDC_DATASETS
+from .hmda import HMDA_DATASETS
 
 ADULT_URL = "https://archive.ics.uci.edu/ml/machine-learning-databases/adult/adult.data"
 COMPAS_URL = (
@@ -31,21 +38,11 @@ ADULT_COLUMNS = [
     "capital-gain", "capital-loss", "hours-per-week", "native-country", "income",
 ]
 
-LoadedDataset = Tuple[pd.DataFrame, Dict[str, int], AttributeRoles]
-
 
 def _download(url: str, cache_path: Path) -> Path:
     if not cache_path.exists():
         urllib.request.urlretrieve(url, cache_path)
     return cache_path
-
-
-def _discretize(series: pd.Series, bins: int = 4) -> pd.Series:
-    # rank(method="first") breaks ties so qcut can always produce `bins`
-    # equal-sized buckets even for heavily-zero-inflated columns like
-    # capital-gain/capital-loss.
-    ranked = series.rank(method="first")
-    return pd.qcut(ranked, q=bins, labels=False, duplicates="drop").astype(int)
 
 
 def load_adult() -> LoadedDataset:
@@ -123,39 +120,6 @@ SBO_PATH = Path(
     )
 )
 
-#: Rows drawn from the big tables. Adult is ~45k after dropping NAs, so this
-#: keeps every dataset within the same order of magnitude -- without it SNAKE
-#: (201k) and SBO (161k) would make the GAN methods 4x slower than the rest of
-#: the grid and quietly turn "which method is better" into "which method got
-#: more data". Seeded, so the subsample is identical across every run.
-BIG_TABLE_ROWS = 50_000
-BIG_TABLE_SEED = 20260803
-
-
-def _subsample(df: pd.DataFrame, n: int = BIG_TABLE_ROWS) -> pd.DataFrame:
-    if len(df) <= n:
-        return df.reset_index(drop=True)
-    return df.sample(n=n, random_state=BIG_TABLE_SEED).reset_index(drop=True)
-
-
-def _recode(df: pd.DataFrame) -> pd.DataFrame:
-    """Force every column onto contiguous codes 0..k-1.
-
-    Not cosmetic. The declared domain is `nunique`, and both the DP
-    synthesizers and DECAF's output heads treat a column's domain as the range
-    of values it may take -- so a column carrying its source codes (SBO's
-    `SECTOR` runs 11..99 over 20 real values) declares a domain of 100 and
-    spends privacy budget, and generator capacity, on 80 categories that can
-    never occur. Adult's `education-num` has exactly this bug today; it is
-    left alone there only because every published number in the report was
-    produced under it, and silently re-encoding would invalidate the
-    comparison rather than fix it.
-    """
-    for col in df.columns:
-        df[col] = df[col].astype("category").cat.codes.astype(int)
-    return df
-
-
 def load_snake() -> LoadedDataset:
     """SNAKE (Current Population Survey extract), 15 attributes.
 
@@ -177,7 +141,8 @@ def load_snake() -> LoadedDataset:
     df = pd.read_parquet(SNAKE_PATH)
 
     # 12 = "$75,000 - $99,999" in the meta.json ordering; >= that is the
-    # top three brackets, giving a ~30% positive rate (Adult's is ~25%).
+    # top three brackets, giving a 58% positive rate (measured; family income
+    # runs well above Adult's individual earnings, where it is ~25%).
     order = list(df["faminc"].cat.categories) if hasattr(df["faminc"], "cat") else None
     codes = df["faminc"].cat.codes if order else df["faminc"].astype("category").cat.codes
     df = df.drop(columns=["faminc"])
@@ -282,4 +247,7 @@ DATASETS: Dict[str, Callable[[], LoadedDataset]] = {
     "compas": load_compas,
     "snake": load_snake,
     "sbo": load_sbo,
+    **ACS_DATASETS,
+    **CDC_DATASETS,
+    **HMDA_DATASETS,
 }

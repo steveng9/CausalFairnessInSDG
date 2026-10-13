@@ -200,18 +200,23 @@ def build_markdown(df: pd.DataFrame, batch: Optional[str]) -> str:
     # several trials per cell, ranking raw runs would just surface whichever
     # seed happened to land lowest, which is exactly the cherry-pick the extra
     # trials were added to eliminate.
-    scored = ok.dropna(subset=["fairness_gap", "downstream_accuracy_mlp"])
+    # A shard in which every run collapsed to a single outcome class (the
+    # DP-GAN backbones do this on COMPAS) has no classifier-based columns at
+    # all, so ask for the ones that are actually present.
+    rank_cols = [c for c in ("fairness_gap", "downstream_accuracy_mlp") if c in ok.columns]
+    scored = ok.dropna(subset=rank_cols) if rank_cols else ok.iloc[0:0]
     if not scored.empty:
         cell_keys = [
             "dataset", "role_config", "sdg_method", "fairness_mechanism", "epsilon",
         ]
         cells = _agg(
             scored, cell_keys,
-            ["fairness_gap", "cond_fairness_gap", "tvd_1way",
-             "downstream_accuracy_mlp"],
+            [c for c in ("fairness_gap", "cond_fairness_gap", "tvd_1way",
+                         "downstream_accuracy_mlp") if c in scored.columns],
         ).reset_index()
+        sort_cols = [c for c in ("fairness_gap", "downstream_accuracy_mlp") if c in cells.columns]
         best = cells.sort_values(
-            ["fairness_gap", "downstream_accuracy_mlp"], ascending=[True, False]
+            sort_cols, ascending=[True, False][: len(sort_cols)]
         ).head(20)
         acc_floor = cells["downstream_accuracy_mlp"].quantile(0.5)
         useful = cells[cells["downstream_accuracy_mlp"] >= acc_floor].sort_values(

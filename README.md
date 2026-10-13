@@ -165,6 +165,7 @@ method, and only for MST with one fairness definition.
 | AIM | McKenna et al. 2022; current SOTA marginal-based DP synthesizer | `sdg/aim.py` + `sdg/_aim_vendor.py`, adapted from `ryan112358/private-pgm/mechanisms/aim.py` (pairwise workload only) |
 | PrivSyn | Zhang et al. 2021 | `sdg/privsyn.py` + `sdg/_privsyn_gum.py`, built from the paper's description (no importable official implementation found) |
 | DECAF | Kyono et al. 2021 (the paper this whole project ports fairness mechanisms *from*) | `sdg/decaf.py`, wraps the real `decaf-synthetic-data` PyPI package directly (optional `decaf` extra) — a non-private baseline, not a DP synthesizer |
+| DECAF + TabPFN (`decaf_tabpfn`) | DECAF's causal generator with a tabular foundation model (TabPFN-3.5, in context) as every attribute's conditional; nothing is trained. Non-private | `sdg/decaf_tabpfn.py` (the estimator and method) + `sdg/_decaf_incontext.py` (the DECAF semantics, for any class-probability estimator). Runs from the `sdg_tabpfn` environment, below |
 | PrivTree | Zhang et al. 2016 | not implemented — partitions the joint value domain hierarchically rather than building an attribute graph, so it doesn't fit the edge-removal fairness abstraction without a separate design pass |
 
 All four DP methods (MST/PrivBayes/AIM/PrivSyn) share the same modular `FairnessMechanism`
@@ -185,8 +186,75 @@ installed) `decaf-synthetic-data`/`torch`/`pytorch-lightning`:
 ```
 source <conda-base>/bin/activate sdg
 pip install -e '.[dev,decaf]'   # decaf extra optional; pulls in torch + pytorch-lightning
+pip install --no-deps folktables  # only for the ACS datasets (data/acs.py)
 pytest tests/ -m "not slow"     # excludes DECAF's real-GAN-training tests
 ```
+
+`decaf_tabpfn` needs `tabpfn` (torch >= 2.5), which cannot share an environment with the
+torch the other backbones are pinned to. It runs from `sdg_tabpfn`, a clone of `sdg` with
+only torch replaced, so the split and the evaluation are the same code on the same numpy /
+pandas / scikit-learn:
+
+```
+conda create -n sdg_tabpfn --clone sdg
+conda run -n sdg pip freeze | grep -iE '^(numpy|pandas|scikit-learn|scipy|networkx|pyarrow|joblib)==' > constraints.txt
+conda run -n sdg_tabpfn pip install -c constraints.txt tabpfn==9.1.0 torch==2.14.1 --extra-index-url https://download.pytorch.org/whl/cu130
+conda run -n sdg_tabpfn pip uninstall -y torchvision torchtext   # built against the old torch
+```
+
+The TabPFN-3.5 weights are licence-gated (Prior Labs, non-commercial research); accept the
+licence once and they are cached under `~/.cache/tabpfn/`.
+
+## Datasets
+
+| Name | Source | Rows × attributes | Loader |
+|---|---|---|---|
+| `adult`, `compas` | UCI Adult, ProPublica COMPAS (downloaded on first use) | 45k × 14, 6k × 8 | `data/datasets.py` |
+| `snake`, `sbo` | CPS extract, NIST Survey of Business Owners (external files; set `$SNAKE_PATH` / `$SBO_PATH`) | 50k × 15, 50k × 25 | `data/datasets.py` |
+| `acsincome_ca`, `acsincome_tx` | ACS PUMS 2018 via `folktables` (Ding et al. 2021), downloaded on first use | 50k × 12 | `data/acs.py` |
+| `acspubcov_ca`, `acspubcov_tx` | same PUMS files, folktables' ACSPublicCoverage task | 50k × 20 | `data/acs.py` |
+| `cdc_diabetes` | CDC Diabetes Health Indicators (UCI id 891), downloaded on first use | 50k × 22 | `data/cdc_diabetes.py` |
+
+Every loader returns `(df, domain, roles)` under one contract, checked by
+`data/_encoding.py::validate_encoding`: integer columns on contiguous codes `0..k-1`, and
+a `domain` that says exactly `k`. The ACS loader also writes a codebook (code → label for
+every column, plus row counts and file hashes) next to its cached table in
+`data/processed/`.
+
+**Adding a dataset** means registering it in four places; `tests/test_dataset_registry.py`
+fails with the name of whichever is missing:
+
+1. a loader in `data/` and an entry in `datasets.DATASETS`;
+2. a causal DAG in `data/causal_graphs.py::CAUSAL_GRAPHS`;
+3. role splits in `scripts/run_experiments.py::ROLE_CONFIGS` (and `DECAF_SETTINGS`);
+4. training settings for the torch backbones: list the name in
+   `sdg/base.py::UNTUNED_DATASETS` to run on SNAKE's settings until an epoch sweep has
+   been run, then give it its own entries in `sdg/decaf_variants.py`.
+
+## Running a sweep
+
+`scripts/sweep.py` runs a declared grid as independent shards, one per
+(dataset, method, seed), each with its own SQLite file, log, and saved synthetic tables
+under `sweeps/<batch>/`:
+
+```
+python scripts/sweep.py init   --batch my-sweep --datasets acsincome_ca,sbo --methods mst,privbayes,privsyn
+python scripts/sweep.py run    --batch my-sweep --workers 12 --cpus 32-47   # add --gpu N for torch methods
+python scripts/sweep.py status --batch my-sweep
+python scripts/merge_sweep_dbs.py sweeps/my-sweep/db -o report/data/my-sweep.csv
+```
+
+A method that needs its own environment or a GPU says so in `sweep.json`, and the
+scheduler does the rest from whichever environment it was started in:
+
+```
+"python":   {"decaf_tabpfn": "<conda-base>/envs/sdg_tabpfn/bin/python"},
+"gpu_only": ["decaf_tabpfn"]
+```
+
+`run` resumes: finished shards are skipped, and a second `run` on the same batch (more
+cores, or a GPU) picks up only shards no other scheduler holds. To extend a sweep, add
+datasets, methods or seeds to `sweeps/<batch>/sweep.json` and `run` again.
 
 ## Status
 

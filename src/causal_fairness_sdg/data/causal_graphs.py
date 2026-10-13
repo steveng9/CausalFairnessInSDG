@@ -226,11 +226,336 @@ SBO_DAG: List[Edge] = [
     ("RACE1", "high_receipts"),
 ]
 
+# ACSIncome (`data/acs.py`): the same status-attainment chain as SNAKE, on the
+# attributes folktables keeps. Ascribed characteristics (sex, race, Hispanic
+# origin, world area of birth, age) are roots; they shape schooling, schooling
+# and the ascribed characteristics sort people into occupations, occupation
+# fixes class of worker and hours, and all of those set earnings. Household
+# position (`MAR`, `RELP`) is the parallel family path, entering earnings both
+# directly and through hours. Direct `SEX`/`RAC1P`/`HISP` -> outcome edges are
+# the residual gap the mediated paths do not explain, as in the other graphs,
+# and are what FTU is allowed to cut. `WAOB` has no direct edge: nativity is
+# taken to act through schooling and occupational sorting only.
+#
+# One graph for every state on purpose -- whether a graph specified once
+# transfers across populations is one of the things the two states test.
+ACSINCOME_DAG: List[Edge] = [
+    ("SEX", "SCHL"),
+    ("RAC1P", "SCHL"),
+    ("HISP", "SCHL"),
+    ("WAOB", "SCHL"),
+    ("AGEP", "SCHL"),
+    ("AGEP", "MAR"),
+    ("SEX", "MAR"),
+    ("RAC1P", "MAR"),
+    ("HISP", "MAR"),
+    ("MAR", "RELP"),
+    ("AGEP", "RELP"),
+    ("SEX", "RELP"),
+    ("SCHL", "OCCP"),
+    ("SEX", "OCCP"),
+    ("RAC1P", "OCCP"),
+    ("HISP", "OCCP"),
+    ("WAOB", "OCCP"),
+    ("OCCP", "COW"),
+    ("SCHL", "COW"),
+    ("OCCP", "WKHP"),
+    ("COW", "WKHP"),
+    ("SEX", "WKHP"),
+    ("MAR", "WKHP"),
+    ("AGEP", "WKHP"),
+    ("SCHL", "high_income"),
+    ("OCCP", "high_income"),
+    ("COW", "high_income"),
+    ("WKHP", "high_income"),
+    ("MAR", "high_income"),
+    ("RELP", "high_income"),
+    ("AGEP", "high_income"),
+    ("SEX", "high_income"),
+    ("RAC1P", "high_income"),
+    ("HISP", "high_income"),
+]
+
+# ACSPublicCoverage (`data/acs.py`): 20 nodes. Demographics (age, sex, race,
+# Hispanic origin, nativity) are roots. Nativity fixes citizenship; age drives
+# the three functional difficulties, which define the overall disability flag
+# (`DIS` is the survey's own "any difficulty" recode). Schooling, marriage,
+# military service, a recent birth and migration follow from demographics;
+# employment status follows from all of those; income from employment and
+# schooling. Coverage then depends on the things programmes are written in
+# terms of -- income, employment, disability, age, a recent birth,
+# citizenship, veteran status, and (for minors) the parents' employment --
+# plus direct `SEX`/`RAC1P`/`HISP` edges for the residual gap, as elsewhere.
+# `NATIVITY` has no direct edge: it reaches coverage through citizenship.
+ACSPUBCOV_DAG: List[Edge] = [
+    ("RAC1P", "ANC"),
+    ("HISP", "ANC"),
+    ("NATIVITY", "ANC"),
+    ("NATIVITY", "CIT"),
+    ("AGEP", "CIT"),
+    ("HISP", "CIT"),
+    ("AGEP", "DEAR"),
+    ("AGEP", "DEYE"),
+    ("AGEP", "DREM"),
+    ("SEX", "DREM"),
+    ("DEAR", "DIS"),
+    ("DEYE", "DIS"),
+    ("DREM", "DIS"),
+    ("AGEP", "DIS"),
+    ("AGEP", "SCHL"),
+    ("SEX", "SCHL"),
+    ("RAC1P", "SCHL"),
+    ("HISP", "SCHL"),
+    ("NATIVITY", "SCHL"),
+    ("DREM", "SCHL"),
+    ("AGEP", "MAR"),
+    ("SEX", "MAR"),
+    ("RAC1P", "MAR"),
+    ("HISP", "MAR"),
+    ("AGEP", "ESP"),
+    ("MAR", "ESP"),
+    ("AGEP", "MIL"),
+    ("SEX", "MIL"),
+    ("CIT", "MIL"),
+    ("AGEP", "MIG"),
+    ("MAR", "MIG"),
+    ("NATIVITY", "MIG"),
+    ("AGEP", "FER"),
+    ("SEX", "FER"),
+    ("MAR", "FER"),
+    ("AGEP", "ESR"),
+    ("SEX", "ESR"),
+    ("SCHL", "ESR"),
+    ("DIS", "ESR"),
+    ("MIL", "ESR"),
+    ("FER", "ESR"),
+    ("MAR", "ESR"),
+    ("ESR", "PINCP"),
+    ("SCHL", "PINCP"),
+    ("AGEP", "PINCP"),
+    ("SEX", "PINCP"),
+    ("DIS", "PINCP"),
+    ("MAR", "PINCP"),
+    ("PINCP", "public_coverage"),
+    ("ESR", "public_coverage"),
+    ("DIS", "public_coverage"),
+    ("AGEP", "public_coverage"),
+    ("FER", "public_coverage"),
+    ("CIT", "public_coverage"),
+    ("MIL", "public_coverage"),
+    ("MAR", "public_coverage"),
+    ("ESP", "public_coverage"),
+    ("SEX", "public_coverage"),
+    ("RAC1P", "public_coverage"),
+    ("HISP", "public_coverage"),
+]
+
+# CDC Diabetes (`data/cdc_diabetes.py`): 22 nodes, the usual social-
+# determinants layering. Sex and age are roots; they and each other shape
+# education and income; socioeconomic status shapes access to care and health
+# behaviours; behaviours shape BMI; BMI and behaviours shape blood pressure
+# and cholesterol, which shape heart disease and stroke; general health,
+# days unwell and difficulty walking summarise all of that.
+#
+# The outcome is kept a sink, as in every other graph here, because the task
+# is predicting it. Clinically some arrows also run the other way (diabetes
+# causes heart disease and poor self-rated health); those are drawn as
+# predictors of the outcome, which is a modelling choice and not a claim.
+# Direct `Sex`/`Income`/`Education` -> outcome edges are the residual effect.
+CDC_DIABETES_DAG: List[Edge] = [
+    ("Age", "Education"),
+    ("Sex", "Education"),
+    ("Education", "Income"),
+    ("Age", "Income"),
+    ("Sex", "Income"),
+    ("Income", "AnyHealthcare"),
+    ("Education", "AnyHealthcare"),
+    ("Age", "AnyHealthcare"),
+    ("Income", "NoDocbcCost"),
+    ("AnyHealthcare", "NoDocbcCost"),
+    ("AnyHealthcare", "CholCheck"),
+    ("NoDocbcCost", "CholCheck"),
+    ("Age", "CholCheck"),
+    ("Sex", "Smoker"),
+    ("Age", "Smoker"),
+    ("Education", "Smoker"),
+    ("Income", "Smoker"),
+    ("Sex", "PhysActivity"),
+    ("Age", "PhysActivity"),
+    ("Education", "PhysActivity"),
+    ("Income", "PhysActivity"),
+    ("Sex", "Fruits"),
+    ("Education", "Fruits"),
+    ("Income", "Fruits"),
+    ("Sex", "Veggies"),
+    ("Education", "Veggies"),
+    ("Income", "Veggies"),
+    ("Sex", "HvyAlcoholConsump"),
+    ("Age", "HvyAlcoholConsump"),
+    ("Income", "HvyAlcoholConsump"),
+    ("PhysActivity", "BMI"),
+    ("Fruits", "BMI"),
+    ("Veggies", "BMI"),
+    ("Age", "BMI"),
+    ("Sex", "BMI"),
+    ("Income", "BMI"),
+    ("Education", "BMI"),
+    ("BMI", "HighBP"),
+    ("Age", "HighBP"),
+    ("Sex", "HighBP"),
+    ("Smoker", "HighBP"),
+    ("HvyAlcoholConsump", "HighBP"),
+    ("PhysActivity", "HighBP"),
+    ("BMI", "HighChol"),
+    ("Age", "HighChol"),
+    ("Sex", "HighChol"),
+    ("CholCheck", "HighChol"),
+    ("HighBP", "HeartDiseaseorAttack"),
+    ("HighChol", "HeartDiseaseorAttack"),
+    ("Smoker", "HeartDiseaseorAttack"),
+    ("Age", "HeartDiseaseorAttack"),
+    ("Sex", "HeartDiseaseorAttack"),
+    ("BMI", "HeartDiseaseorAttack"),
+    ("HighBP", "Stroke"),
+    ("HighChol", "Stroke"),
+    ("Smoker", "Stroke"),
+    ("Age", "Stroke"),
+    ("HeartDiseaseorAttack", "Stroke"),
+    ("Age", "PhysHlth"),
+    ("BMI", "PhysHlth"),
+    ("HeartDiseaseorAttack", "PhysHlth"),
+    ("Stroke", "PhysHlth"),
+    ("Income", "MentHlth"),
+    ("Sex", "MentHlth"),
+    ("PhysHlth", "MentHlth"),
+    ("Age", "DiffWalk"),
+    ("BMI", "DiffWalk"),
+    ("Stroke", "DiffWalk"),
+    ("PhysHlth", "DiffWalk"),
+    ("BMI", "GenHlth"),
+    ("HighBP", "GenHlth"),
+    ("HeartDiseaseorAttack", "GenHlth"),
+    ("Stroke", "GenHlth"),
+    ("PhysActivity", "GenHlth"),
+    ("Income", "GenHlth"),
+    ("Age", "GenHlth"),
+    ("PhysHlth", "GenHlth"),
+    ("MentHlth", "GenHlth"),
+    ("BMI", "Diabetes_binary"),
+    ("HighBP", "Diabetes_binary"),
+    ("HighChol", "Diabetes_binary"),
+    ("Age", "Diabetes_binary"),
+    ("PhysActivity", "Diabetes_binary"),
+    ("HeartDiseaseorAttack", "Diabetes_binary"),
+    ("Smoker", "Diabetes_binary"),
+    ("HvyAlcoholConsump", "Diabetes_binary"),
+    ("AnyHealthcare", "Diabetes_binary"),
+    ("CholCheck", "Diabetes_binary"),
+    ("GenHlth", "Diabetes_binary"),
+    ("DiffWalk", "Diabetes_binary"),
+    ("Sex", "Diabetes_binary"),
+    ("Income", "Diabetes_binary"),
+    ("Education", "Diabetes_binary"),
+]
+
+# HMDA mortgage applications (`data/hmda.py`): 17 nodes, the order in which an
+# application comes to exist. The applicant's sex, race, ethnicity and age are
+# roots. They shape whether there is a co-applicant and what the household
+# earns; race, ethnicity and income shape where the property is (the tract's
+# minority share and relative income -- residential segregation, and the
+# channel redlining acts through). The loan follows: its purpose, its size,
+# whether that size is over the conforming limit, the programme (FHA, VA and
+# USDA loans are where low-down-payment and minority borrowers are
+# concentrated), the term, and the two underwriting ratios, which are
+# arithmetic on income, loan size and programme. The lender's automated
+# underwriting system follows from the programme. The decision depends on all
+# of it.
+#
+# The direct protected -> `approved` edges are the residual disparity that the
+# reported underwriting variables do not explain, as in the other graphs, and
+# are what FTU cuts. They are not a claim of disparate treatment: the public
+# file has no credit score, so part of that residual is an unobserved
+# underwriting input (see the module docstring of `data/hmda.py`).
+HMDA_DAG: List[Edge] = [
+    ("sex", "coapplicant"),
+    ("race", "coapplicant"),
+    ("ethnicity", "coapplicant"),
+    ("age", "coapplicant"),
+    ("sex", "income"),
+    ("race", "income"),
+    ("ethnicity", "income"),
+    ("age", "income"),
+    ("coapplicant", "income"),
+    ("race", "tract_minority"),
+    ("ethnicity", "tract_minority"),
+    ("income", "tract_minority"),
+    ("race", "tract_income"),
+    ("ethnicity", "tract_income"),
+    ("income", "tract_income"),
+    ("tract_minority", "tract_income"),
+    ("age", "loan_purpose"),
+    ("income", "loan_purpose"),
+    ("income", "loan_amount"),
+    ("coapplicant", "loan_amount"),
+    ("age", "loan_amount"),
+    ("tract_income", "loan_amount"),
+    ("loan_purpose", "loan_amount"),
+    ("loan_amount", "jumbo"),
+    ("sex", "loan_type"),
+    ("race", "loan_type"),
+    ("ethnicity", "loan_type"),
+    ("age", "loan_type"),
+    ("income", "loan_type"),
+    ("loan_purpose", "loan_type"),
+    ("loan_amount", "loan_type"),
+    ("jumbo", "loan_type"),
+    ("age", "loan_term"),
+    ("income", "loan_term"),
+    ("loan_purpose", "loan_term"),
+    ("loan_type", "loan_term"),
+    ("age", "ltv"),
+    ("income", "ltv"),
+    ("loan_purpose", "ltv"),
+    ("loan_amount", "ltv"),
+    ("loan_type", "ltv"),
+    ("income", "dti"),
+    ("coapplicant", "dti"),
+    ("loan_amount", "dti"),
+    ("loan_term", "dti"),
+    ("loan_type", "dti"),
+    ("loan_type", "aus"),
+    ("jumbo", "aus"),
+    ("loan_purpose", "aus"),
+    ("dti", "approved"),
+    ("ltv", "approved"),
+    ("income", "approved"),
+    ("loan_amount", "approved"),
+    ("jumbo", "approved"),
+    ("loan_type", "approved"),
+    ("loan_purpose", "approved"),
+    ("loan_term", "approved"),
+    ("aus", "approved"),
+    ("coapplicant", "approved"),
+    ("tract_minority", "approved"),
+    ("tract_income", "approved"),
+    ("sex", "approved"),
+    ("race", "approved"),
+    ("ethnicity", "approved"),
+    ("age", "approved"),
+]
+
 CAUSAL_GRAPHS: Dict[str, List[Edge]] = {
     "adult": ADULT_DAG,
     "compas": COMPAS_DAG,
     "snake": SNAKE_DAG,
     "sbo": SBO_DAG,
+    "acsincome_ca": ACSINCOME_DAG,
+    "acsincome_tx": ACSINCOME_DAG,
+    "acspubcov_ca": ACSPUBCOV_DAG,
+    "acspubcov_tx": ACSPUBCOV_DAG,
+    "cdc_diabetes": CDC_DIABETES_DAG,
+    "hmda_ca": HMDA_DAG,
+    "hmda_tx": HMDA_DAG,
 }
 
 

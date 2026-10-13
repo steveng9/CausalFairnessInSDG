@@ -39,7 +39,7 @@ import pandas as pd
 
 from ..data.causal_graphs import CAUSAL_GRAPHS, as_digraph
 from ..fairness.base import AttributeRoles, FairnessMechanism
-from .base import SDGMethod, SDGResult
+from .base import SDGMethod, SDGResult, borrow_untuned_settings
 
 try:
     from ._decaf_ctgan import ColumnBlocks, CTGANCausalTrainer
@@ -502,3 +502,10 @@ class DECAFDPDiffusionMethod(DECAFDiffusionMethod):
         "snake": {"max_epochs": 100, "batch_size": 256, "timesteps": 50},
         "sbo": {"max_epochs": 100, "batch_size": 256, "timesteps": 50},
     }
+
+
+for _variant in (
+    DECAFDPGANMethod, DECAFCTGANMethod, DECAFDPCTGANMethod,
+    DECAFDiffusionMethod, DECAFDPDiffusionMethod,
+):
+    borrow_untuned_settings(_variant.settings)

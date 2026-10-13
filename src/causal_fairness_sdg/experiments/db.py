@@ -179,6 +179,21 @@ def update_run_status(
     conn.commit()
 
 
+def merge_run_params(conn: sqlite3.Connection, run_id: int, params: Dict[str, Any]) -> None:
+    """Add `params` to a run's `extra_params` -- for provenance that is only
+    known once the method has run (e.g. which checkpoint file it loaded)."""
+    if not params:
+        return
+    (raw,) = conn.execute(
+        "SELECT extra_params FROM runs WHERE run_id = ?", (run_id,)
+    ).fetchone()
+    merged = {**(json.loads(raw) if raw else {}), **params}
+    conn.execute(
+        "UPDATE runs SET extra_params = ? WHERE run_id = ?", (json.dumps(merged), run_id)
+    )
+    conn.commit()
+
+
 def log_metric(
     conn: sqlite3.Connection,
     run_id: int,
