@@ -1,0 +1,37 @@
+{
+  "batch": "facct-eps-b-2026-10-13",
+  "created": "2026-10-13T03:57:18",
+  "datasets": [
+    "acsincome_ca",
+    "acsincome_tx",
+    "snake",
+    "sbo",
+    "acspubcov_ca",
+    "acspubcov_tx",
+    "cdc_diabetes",
+    "hmda_ca",
+    "hmda_tx",
+    "adult",
+    "compas"
+  ],
+  "methods": [
+    "mst",
+    "privbayes",
+    "privsyn"
+  ],
+  "seeds": [
+    0,
+    1,
+    2,
+    3,
+    4
+  ],
+  "epsilons": [
+    0.3,
+    3.0,
+    30.0,
+    300.0
+  ],
+  "classifier": "rf",
+  "notes": "Privacy axis for the DP marginal generators, second extension: the half-decade points epsilon 0.3, 3, 30, 300. With facct-2026-10-09 (1, 10, 1000) and facct-eps-a-2026-10-13 (0.1, 100) this gives nine epsilons from 0.1 to 1000 on the same datasets, role splits, mechanisms, seeds and classifier."
+}

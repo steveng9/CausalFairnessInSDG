@@ -1,0 +1,35 @@
+{
+  "batch": "facct-eps-a-2026-10-13",
+  "created": "2026-10-13T03:57:18",
+  "datasets": [
+    "acsincome_ca",
+    "acsincome_tx",
+    "snake",
+    "sbo",
+    "acspubcov_ca",
+    "acspubcov_tx",
+    "cdc_diabetes",
+    "hmda_ca",
+    "hmda_tx",
+    "adult",
+    "compas"
+  ],
+  "methods": [
+    "mst",
+    "privbayes",
+    "privsyn"
+  ],
+  "seeds": [
+    0,
+    1,
+    2,
+    3,
+    4
+  ],
+  "epsilons": [
+    0.1,
+    100.0
+  ],
+  "classifier": "rf",
+  "notes": "Privacy axis for the DP marginal generators, first extension: epsilon 0.1 and 100, to go with 1, 10, 1000 in facct-2026-10-09. Same datasets, role splits, mechanisms, seeds and classifier, so the two batches concatenate into a five-point epsilon grid. Question: how the privacy budget changes what each causal fairness mechanism does, by family, mechanism, dataset and role split."
+}

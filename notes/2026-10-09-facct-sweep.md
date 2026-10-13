@@ -426,3 +426,20 @@ tail sweeps/facct-fges-2026-10-13/scheduler-cpu.out sweeps/chain-gpu1-fges-2026-
 python scripts/discover_graphs.py            # regenerate the graphs
 python scripts/summarize_graphs.py           # regenerate the comparison table
 ```
+
+## 14. Queued, 2026-10-13 — privacy axis for the DP marginal generators
+
+Steven, 2026-10-13: next priority after the main portability results is how the privacy
+budget affects the causal fairness mechanisms, across families, mechanisms, datasets and
+role splits. First step: fill the epsilon grid for MST, PrivBayes and PrivSyn.
+
+- `facct-eps-a-2026-10-13`: epsilon 0.1, 100 (3,960 runs, about 5 hours on 14 workers).
+- `facct-eps-b-2026-10-13`: epsilon 0.3, 3, 30, 300 (7,920 runs, about 10 hours).
+- Same 11 datasets, 3 role splits, 4 mechanisms, 5 seeds and RF classifier as
+  `facct-2026-10-09`, which holds epsilon 1, 10, 1000; the three concatenate.
+- Both start by themselves when the `facct-fges` torch shards finish
+  (`sweeps/chain-cpu-eps-2026-10-13.sh`, waiting on that scheduler's PID).
+- Not covered: the DP causal families (`decaf_dpgan`, `decaf_dpdiffusion`), which wait
+  on the graph decision in §13, and AIM.
+- Analysis to do afterwards (plan §1e): separate DP noise shrinking the baseline gap
+  from the mechanism's own effect at each epsilon.
