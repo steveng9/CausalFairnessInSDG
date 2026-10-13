@@ -1,0 +1,74 @@
+Disabling PyTorch because PyTorch >= 2.4 is required but found 2.2.2
+PyTorch was not found. Models won't be available and only tokenizers, configuration and file/data utilities can be used.
+[10-10 19:51:52] batch=facct-2026-10-09 code=33a7139-dirty:379582ab shards=35 workers=1 cpus=32-47 gpu=1
+[10-10 19:51:52] start acsincome_ca-decaf_tabpfn-s0 pid=752298 (0/12 already finished)
+[10-10 20:01:55] exit acsincome_ca-decaf_tabpfn-s0 rc=0 finished=12/12 failed=0
+[10-10 20:01:55] start acsincome_tx-decaf_tabpfn-s0 pid=755404 (0/12 already finished)
+[10-10 20:11:17] exit acsincome_tx-decaf_tabpfn-s0 rc=0 finished=12/12 failed=0
+[10-10 20:11:17] start snake-decaf_tabpfn-s0 pid=757613 (0/12 already finished)
+[10-10 20:23:19] exit snake-decaf_tabpfn-s0 rc=0 finished=12/12 failed=0
+[10-10 20:23:19] start sbo-decaf_tabpfn-s0 pid=760488 (0/12 already finished)
+[10-10 20:58:47] exit sbo-decaf_tabpfn-s0 rc=0 finished=12/12 failed=0
+[10-10 20:58:47] start acspubcov_ca-decaf_tabpfn-s0 pid=768706 (0/12 already finished)
+[10-10 21:10:10] exit acspubcov_ca-decaf_tabpfn-s0 rc=0 finished=12/12 failed=0
+[10-10 21:10:10] start acspubcov_tx-decaf_tabpfn-s0 pid=771045 (0/12 already finished)
+[10-10 21:21:13] exit acspubcov_tx-decaf_tabpfn-s0 rc=0 finished=12/12 failed=0
+[10-10 21:21:13] start cdc_diabetes-decaf_tabpfn-s0 pid=773290 (0/12 already finished)
+[10-10 21:34:15] exit cdc_diabetes-decaf_tabpfn-s0 rc=0 finished=12/12 failed=0
+[10-10 21:34:15] start acsincome_ca-decaf_tabpfn-s1 pid=775922 (0/12 already finished)
+[10-10 21:44:18] exit acsincome_ca-decaf_tabpfn-s1 rc=0 finished=12/12 failed=0
+[10-10 21:44:18] start acsincome_tx-decaf_tabpfn-s1 pid=777902 (0/12 already finished)
+[10-10 21:53:40] exit acsincome_tx-decaf_tabpfn-s1 rc=0 finished=12/12 failed=0
+[10-10 21:53:40] start snake-decaf_tabpfn-s1 pid=779704 (0/12 already finished)
+[10-10 22:05:03] exit snake-decaf_tabpfn-s1 rc=0 finished=12/12 failed=0
+[10-10 22:05:03] start sbo-decaf_tabpfn-s1 pid=781852 (0/12 already finished)
+[10-10 22:39:11] exit sbo-decaf_tabpfn-s1 rc=0 finished=12/12 failed=0
+[10-10 22:39:11] start acspubcov_ca-decaf_tabpfn-s1 pid=788263 (0/12 already finished)
+[10-10 22:50:14] exit acspubcov_ca-decaf_tabpfn-s1 rc=0 finished=12/12 failed=0
+[10-10 22:50:14] start acspubcov_tx-decaf_tabpfn-s1 pid=790363 (0/12 already finished)
+[10-10 23:00:37] exit acspubcov_tx-decaf_tabpfn-s1 rc=0 finished=12/12 failed=0
+[10-10 23:00:37] start cdc_diabetes-decaf_tabpfn-s1 pid=792493 (0/12 already finished)
+[10-10 23:12:59] exit cdc_diabetes-decaf_tabpfn-s1 rc=0 finished=12/12 failed=0
+[10-10 23:12:59] start acsincome_ca-decaf_tabpfn-s2 pid=794981 (0/12 already finished)
+[10-10 23:22:01] exit acsincome_ca-decaf_tabpfn-s2 rc=0 finished=12/12 failed=0
+[10-10 23:22:01] start acsincome_tx-decaf_tabpfn-s2 pid=796823 (0/12 already finished)
+[10-10 23:30:22] exit acsincome_tx-decaf_tabpfn-s2 rc=0 finished=12/12 failed=0
+[10-10 23:30:22] start snake-decaf_tabpfn-s2 pid=798526 (0/12 already finished)
+[10-10 23:40:45] exit snake-decaf_tabpfn-s2 rc=0 finished=12/12 failed=0
+[10-10 23:40:45] start sbo-decaf_tabpfn-s2 pid=800637 (0/12 already finished)
+[10-11 00:11:12] exit sbo-decaf_tabpfn-s2 rc=0 finished=12/12 failed=0
+[10-11 00:11:12] start acspubcov_ca-decaf_tabpfn-s2 pid=806868 (0/12 already finished)
+[10-11 00:20:55] exit acspubcov_ca-decaf_tabpfn-s2 rc=0 finished=12/12 failed=0
+[10-11 00:20:55] start acspubcov_tx-decaf_tabpfn-s2 pid=808842 (0/12 already finished)
+[10-11 00:30:17] exit acspubcov_tx-decaf_tabpfn-s2 rc=0 finished=12/12 failed=0
+[10-11 00:30:17] start cdc_diabetes-decaf_tabpfn-s2 pid=810721 (0/12 already finished)
+[10-11 00:41:40] exit cdc_diabetes-decaf_tabpfn-s2 rc=0 finished=12/12 failed=0
+[10-11 00:41:40] start acsincome_ca-decaf_tabpfn-s3 pid=813015 (0/12 already finished)
+[10-11 00:50:22] exit acsincome_ca-decaf_tabpfn-s3 rc=0 finished=12/12 failed=0
+[10-11 00:50:22] start acsincome_tx-decaf_tabpfn-s3 pid=814747 (0/12 already finished)
+[10-11 00:58:45] exit acsincome_tx-decaf_tabpfn-s3 rc=0 finished=12/12 failed=0
+[10-11 00:58:45] start snake-decaf_tabpfn-s3 pid=816337 (0/12 already finished)
+[10-11 01:09:07] exit snake-decaf_tabpfn-s3 rc=0 finished=12/12 failed=0
+[10-11 01:09:07] start sbo-decaf_tabpfn-s3 pid=818294 (0/12 already finished)
+[10-11 01:39:54] exit sbo-decaf_tabpfn-s3 rc=0 finished=12/12 failed=0
+[10-11 01:39:54] start acspubcov_ca-decaf_tabpfn-s3 pid=824055 (0/12 already finished)
+[10-11 01:49:37] exit acspubcov_ca-decaf_tabpfn-s3 rc=0 finished=12/12 failed=0
+[10-11 01:49:37] start acspubcov_tx-decaf_tabpfn-s3 pid=825896 (0/12 already finished)
+[10-11 01:59:00] exit acspubcov_tx-decaf_tabpfn-s3 rc=0 finished=12/12 failed=0
+[10-11 01:59:00] start cdc_diabetes-decaf_tabpfn-s3 pid=827674 (0/12 already finished)
+[10-11 02:10:23] exit cdc_diabetes-decaf_tabpfn-s3 rc=0 finished=12/12 failed=0
+[10-11 02:10:23] start acsincome_ca-decaf_tabpfn-s4 pid=830817 (0/12 already finished)
+[10-11 02:19:05] exit acsincome_ca-decaf_tabpfn-s4 rc=0 finished=12/12 failed=0
+[10-11 02:19:05] start acsincome_tx-decaf_tabpfn-s4 pid=833380 (0/12 already finished)
+[10-11 02:27:27] exit acsincome_tx-decaf_tabpfn-s4 rc=0 finished=12/12 failed=0
+[10-11 02:27:27] start snake-decaf_tabpfn-s4 pid=835716 (0/12 already finished)
+[10-11 02:37:49] exit snake-decaf_tabpfn-s4 rc=0 finished=12/12 failed=0
+[10-11 02:37:49] start sbo-decaf_tabpfn-s4 pid=838485 (0/12 already finished)
+[10-11 03:08:36] exit sbo-decaf_tabpfn-s4 rc=0 finished=12/12 failed=0
+[10-11 03:08:36] start acspubcov_ca-decaf_tabpfn-s4 pid=847700 (0/12 already finished)
+[10-11 03:17:18] exit acspubcov_ca-decaf_tabpfn-s4 rc=0 finished=12/12 failed=0
+[10-11 03:17:18] start acspubcov_tx-decaf_tabpfn-s4 pid=850414 (0/12 already finished)
+[10-11 03:26:00] exit acspubcov_tx-decaf_tabpfn-s4 rc=0 finished=12/12 failed=0
+[10-11 03:26:00] start cdc_diabetes-decaf_tabpfn-s4 pid=852678 (0/12 already finished)
+[10-11 03:36:02] exit cdc_diabetes-decaf_tabpfn-s4 rc=0 finished=12/12 failed=0
+[10-11 03:36:22] nothing left to schedule

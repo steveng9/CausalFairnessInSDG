@@ -1,0 +1,43 @@
+{
+  "batch": "facct-2026-10-09",
+  "created": "2026-10-09T23:14:18",
+  "datasets": [
+    "acsincome_ca",
+    "acsincome_tx",
+    "snake",
+    "sbo",
+    "acspubcov_ca",
+    "acspubcov_tx",
+    "cdc_diabetes",
+    "hmda_ca",
+    "hmda_tx",
+    "adult",
+    "compas"
+  ],
+  "methods": [
+    "mst",
+    "privbayes",
+    "privsyn",
+    "decaf_tabpfn"
+  ],
+  "seeds": [
+    0,
+    1,
+    2,
+    3,
+    4
+  ],
+  "epsilons": [
+    1.0,
+    10.0,
+    1000.0
+  ],
+  "classifier": "rf",
+  "notes": "FAccT unified sweep. Marginal generators only for now; torch backbones (decaf, decaf_ctgan, decaf_dpgan, decaf_dpctgan, decaf_diffusion, decaf_dpdiffusion) are added to 'methods' once their per-dataset epochs are tuned. 2026-10-10: added acspubcov_ca, acspubcov_tx, cdc_diabetes (marginal generators). 2026-10-10: added decaf_tabpfn (DECAF's causal generator with TabPFN-3.5 in context as every attribute's conditional; not private, so one run per cell with NULL epsilon; hand-drawn DAGs, same as the GAN/diffusion families). Its shards run under the sdg_tabpfn environment ('python') and only from a scheduler given --gpu ('gpu_only'). Settings are on every row's extra_params; held-out log-loss of its conditionals is in tabpfn_conditionals.csv. 2026-10-12: added hmda_ca, hmda_tx (HMDA 2018 mortgage applications, data/hmda.py; marginal generators and decaf_tabpfn) and adult, compas (appendix continuity; previously only in rf-2026-09-01 at eps=10).",
+  "python": {
+    "decaf_tabpfn": "/home/golobs/miniconda3/envs/sdg_tabpfn/bin/python"
+  },
+  "gpu_only": [
+    "decaf_tabpfn"
+  ]
+}

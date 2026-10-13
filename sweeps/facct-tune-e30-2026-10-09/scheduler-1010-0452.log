@@ -1,0 +1,114 @@
+Disabling PyTorch because PyTorch >= 2.4 is required but found 2.2.2
+PyTorch was not found. Models won't be available and only tokenizers, configuration and file/data utilities can be used.
+[10-10 04:52:16] batch=facct-tune-e30-2026-10-09 code=33a7139-dirty:56c5e3ba shards=54 workers=14 cpus=32-47 gpu=None
+[10-10 04:52:16] start acsincome_ca-decaf-s0 pid=554332 (0/3 already finished)
+[10-10 04:52:16] start acsincome_ca-decaf_ctgan-s0 pid=554336 (0/3 already finished)
+[10-10 04:52:16] start acsincome_ca-decaf_diffusion-s0 pid=554340 (0/3 already finished)
+[10-10 04:52:16] start acsincome_ca-decaf_dpgan-s0 pid=554344 (0/3 already finished)
+[10-10 04:52:16] start acsincome_ca-decaf_dpctgan-s0 pid=554348 (0/3 already finished)
+[10-10 04:52:16] start acsincome_ca-decaf_dpdiffusion-s0 pid=554352 (0/3 already finished)
+[10-10 04:52:16] start snake-decaf-s0 pid=554357 (0/3 already finished)
+[10-10 04:52:16] start snake-decaf_ctgan-s0 pid=554362 (0/3 already finished)
+[10-10 04:52:16] start snake-decaf_diffusion-s0 pid=554367 (0/3 already finished)
+[10-10 04:52:16] start snake-decaf_dpgan-s0 pid=554372 (0/3 already finished)
+[10-10 04:52:16] start snake-decaf_dpctgan-s0 pid=554376 (0/3 already finished)
+[10-10 04:52:16] start snake-decaf_dpdiffusion-s0 pid=554381 (0/3 already finished)
+[10-10 04:52:16] start sbo-decaf-s0 pid=554386 (0/3 already finished)
+[10-10 04:52:16] start sbo-decaf_ctgan-s0 pid=554391 (0/3 already finished)
+[10-10 04:57:18] exit acsincome_ca-decaf_ctgan-s0 rc=0 finished=3/3 failed=0
+[10-10 04:57:18] exit acsincome_ca-decaf_diffusion-s0 rc=0 finished=3/3 failed=0
+[10-10 04:57:18] start sbo-decaf_diffusion-s0 pid=556796 (0/3 already finished)
+[10-10 04:57:18] start sbo-decaf_dpgan-s0 pid=556800 (0/3 already finished)
+[10-10 04:59:18] exit snake-decaf_diffusion-s0 rc=0 finished=3/3 failed=0
+[10-10 04:59:18] start sbo-decaf_dpctgan-s0 pid=557511 (0/3 already finished)
+[10-10 04:59:38] exit snake-decaf_ctgan-s0 rc=0 finished=3/3 failed=0
+[10-10 04:59:38] start sbo-decaf_dpdiffusion-s0 pid=557648 (0/3 already finished)
+[10-10 04:59:58] exit acsincome_ca-decaf-s0 rc=0 finished=3/3 failed=0
+[10-10 04:59:58] start acsincome_ca-decaf-s1 pid=557754 (0/3 already finished)
+[10-10 05:02:39] exit snake-decaf-s0 rc=0 finished=3/3 failed=0
+[10-10 05:02:39] start acsincome_ca-decaf_ctgan-s1 pid=558711 (0/3 already finished)
+[10-10 05:02:59] exit acsincome_ca-decaf_dpgan-s0 rc=0 finished=3/3 failed=0
+[10-10 05:02:59] exit snake-decaf_dpgan-s0 rc=0 finished=3/3 failed=0
+[10-10 05:02:59] start acsincome_ca-decaf_diffusion-s1 pid=558899 (0/3 already finished)
+[10-10 05:02:59] start acsincome_ca-decaf_dpgan-s1 pid=558903 (0/3 already finished)
+[10-10 05:05:40] exit sbo-decaf_ctgan-s0 rc=0 finished=3/3 failed=0
+[10-10 05:05:40] start acsincome_ca-decaf_dpctgan-s1 pid=560349 (0/3 already finished)
+[10-10 05:07:20] exit acsincome_ca-decaf_dpctgan-s0 rc=0 finished=3/3 failed=0
+[10-10 05:07:20] start acsincome_ca-decaf_dpdiffusion-s1 pid=560916 (0/3 already finished)
+[10-10 05:07:40] exit acsincome_ca-decaf_diffusion-s1 rc=0 finished=3/3 failed=0
+[10-10 05:07:40] start snake-decaf-s1 pid=561053 (0/3 already finished)
+[10-10 05:08:00] exit acsincome_ca-decaf-s1 rc=0 finished=3/3 failed=0
+[10-10 05:08:00] start snake-decaf_ctgan-s1 pid=561171 (0/3 already finished)
+[10-10 05:08:20] exit acsincome_ca-decaf_ctgan-s1 rc=0 finished=3/3 failed=0
+[10-10 05:08:20] start snake-decaf_diffusion-s1 pid=561289 (0/3 already finished)
+[10-10 05:09:00] exit sbo-decaf-s0 rc=0 finished=3/3 failed=0
+[10-10 05:09:00] start snake-decaf_dpgan-s1 pid=561562 (0/3 already finished)
+[10-10 05:09:41] exit snake-decaf_dpctgan-s0 rc=0 finished=3/3 failed=0
+[10-10 05:09:41] start snake-decaf_dpctgan-s1 pid=561806 (0/3 already finished)
+[10-10 05:11:41] exit sbo-decaf_diffusion-s0 rc=0 finished=3/3 failed=0
+[10-10 05:11:41] start snake-decaf_dpdiffusion-s1 pid=562564 (0/3 already finished)
+[10-10 05:14:02] exit sbo-decaf_dpgan-s0 rc=0 finished=3/3 failed=0
+[10-10 05:14:02] start sbo-decaf-s1 pid=563512 (0/3 already finished)
+[10-10 05:14:42] exit acsincome_ca-decaf_dpgan-s1 rc=0 finished=3/3 failed=0
+[10-10 05:14:42] start sbo-decaf_ctgan-s1 pid=563802 (0/3 already finished)
+[10-10 05:16:22] exit snake-decaf_ctgan-s1 rc=0 finished=3/3 failed=0
+[10-10 05:16:22] start sbo-decaf_diffusion-s1 pid=564651 (0/3 already finished)
+[10-10 05:17:03] exit snake-decaf_diffusion-s1 rc=0 finished=3/3 failed=0
+[10-10 05:17:03] start sbo-decaf_dpgan-s1 pid=564883 (0/3 already finished)
+[10-10 05:20:43] exit snake-decaf-s1 rc=0 finished=3/3 failed=0
+[10-10 05:20:43] start sbo-decaf_dpctgan-s1 pid=566215 (0/3 already finished)
+[10-10 05:21:24] exit snake-decaf_dpgan-s1 rc=0 finished=3/3 failed=0
+[10-10 05:21:24] start sbo-decaf_dpdiffusion-s1 pid=566458 (0/3 already finished)
+[10-10 05:21:44] exit acsincome_ca-decaf_dpctgan-s1 rc=0 finished=3/3 failed=0
+[10-10 05:21:44] start acsincome_ca-decaf-s2 pid=566567 (0/3 already finished)
+[10-10 05:25:24] exit sbo-decaf_dpctgan-s0 rc=0 finished=3/3 failed=0
+[10-10 05:25:24] start acsincome_ca-decaf_ctgan-s2 pid=568076 (0/3 already finished)
+[10-10 05:33:06] exit sbo-decaf_ctgan-s1 rc=0 finished=3/3 failed=0
+[10-10 05:33:06] start acsincome_ca-decaf_diffusion-s2 pid=571098 (0/3 already finished)
+[10-10 05:33:46] exit acsincome_ca-decaf_ctgan-s2 rc=0 finished=3/3 failed=0
+[10-10 05:33:46] start acsincome_ca-decaf_dpgan-s2 pid=571330 (0/3 already finished)
+[10-10 05:34:47] exit acsincome_ca-decaf-s2 rc=0 finished=3/3 failed=0
+[10-10 05:34:47] start acsincome_ca-decaf_dpctgan-s2 pid=571687 (0/3 already finished)
+[10-10 05:35:47] exit snake-decaf_dpctgan-s1 rc=0 finished=3/3 failed=0
+[10-10 05:35:47] exit sbo-decaf_diffusion-s1 rc=0 finished=3/3 failed=0
+[10-10 05:35:47] start acsincome_ca-decaf_dpdiffusion-s2 pid=572055 (0/3 already finished)
+[10-10 05:35:47] start snake-decaf-s2 pid=572059 (0/3 already finished)
+[10-10 05:37:07] exit sbo-decaf_dpgan-s1 rc=0 finished=3/3 failed=0
+[10-10 05:37:07] start snake-decaf_ctgan-s2 pid=572553 (0/3 already finished)
+[10-10 05:37:27] exit acsincome_ca-decaf_dpdiffusion-s0 rc=0 finished=3/3 failed=0
+[10-10 05:37:27] start snake-decaf_diffusion-s2 pid=572670 (0/3 already finished)
+[10-10 05:37:47] exit sbo-decaf-s1 rc=0 finished=3/3 failed=0
+[10-10 05:37:47] start snake-decaf_dpgan-s2 pid=572792 (0/3 already finished)
+[10-10 05:41:08] exit acsincome_ca-decaf_diffusion-s2 rc=0 finished=3/3 failed=0
+[10-10 05:41:08] start snake-decaf_dpctgan-s2 pid=574003 (0/3 already finished)
+[10-10 05:48:10] exit snake-decaf_diffusion-s2 rc=0 finished=3/3 failed=0
+[10-10 05:48:10] start snake-decaf_dpdiffusion-s2 pid=576259 (0/3 already finished)
+[10-10 05:49:50] exit snake-decaf_ctgan-s2 rc=0 finished=3/3 failed=0
+[10-10 05:49:50] start sbo-decaf-s2 pid=576972 (0/3 already finished)
+[10-10 05:50:30] exit acsincome_ca-decaf_dpgan-s2 rc=0 finished=3/3 failed=0
+[10-10 05:50:30] start sbo-decaf_ctgan-s2 pid=577195 (0/3 already finished)
+[10-10 05:51:31] exit snake-decaf-s2 rc=0 finished=3/3 failed=0
+[10-10 05:51:31] start sbo-decaf_diffusion-s2 pid=577652 (0/3 already finished)
+[10-10 05:54:52] exit snake-decaf_dpgan-s2 rc=0 finished=3/3 failed=0
+[10-10 05:54:52] start sbo-decaf_dpgan-s2 pid=579307 (0/3 already finished)
+[10-10 05:57:32] exit sbo-decaf_dpctgan-s1 rc=0 finished=3/3 failed=0
+[10-10 05:57:32] start sbo-decaf_dpctgan-s2 pid=580483 (0/3 already finished)
+[10-10 05:57:52] exit acsincome_ca-decaf_dpctgan-s2 rc=0 finished=3/3 failed=0
+[10-10 05:57:52] start sbo-decaf_dpdiffusion-s2 pid=580696 (0/3 already finished)
+[10-10 06:01:13] exit acsincome_ca-decaf_dpdiffusion-s1 rc=0 finished=3/3 failed=0
+[10-10 06:09:55] exit snake-decaf_dpctgan-s2 rc=0 finished=3/3 failed=0
+[10-10 06:11:35] exit sbo-decaf_ctgan-s2 rc=0 finished=3/3 failed=0
+[10-10 06:12:15] exit sbo-decaf_dpgan-s2 rc=0 finished=1/3 failed=2
+[10-10 06:12:15] start sbo-decaf_dpgan-s2 pid=586629 (1/3 already finished)
+[10-10 06:12:36] exit sbo-decaf_diffusion-s2 rc=0 finished=3/3 failed=0
+[10-10 06:13:36] exit snake-decaf_dpdiffusion-s0 rc=0 finished=3/3 failed=0
+[10-10 06:15:56] exit sbo-decaf-s2 rc=0 finished=3/3 failed=0
+[10-10 06:24:38] exit acsincome_ca-decaf_dpdiffusion-s2 rc=0 finished=3/3 failed=0
+[10-10 06:25:38] exit sbo-decaf_dpgan-s2 rc=0 finished=3/3 failed=0
+[10-10 06:27:59] exit sbo-decaf_dpctgan-s2 rc=0 finished=3/3 failed=0
+[10-10 06:28:59] exit snake-decaf_dpdiffusion-s1 rc=0 finished=3/3 failed=0
+[10-10 06:39:01] exit sbo-decaf_dpdiffusion-s0 rc=0 finished=3/3 failed=0
+[10-10 06:40:02] exit snake-decaf_dpdiffusion-s2 rc=0 finished=3/3 failed=0
+[10-10 06:50:43] exit sbo-decaf_dpdiffusion-s1 rc=0 finished=3/3 failed=0
+[10-10 06:59:45] exit sbo-decaf_dpdiffusion-s2 rc=0 finished=3/3 failed=0
+[10-10 07:00:05] nothing left to schedule

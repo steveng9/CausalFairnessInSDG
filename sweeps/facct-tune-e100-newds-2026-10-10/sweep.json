@@ -1,0 +1,30 @@
+{
+  "batch": "facct-tune-e100-newds-2026-10-10",
+  "created": "2026-10-10T19:18:27",
+  "datasets": [
+    "acspubcov_ca",
+    "acspubcov_tx",
+    "cdc_diabetes"
+  ],
+  "methods": [
+    "decaf",
+    "decaf_ctgan",
+    "decaf_diffusion",
+    "decaf_dpgan",
+    "decaf_dpdiffusion"
+  ],
+  "seeds": [
+    0,
+    1,
+    2
+  ],
+  "epsilons": [
+    1000.0
+  ],
+  "classifier": "rf",
+  "notes": "100-epoch pilot for the torch backbones on the three datasets added 2026-10-10, same protocol as facct-tune-e100-2026-10-09 (no mechanism, eps=1000, 3 seeds). DP-CTGAN left out: it is at chance on every dataset in the earlier pilots and is parked (Steven, 2026-10-10). Hand-drawn DAGs.",
+  "only": "/none",
+  "settings": {
+    "max_epochs": 100
+  }
+}

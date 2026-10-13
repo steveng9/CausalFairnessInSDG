@@ -1,0 +1,94 @@
+Disabling PyTorch because PyTorch >= 2.4 is required but found 2.2.2
+PyTorch was not found. Models won't be available and only tokenizers, configuration and file/data utilities can be used.
+[10-10 05:23:44] batch=facct-2026-10-09 code=33a7139-dirty:d8728b22 shards=105 workers=8 cpus=32-47 gpu=None
+[10-10 05:23:44] start acspubcov_ca-mst-s0 pid=567420 (0/36 already finished)
+[10-10 05:23:44] start acspubcov_ca-privbayes-s0 pid=567424 (0/36 already finished)
+[10-10 05:23:44] start acspubcov_ca-privsyn-s0 pid=567428 (0/36 already finished)
+[10-10 05:23:44] start acspubcov_tx-mst-s0 pid=567432 (0/36 already finished)
+[10-10 05:23:44] start acspubcov_tx-privbayes-s0 pid=567436 (0/36 already finished)
+[10-10 05:23:44] start acspubcov_tx-privsyn-s0 pid=567440 (0/36 already finished)
+[10-10 05:23:44] start cdc_diabetes-mst-s0 pid=567444 (0/36 already finished)
+[10-10 05:23:44] start cdc_diabetes-privbayes-s0 pid=567448 (0/36 already finished)
+[10-10 06:01:52] exit acspubcov_tx-privsyn-s0 rc=0 finished=36/36 failed=0
+[10-10 06:01:52] start cdc_diabetes-privsyn-s0 pid=582317 (0/36 already finished)
+[10-10 06:03:33] exit acspubcov_ca-privsyn-s0 rc=0 finished=36/36 failed=0
+[10-10 06:03:33] start acspubcov_ca-mst-s1 pid=582939 (0/36 already finished)
+[10-10 06:11:35] exit acspubcov_tx-mst-s0 rc=0 finished=36/36 failed=0
+[10-10 06:11:35] start acspubcov_ca-privbayes-s1 pid=586427 (0/36 already finished)
+[10-10 06:12:35] exit acspubcov_ca-mst-s0 rc=0 finished=36/36 failed=0
+[10-10 06:12:35] exit cdc_diabetes-mst-s0 rc=0 finished=36/36 failed=0
+[10-10 06:12:35] start acspubcov_ca-privsyn-s1 pid=586791 (0/36 already finished)
+[10-10 06:12:35] start acspubcov_tx-mst-s1 pid=586795 (0/36 already finished)
+[10-10 06:25:58] exit cdc_diabetes-privsyn-s0 rc=0 finished=36/36 failed=0
+[10-10 06:25:58] start acspubcov_tx-privbayes-s1 pid=591108 (0/36 already finished)
+[10-10 06:37:41] exit acspubcov_ca-mst-s1 rc=0 finished=36/36 failed=0
+[10-10 06:37:41] start acspubcov_tx-privsyn-s1 pid=594687 (0/36 already finished)
+[10-10 06:38:41] exit acspubcov_ca-privsyn-s1 rc=0 finished=36/36 failed=0
+[10-10 06:38:41] start cdc_diabetes-mst-s1 pid=594992 (0/36 already finished)
+[10-10 06:43:22] exit acspubcov_tx-mst-s1 rc=0 finished=36/36 failed=0
+[10-10 06:43:22] start cdc_diabetes-privbayes-s1 pid=596429 (0/36 already finished)
+[10-10 06:48:23] exit acspubcov_ca-privbayes-s0 rc=0 finished=36/36 failed=0
+[10-10 06:48:23] start cdc_diabetes-privsyn-s1 pid=597940 (0/36 already finished)
+[10-10 06:48:43] exit acspubcov_tx-privbayes-s0 rc=0 finished=36/36 failed=0
+[10-10 06:48:43] start acspubcov_ca-mst-s2 pid=598047 (0/36 already finished)
+[10-10 06:59:05] exit acspubcov_tx-privsyn-s1 rc=0 finished=36/36 failed=0
+[10-10 06:59:05] start acspubcov_ca-privbayes-s2 pid=601095 (0/36 already finished)
+[10-10 07:09:27] exit cdc_diabetes-privsyn-s1 rc=0 finished=36/36 failed=0
+[10-10 07:09:28] start acspubcov_ca-privsyn-s2 pid=603863 (0/36 already finished)
+[10-10 07:10:28] exit cdc_diabetes-mst-s1 rc=0 finished=36/36 failed=0
+[10-10 07:10:28] start acspubcov_tx-mst-s2 pid=604092 (0/36 already finished)
+[10-10 07:20:30] exit acspubcov_ca-privbayes-s1 rc=0 finished=36/36 failed=0
+[10-10 07:20:30] start acspubcov_tx-privbayes-s2 pid=606228 (0/36 already finished)
+[10-10 07:25:51] exit cdc_diabetes-privbayes-s0 rc=0 finished=36/36 failed=0
+[10-10 07:25:51] start acspubcov_tx-privsyn-s2 pid=607332 (0/36 already finished)
+[10-10 07:27:52] exit acspubcov_ca-mst-s2 rc=0 finished=36/36 failed=0
+[10-10 07:27:52] start cdc_diabetes-mst-s2 pid=607754 (0/36 already finished)
+[10-10 07:37:34] exit acspubcov_tx-privbayes-s1 rc=0 finished=36/36 failed=0
+[10-10 07:37:34] start cdc_diabetes-privbayes-s2 pid=609739 (0/36 already finished)
+[10-10 07:45:56] exit acspubcov_ca-privsyn-s2 rc=0 finished=36/36 failed=0
+[10-10 07:45:56] start cdc_diabetes-privsyn-s2 pid=611477 (0/36 already finished)
+[10-10 07:55:18] exit acspubcov_tx-mst-s2 rc=0 finished=36/36 failed=0
+[10-10 07:55:18] start acspubcov_ca-mst-s3 pid=613365 (0/36 already finished)
+[10-10 08:00:39] exit acspubcov_tx-privsyn-s2 rc=0 finished=36/36 failed=0
+[10-10 08:00:39] start acspubcov_ca-privbayes-s3 pid=614327 (0/36 already finished)
+[10-10 08:13:22] exit cdc_diabetes-mst-s2 rc=0 finished=36/36 failed=0
+[10-10 08:13:22] start acspubcov_ca-privsyn-s3 pid=616432 (0/36 already finished)
+[10-10 08:15:43] exit cdc_diabetes-privsyn-s2 rc=0 finished=36/36 failed=0
+[10-10 08:15:43] start acspubcov_tx-mst-s3 pid=616857 (0/36 already finished)
+[10-10 08:32:07] exit acspubcov_ca-privbayes-s2 rc=0 finished=36/36 failed=0
+[10-10 08:32:07] start acspubcov_tx-privbayes-s3 pid=619564 (0/36 already finished)
+[10-10 08:41:29] exit acspubcov_ca-mst-s3 rc=0 finished=36/36 failed=0
+[10-10 08:41:29] start acspubcov_tx-privsyn-s3 pid=621108 (0/36 already finished)
+[10-10 08:44:30] exit cdc_diabetes-privbayes-s1 rc=0 finished=36/36 failed=0
+[10-10 08:44:30] start cdc_diabetes-mst-s3 pid=621609 (0/36 already finished)
+[10-10 08:48:51] exit acspubcov_ca-privsyn-s3 rc=0 finished=36/36 failed=0
+[10-10 08:48:51] start cdc_diabetes-privbayes-s3 pid=622351 (0/36 already finished)
+[10-10 08:53:32] exit acspubcov_tx-privbayes-s2 rc=0 finished=36/36 failed=0
+[10-10 08:53:32] start cdc_diabetes-privsyn-s3 pid=623123 (0/36 already finished)
+[10-10 08:57:33] exit acspubcov_tx-mst-s3 rc=0 finished=36/36 failed=0
+[10-10 08:57:33] start acspubcov_ca-mst-s4 pid=623814 (0/36 already finished)
+[10-10 09:08:36] exit acspubcov_tx-privsyn-s3 rc=0 finished=36/36 failed=0
+[10-10 09:08:36] start acspubcov_ca-privbayes-s4 pid=625675 (0/36 already finished)
+[10-10 09:14:17] exit cdc_diabetes-privsyn-s3 rc=0 finished=36/36 failed=0
+[10-10 09:14:17] start acspubcov_ca-privsyn-s4 pid=626626 (0/36 already finished)
+[10-10 09:16:57] exit cdc_diabetes-mst-s3 rc=0 finished=36/36 failed=0
+[10-10 09:16:57] start acspubcov_tx-mst-s4 pid=627104 (0/36 already finished)
+[10-10 09:22:59] exit acspubcov_ca-privbayes-s3 rc=0 finished=36/36 failed=0
+[10-10 09:22:59] start acspubcov_tx-privbayes-s4 pid=628123 (0/36 already finished)
+[10-10 09:28:40] exit acspubcov_ca-mst-s4 rc=0 finished=36/36 failed=0
+[10-10 09:28:40] start acspubcov_tx-privsyn-s4 pid=629075 (0/36 already finished)
+[10-10 09:36:01] exit cdc_diabetes-privbayes-s2 rc=0 finished=36/36 failed=0
+[10-10 09:36:01] start cdc_diabetes-mst-s4 pid=630320 (0/36 already finished)
+[10-10 09:37:22] exit acspubcov_ca-privsyn-s4 rc=0 finished=36/36 failed=0
+[10-10 09:37:22] start cdc_diabetes-privbayes-s4 pid=630539 (0/36 already finished)
+[10-10 09:42:23] exit acspubcov_tx-privbayes-s3 rc=0 finished=36/36 failed=0
+[10-10 09:42:23] start cdc_diabetes-privsyn-s4 pid=631428 (0/36 already finished)
+[10-10 09:45:44] exit acspubcov_tx-mst-s4 rc=0 finished=36/36 failed=0
+[10-10 09:51:25] exit acspubcov_tx-privsyn-s4 rc=0 finished=36/36 failed=0
+[10-10 10:01:48] exit cdc_diabetes-privsyn-s4 rc=0 finished=36/36 failed=0
+[10-10 10:05:09] exit cdc_diabetes-mst-s4 rc=0 finished=36/36 failed=0
+[10-10 10:08:29] exit acspubcov_ca-privbayes-s4 rc=0 finished=36/36 failed=0
+[10-10 10:14:10] exit cdc_diabetes-privbayes-s3 rc=0 finished=36/36 failed=0
+[10-10 10:15:31] exit acspubcov_tx-privbayes-s4 rc=0 finished=36/36 failed=0
+[10-10 10:54:19] exit cdc_diabetes-privbayes-s4 rc=0 finished=36/36 failed=0
+[10-10 10:54:39] nothing left to schedule

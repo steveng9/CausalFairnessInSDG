@@ -1,0 +1,39 @@
+{
+  "batch": "facct-cut025-2026-10-12",
+  "created": "2026-10-13T00:00:41",
+  "datasets": [
+    "acsincome_ca",
+    "acsincome_tx",
+    "snake",
+    "sbo",
+    "acspubcov_ca",
+    "acspubcov_tx",
+    "cdc_diabetes",
+    "hmda_ca",
+    "hmda_tx"
+  ],
+  "methods": [
+    "decaf_tabpfn"
+  ],
+  "seeds": [
+    0,
+    1,
+    2,
+    3,
+    4
+  ],
+  "epsilons": [
+    1000.0
+  ],
+  "classifier": "rf",
+  "notes": "Partial-cut axis for the TabPFN causal family (plan 1a): each mechanism's cut applied to a share cut_strength=0.25 of the generated rows (InContextCausalSampler.generate). Strength 1 is decaf_tabpfn in facct-2026-10-09; the 'none' rows here are unaffected by the setting and repeat that sweep's as a check. Hand-drawn DAGs, same splits, same seeds.",
+  "settings": {
+    "cut_strength": 0.25
+  },
+  "python": {
+    "decaf_tabpfn": "/home/golobs/miniconda3/envs/sdg_tabpfn/bin/python"
+  },
+  "gpu_only": [
+    "decaf_tabpfn"
+  ]
+}

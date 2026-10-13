@@ -1,0 +1,124 @@
+Disabling PyTorch because PyTorch >= 2.4 is required but found 2.2.2
+PyTorch was not found. Models won't be available and only tokenizers, configuration and file/data utilities can be used.
+[10-09 23:14:21] batch=facct-2026-10-09 code=33a7139-dirty:8784d94b shards=60 workers=14 cpus=32-47 gpu=None
+[10-09 23:14:21] start acsincome_ca-mst-s0 pid=458934 (0/36 already finished)
+[10-09 23:14:21] start acsincome_ca-privbayes-s0 pid=458935 (0/36 already finished)
+[10-09 23:14:21] start acsincome_ca-privsyn-s0 pid=458936 (0/36 already finished)
+[10-09 23:14:21] start acsincome_tx-mst-s0 pid=458937 (0/36 already finished)
+[10-09 23:14:21] start acsincome_tx-privbayes-s0 pid=458938 (0/36 already finished)
+[10-09 23:14:21] start acsincome_tx-privsyn-s0 pid=458939 (0/36 already finished)
+[10-09 23:14:21] start snake-mst-s0 pid=458940 (0/36 already finished)
+[10-09 23:14:21] start snake-privbayes-s0 pid=458941 (0/36 already finished)
+[10-09 23:14:21] start snake-privsyn-s0 pid=458942 (0/36 already finished)
+[10-09 23:14:21] start sbo-mst-s0 pid=458943 (0/36 already finished)
+[10-09 23:14:21] start sbo-privbayes-s0 pid=458944 (0/36 already finished)
+[10-09 23:14:21] start sbo-privsyn-s0 pid=458945 (0/36 already finished)
+[10-09 23:14:21] start acsincome_ca-mst-s1 pid=458946 (0/36 already finished)
+[10-09 23:14:21] start acsincome_ca-privbayes-s1 pid=458947 (0/36 already finished)
+[10-09 23:32:24] exit acsincome_ca-privbayes-s1 rc=0 finished=36/36 failed=0
+[10-09 23:32:24] start acsincome_ca-privsyn-s1 pid=465185 (0/36 already finished)
+[10-09 23:33:45] exit acsincome_tx-privbayes-s0 rc=0 finished=36/36 failed=0
+[10-09 23:33:45] start acsincome_tx-mst-s1 pid=465565 (0/36 already finished)
+[10-09 23:34:05] exit acsincome_ca-privbayes-s0 rc=0 finished=36/36 failed=0
+[10-09 23:34:05] start acsincome_tx-privbayes-s1 pid=465695 (0/36 already finished)
+[10-09 23:36:46] exit acsincome_tx-privsyn-s0 rc=0 finished=36/36 failed=0
+[10-09 23:36:46] start acsincome_tx-privsyn-s1 pid=466500 (0/36 already finished)
+[10-09 23:37:46] exit acsincome_ca-mst-s0 rc=0 finished=36/36 failed=0
+[10-09 23:37:46] exit acsincome_tx-mst-s0 rc=0 finished=36/36 failed=0
+[10-09 23:37:46] start snake-mst-s1 pid=466802 (0/36 already finished)
+[10-09 23:37:46] start snake-privbayes-s1 pid=466803 (0/36 already finished)
+[10-09 23:38:06] exit acsincome_ca-privsyn-s0 rc=0 finished=36/36 failed=0
+[10-09 23:38:06] start snake-privsyn-s1 pid=466935 (0/36 already finished)
+[10-09 23:38:26] exit acsincome_ca-mst-s1 rc=0 finished=36/36 failed=0
+[10-09 23:38:26] start sbo-mst-s1 pid=467042 (0/36 already finished)
+[10-09 23:44:28] exit snake-mst-s0 rc=0 finished=36/36 failed=0
+[10-09 23:44:28] start sbo-privbayes-s1 pid=468755 (0/36 already finished)
+[10-09 23:47:08] exit snake-privsyn-s0 rc=0 finished=36/36 failed=0
+[10-09 23:47:08] start sbo-privsyn-s1 pid=469508 (0/36 already finished)
+[10-09 23:51:49] exit acsincome_tx-privbayes-s1 rc=0 finished=36/36 failed=0
+[10-09 23:51:49] start acsincome_ca-mst-s2 pid=470859 (0/36 already finished)
+[10-09 23:54:10] exit snake-privbayes-s0 rc=0 finished=36/36 failed=0
+[10-09 23:54:10] start acsincome_ca-privbayes-s2 pid=471562 (0/36 already finished)
+[10-09 23:55:30] exit acsincome_ca-privsyn-s1 rc=0 finished=36/36 failed=0
+[10-09 23:55:30] start acsincome_ca-privsyn-s2 pid=471952 (0/36 already finished)
+[10-09 23:56:31] exit acsincome_tx-mst-s1 rc=0 finished=36/36 failed=0
+[10-09 23:56:31] start acsincome_tx-mst-s2 pid=472236 (0/36 already finished)
+[10-09 23:59:11] exit acsincome_tx-privsyn-s1 rc=0 finished=36/36 failed=0
+[10-09 23:59:11] start acsincome_tx-privbayes-s2 pid=473046 (0/36 already finished)
+[10-10 00:07:33] exit snake-mst-s1 rc=0 finished=36/36 failed=0
+[10-10 00:07:33] start acsincome_tx-privsyn-s2 pid=475604 (0/36 already finished)
+[10-10 00:10:34] exit snake-privsyn-s1 rc=0 finished=36/36 failed=0
+[10-10 00:10:34] start snake-mst-s2 pid=476582 (0/36 already finished)
+[10-10 00:12:35] exit acsincome_ca-privbayes-s2 rc=0 finished=36/36 failed=0
+[10-10 00:12:35] start snake-privbayes-s2 pid=477254 (0/36 already finished)
+[10-10 00:15:15] exit acsincome_ca-mst-s2 rc=0 finished=36/36 failed=0
+[10-10 00:15:15] start snake-privsyn-s2 pid=478089 (0/36 already finished)
+[10-10 00:17:16] exit acsincome_tx-privbayes-s2 rc=0 finished=36/36 failed=0
+[10-10 00:17:16] start sbo-mst-s2 pid=478748 (0/36 already finished)
+[10-10 00:17:56] exit snake-privbayes-s1 rc=0 finished=36/36 failed=0
+[10-10 00:17:56] start sbo-privbayes-s2 pid=478987 (0/36 already finished)
+[10-10 00:18:16] exit acsincome_ca-privsyn-s2 rc=0 finished=36/36 failed=0
+[10-10 00:18:16] start sbo-privsyn-s2 pid=479070 (0/36 already finished)
+[10-10 00:19:36] exit acsincome_tx-mst-s2 rc=0 finished=36/36 failed=0
+[10-10 00:19:36] start acsincome_ca-mst-s3 pid=479500 (0/36 already finished)
+[10-10 00:29:39] exit acsincome_tx-privsyn-s2 rc=0 finished=36/36 failed=0
+[10-10 00:29:39] start acsincome_ca-privbayes-s3 pid=482533 (0/36 already finished)
+[10-10 00:40:01] exit snake-mst-s2 rc=0 finished=36/36 failed=0
+[10-10 00:40:01] start acsincome_ca-privsyn-s3 pid=485256 (0/36 already finished)
+[10-10 00:43:22] exit acsincome_ca-mst-s3 rc=0 finished=36/36 failed=0
+[10-10 00:43:22] start acsincome_tx-mst-s3 pid=486203 (0/36 already finished)
+[10-10 00:45:02] exit sbo-mst-s0 rc=0 finished=36/36 failed=0
+[10-10 00:45:02] start acsincome_tx-privbayes-s3 pid=486624 (0/36 already finished)
+[10-10 00:47:03] exit sbo-privsyn-s0 rc=0 finished=36/36 failed=0
+[10-10 00:47:03] exit snake-privsyn-s2 rc=0 finished=36/36 failed=0
+[10-10 00:47:03] start acsincome_tx-privsyn-s3 pid=487181 (0/36 already finished)
+[10-10 00:47:03] start snake-mst-s3 pid=487182 (0/36 already finished)
+[10-10 00:47:43] exit acsincome_ca-privbayes-s3 rc=0 finished=36/36 failed=0
+[10-10 00:47:43] start snake-privbayes-s3 pid=487384 (0/36 already finished)
+[10-10 00:52:04] exit snake-privbayes-s2 rc=0 finished=36/36 failed=0
+[10-10 00:52:04] start snake-privsyn-s3 pid=488534 (0/36 already finished)
+[10-10 01:02:06] exit acsincome_tx-privbayes-s3 rc=0 finished=36/36 failed=0
+[10-10 01:02:06] start sbo-mst-s3 pid=491168 (0/36 already finished)
+[10-10 01:04:07] exit acsincome_ca-privsyn-s3 rc=0 finished=36/36 failed=0
+[10-10 01:04:07] start sbo-privbayes-s3 pid=491687 (0/36 already finished)
+[10-10 01:06:27] exit acsincome_tx-mst-s3 rc=0 finished=36/36 failed=0
+[10-10 01:06:27] start sbo-privsyn-s3 pid=492288 (0/36 already finished)
+[10-10 01:09:48] exit sbo-mst-s1 rc=0 finished=36/36 failed=0
+[10-10 01:09:48] exit acsincome_tx-privsyn-s3 rc=0 finished=36/36 failed=0
+[10-10 01:09:48] start acsincome_ca-mst-s4 pid=493122 (0/36 already finished)
+[10-10 01:09:48] start acsincome_ca-privbayes-s4 pid=493123 (0/36 already finished)
+[10-10 01:17:30] exit sbo-privsyn-s1 rc=0 finished=36/36 failed=0
+[10-10 01:17:30] exit snake-mst-s3 rc=0 finished=36/36 failed=0
+[10-10 01:17:30] start acsincome_ca-privsyn-s4 pid=494967 (0/36 already finished)
+[10-10 01:17:30] start acsincome_tx-mst-s4 pid=494968 (0/36 already finished)
+[10-10 01:25:11] exit snake-privsyn-s3 rc=0 finished=36/36 failed=0
+[10-10 01:25:11] start acsincome_tx-privbayes-s4 pid=496800 (0/36 already finished)
+[10-10 01:27:52] exit snake-privbayes-s3 rc=0 finished=36/36 failed=0
+[10-10 01:27:52] start acsincome_tx-privsyn-s4 pid=497484 (0/36 already finished)
+[10-10 01:28:32] exit acsincome_ca-privbayes-s4 rc=0 finished=36/36 failed=0
+[10-10 01:28:32] start snake-mst-s4 pid=497631 (0/36 already finished)
+[10-10 01:33:33] exit acsincome_ca-mst-s4 rc=0 finished=36/36 failed=0
+[10-10 01:33:33] start snake-privbayes-s4 pid=498833 (0/36 already finished)
+[10-10 01:40:35] exit acsincome_ca-privsyn-s4 rc=0 finished=36/36 failed=0
+[10-10 01:40:35] exit acsincome_tx-mst-s4 rc=0 finished=36/36 failed=0
+[10-10 01:40:35] start snake-privsyn-s4 pid=500534 (0/36 already finished)
+[10-10 01:40:35] start sbo-mst-s4 pid=500535 (0/36 already finished)
+[10-10 01:43:15] exit acsincome_tx-privbayes-s4 rc=0 finished=36/36 failed=0
+[10-10 01:43:15] start sbo-privbayes-s4 pid=501165 (0/36 already finished)
+[10-10 01:46:36] exit sbo-mst-s2 rc=0 finished=36/36 failed=0
+[10-10 01:46:36] start sbo-privsyn-s4 pid=501980 (0/36 already finished)
+[10-10 01:48:16] exit sbo-privsyn-s2 rc=0 finished=36/36 failed=0
+[10-10 01:50:17] exit acsincome_tx-privsyn-s4 rc=0 finished=36/36 failed=0
+[10-10 01:58:38] exit snake-mst-s4 rc=0 finished=36/36 failed=0
+[10-10 02:12:41] exit snake-privsyn-s4 rc=0 finished=36/36 failed=0
+[10-10 02:16:22] exit snake-privbayes-s4 rc=0 finished=36/36 failed=0
+[10-10 02:27:04] exit sbo-privbayes-s0 rc=0 finished=36/36 failed=0
+[10-10 02:31:45] exit sbo-mst-s3 rc=0 finished=36/36 failed=0
+[10-10 02:35:06] exit sbo-privsyn-s3 rc=0 finished=36/36 failed=0
+[10-10 02:54:51] exit sbo-privbayes-s1 rc=0 finished=36/36 failed=0
+[10-10 03:07:33] exit sbo-mst-s4 rc=0 finished=36/36 failed=0
+[10-10 03:14:55] exit sbo-privsyn-s4 rc=0 finished=36/36 failed=0
+[10-10 03:23:57] exit sbo-privbayes-s2 rc=0 finished=36/36 failed=0
+[10-10 04:11:48] exit sbo-privbayes-s3 rc=0 finished=36/36 failed=0
+[10-10 04:51:36] exit sbo-privbayes-s4 rc=0 finished=36/36 failed=0
+[10-10 04:51:56] nothing left to schedule

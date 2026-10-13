@@ -1,0 +1,283 @@
+{
+  "collected_utc": "2026-10-13T03:14:09+00:00",
+  "git_head": "33a7139",
+  "sweeps": {
+    "facct-2026-10-09": {
+      "datasets": [
+        "acsincome_ca",
+        "acsincome_tx",
+        "snake",
+        "sbo",
+        "acspubcov_ca",
+        "acspubcov_tx",
+        "cdc_diabetes",
+        "hmda_ca",
+        "hmda_tx",
+        "adult",
+        "compas"
+      ],
+      "methods": [
+        "mst",
+        "privbayes",
+        "privsyn",
+        "decaf_tabpfn"
+      ],
+      "seeds": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "epsilons": [
+        1.0,
+        10.0,
+        1000.0
+      ],
+      "settings": {},
+      "only": null,
+      "rows": 6600,
+      "status": {
+        "done": 6600
+      },
+      "runs_per_dataset_method": {
+        "acsincome_ca/decaf_tabpfn": 60,
+        "acsincome_ca/mst": 180,
+        "acsincome_ca/privbayes": 180,
+        "acsincome_ca/privsyn": 180,
+        "acsincome_tx/decaf_tabpfn": 60,
+        "acsincome_tx/mst": 180,
+        "acsincome_tx/privbayes": 180,
+        "acsincome_tx/privsyn": 180,
+        "acspubcov_ca/decaf_tabpfn": 60,
+        "acspubcov_ca/mst": 180,
+        "acspubcov_ca/privbayes": 180,
+        "acspubcov_ca/privsyn": 180,
+        "acspubcov_tx/decaf_tabpfn": 60,
+        "acspubcov_tx/mst": 180,
+        "acspubcov_tx/privbayes": 180,
+        "acspubcov_tx/privsyn": 180,
+        "adult/decaf_tabpfn": 60,
+        "adult/mst": 180,
+        "adult/privbayes": 180,
+        "adult/privsyn": 180,
+        "cdc_diabetes/decaf_tabpfn": 60,
+        "cdc_diabetes/mst": 180,
+        "cdc_diabetes/privbayes": 180,
+        "cdc_diabetes/privsyn": 180,
+        "compas/decaf_tabpfn": 60,
+        "compas/mst": 180,
+        "compas/privbayes": 180,
+        "compas/privsyn": 180,
+        "hmda_ca/decaf_tabpfn": 60,
+        "hmda_ca/mst": 180,
+        "hmda_ca/privbayes": 180,
+        "hmda_ca/privsyn": 180,
+        "hmda_tx/decaf_tabpfn": 60,
+        "hmda_tx/mst": 180,
+        "hmda_tx/privbayes": 180,
+        "hmda_tx/privsyn": 180,
+        "sbo/decaf_tabpfn": 60,
+        "sbo/mst": 180,
+        "sbo/privbayes": 180,
+        "sbo/privsyn": 180,
+        "snake/decaf_tabpfn": 60,
+        "snake/mst": 180,
+        "snake/privbayes": 180,
+        "snake/privsyn": 180
+      }
+    },
+    "facct-cut050-2026-10-12": {
+      "datasets": [
+        "acsincome_ca",
+        "acsincome_tx",
+        "snake",
+        "sbo",
+        "acspubcov_ca",
+        "acspubcov_tx",
+        "cdc_diabetes",
+        "hmda_ca",
+        "hmda_tx"
+      ],
+      "methods": [
+        "decaf_tabpfn"
+      ],
+      "seeds": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "epsilons": [
+        1000.0
+      ],
+      "settings": {
+        "cut_strength": 0.5
+      },
+      "only": null,
+      "rows": 37,
+      "status": {
+        "done": 36,
+        "pending": 1
+      },
+      "runs_per_dataset_method": {
+        "acsincome_ca/decaf_tabpfn": 12,
+        "acsincome_tx/decaf_tabpfn": 12,
+        "sbo/decaf_tabpfn": 1,
+        "snake/decaf_tabpfn": 12
+      }
+    },
+    "facct-tune-e100-2026-10-09": {
+      "datasets": [
+        "acsincome_ca",
+        "snake",
+        "sbo"
+      ],
+      "methods": [
+        "decaf",
+        "decaf_ctgan",
+        "decaf_diffusion",
+        "decaf_dpgan",
+        "decaf_dpctgan",
+        "decaf_dpdiffusion"
+      ],
+      "seeds": [
+        0,
+        1,
+        2
+      ],
+      "epsilons": [
+        1000.0
+      ],
+      "settings": {
+        "max_epochs": 100
+      },
+      "only": "/none",
+      "rows": 162,
+      "status": {
+        "done": 162
+      },
+      "runs_per_dataset_method": {
+        "acsincome_ca/decaf": 9,
+        "acsincome_ca/decaf_ctgan": 9,
+        "acsincome_ca/decaf_diffusion": 9,
+        "acsincome_ca/decaf_dpctgan": 9,
+        "acsincome_ca/decaf_dpdiffusion": 9,
+        "acsincome_ca/decaf_dpgan": 9,
+        "sbo/decaf": 9,
+        "sbo/decaf_ctgan": 9,
+        "sbo/decaf_diffusion": 9,
+        "sbo/decaf_dpctgan": 9,
+        "sbo/decaf_dpdiffusion": 9,
+        "sbo/decaf_dpgan": 9,
+        "snake/decaf": 9,
+        "snake/decaf_ctgan": 9,
+        "snake/decaf_diffusion": 9,
+        "snake/decaf_dpctgan": 9,
+        "snake/decaf_dpdiffusion": 9,
+        "snake/decaf_dpgan": 9
+      }
+    },
+    "facct-tune-e100-newds-2026-10-10": {
+      "datasets": [
+        "acspubcov_ca",
+        "acspubcov_tx",
+        "cdc_diabetes"
+      ],
+      "methods": [
+        "decaf",
+        "decaf_ctgan",
+        "decaf_diffusion",
+        "decaf_dpgan",
+        "decaf_dpdiffusion"
+      ],
+      "seeds": [
+        0,
+        1,
+        2
+      ],
+      "epsilons": [
+        1000.0
+      ],
+      "settings": {
+        "max_epochs": 100
+      },
+      "only": "/none",
+      "rows": 135,
+      "status": {
+        "done": 132,
+        "partial": 3
+      },
+      "runs_per_dataset_method": {
+        "acspubcov_ca/decaf": 9,
+        "acspubcov_ca/decaf_ctgan": 9,
+        "acspubcov_ca/decaf_diffusion": 9,
+        "acspubcov_ca/decaf_dpdiffusion": 9,
+        "acspubcov_ca/decaf_dpgan": 9,
+        "acspubcov_tx/decaf": 9,
+        "acspubcov_tx/decaf_ctgan": 9,
+        "acspubcov_tx/decaf_diffusion": 9,
+        "acspubcov_tx/decaf_dpdiffusion": 9,
+        "acspubcov_tx/decaf_dpgan": 9,
+        "cdc_diabetes/decaf": 9,
+        "cdc_diabetes/decaf_ctgan": 9,
+        "cdc_diabetes/decaf_diffusion": 9,
+        "cdc_diabetes/decaf_dpdiffusion": 9,
+        "cdc_diabetes/decaf_dpgan": 9
+      }
+    },
+    "facct-tune-e30-2026-10-09": {
+      "datasets": [
+        "acsincome_ca",
+        "snake",
+        "sbo"
+      ],
+      "methods": [
+        "decaf",
+        "decaf_ctgan",
+        "decaf_diffusion",
+        "decaf_dpgan",
+        "decaf_dpctgan",
+        "decaf_dpdiffusion"
+      ],
+      "seeds": [
+        0,
+        1,
+        2
+      ],
+      "epsilons": [
+        1000.0
+      ],
+      "settings": {
+        "max_epochs": 30
+      },
+      "only": "/none",
+      "rows": 162,
+      "status": {
+        "done": 158,
+        "partial": 4
+      },
+      "runs_per_dataset_method": {
+        "acsincome_ca/decaf": 9,
+        "acsincome_ca/decaf_ctgan": 9,
+        "acsincome_ca/decaf_diffusion": 9,
+        "acsincome_ca/decaf_dpctgan": 9,
+        "acsincome_ca/decaf_dpdiffusion": 9,
+        "acsincome_ca/decaf_dpgan": 9,
+        "sbo/decaf": 9,
+        "sbo/decaf_ctgan": 9,
+        "sbo/decaf_diffusion": 9,
+        "sbo/decaf_dpctgan": 9,
+        "sbo/decaf_dpdiffusion": 9,
+        "sbo/decaf_dpgan": 9,
+        "snake/decaf": 9,
+        "snake/decaf_ctgan": 9,
+        "snake/decaf_diffusion": 9,
+        "snake/decaf_dpctgan": 9,
+        "snake/decaf_dpdiffusion": 9,
+        "snake/decaf_dpgan": 9
+      }
+    }
+  }
+}

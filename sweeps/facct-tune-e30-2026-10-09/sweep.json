@@ -1,0 +1,31 @@
+{
+  "batch": "facct-tune-e30-2026-10-09",
+  "created": "2026-10-09T23:24:02",
+  "datasets": [
+    "acsincome_ca",
+    "snake",
+    "sbo"
+  ],
+  "methods": [
+    "decaf",
+    "decaf_ctgan",
+    "decaf_diffusion",
+    "decaf_dpgan",
+    "decaf_dpctgan",
+    "decaf_dpdiffusion"
+  ],
+  "seeds": [
+    0,
+    1,
+    2
+  ],
+  "epsilons": [
+    1000.0
+  ],
+  "classifier": "rf",
+  "notes": "Epoch-tuning pilot for the torch backbones on the new datasets: no fairness mechanism, eps=1000 for the private ones (the protocol the Adult/COMPAS settings were chosen under), 3 seeds. Compare against facct-tune-e*: pick per (method, dataset) the epoch count with no collapsed seed, best lift over majority, then lowest tvd_2way.",
+  "only": "/none",
+  "settings": {
+    "max_epochs": 30
+  }
+}

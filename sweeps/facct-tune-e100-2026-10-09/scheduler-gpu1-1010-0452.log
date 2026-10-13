@@ -1,0 +1,38 @@
+Disabling PyTorch because PyTorch >= 2.4 is required but found 2.2.2
+PyTorch was not found. Models won't be available and only tokenizers, configuration and file/data utilities can be used.
+[10-10 04:52:39] batch=facct-tune-e100-2026-10-09 code=33a7139-dirty:56c5e3ba shards=36 workers=1 cpus=32-47 gpu=1
+[10-10 04:52:39] start acsincome_ca-decaf_ctgan-s0 pid=554847 (0/3 already finished)
+[10-10 05:03:02] exit acsincome_ca-decaf_ctgan-s0 rc=0 finished=3/3 failed=0
+[10-10 05:03:02] start acsincome_ca-decaf_diffusion-s0 pid=558917 (0/3 already finished)
+[10-10 05:08:23] exit acsincome_ca-decaf_diffusion-s0 rc=0 finished=3/3 failed=0
+[10-10 05:08:23] start acsincome_ca-decaf_dpctgan-s0 pid=561337 (0/3 already finished)
+[10-10 05:15:05] exit acsincome_ca-decaf_dpctgan-s0 rc=0 finished=3/3 failed=0
+[10-10 05:15:05] start acsincome_ca-decaf_dpdiffusion-s0 pid=563925 (0/3 already finished)
+[10-10 05:29:48] exit acsincome_ca-decaf_dpdiffusion-s0 rc=0 finished=3/3 failed=0
+[10-10 05:29:48] start snake-decaf_ctgan-s0 pid=569826 (0/3 already finished)
+[10-10 05:49:12] exit snake-decaf_ctgan-s0 rc=0 finished=3/3 failed=0
+[10-10 05:49:12] start snake-decaf_diffusion-s0 pid=576593 (0/3 already finished)
+[10-10 05:57:34] exit snake-decaf_diffusion-s0 rc=0 finished=3/3 failed=0
+[10-10 05:57:34] start snake-decaf_dpctgan-s0 pid=580506 (0/3 already finished)
+[10-10 06:09:37] exit snake-decaf_dpctgan-s0 rc=0 finished=3/3 failed=0
+[10-10 06:09:37] start snake-decaf_dpdiffusion-s0 pid=585682 (0/3 already finished)
+[10-10 06:25:41] exit snake-decaf_dpdiffusion-s0 rc=0 finished=3/3 failed=0
+[10-10 06:25:41] start sbo-decaf_ctgan-s0 pid=591019 (0/3 already finished)
+[10-10 06:43:25] exit sbo-decaf_ctgan-s0 rc=0 finished=3/3 failed=0
+[10-10 06:43:25] start sbo-decaf_diffusion-s0 pid=596475 (0/3 already finished)
+[10-10 06:54:07] exit sbo-decaf_diffusion-s0 rc=0 finished=3/3 failed=0
+[10-10 06:54:07] start sbo-decaf_dpctgan-s0 pid=599667 (0/3 already finished)
+[10-10 07:11:11] exit sbo-decaf_dpctgan-s0 rc=0 finished=3/3 failed=0
+[10-10 07:11:11] start snake-decaf_diffusion-s1 pid=604240 (0/3 already finished)
+[10-10 07:18:32] exit snake-decaf_diffusion-s1 rc=0 finished=3/3 failed=0
+[10-10 07:18:32] start snake-decaf_dpctgan-s1 pid=605787 (0/3 already finished)
+[10-10 07:29:15] exit snake-decaf_dpctgan-s1 rc=0 finished=3/3 failed=0
+[10-10 07:29:15] start snake-decaf_dpdiffusion-s1 pid=608047 (0/3 already finished)
+[10-10 07:48:59] exit snake-decaf_dpdiffusion-s1 rc=0 finished=3/3 failed=0
+[10-10 07:48:59] start acsincome_ca-decaf_dpctgan-s2 pid=612090 (0/3 already finished)
+[10-10 07:57:21] exit acsincome_ca-decaf_dpctgan-s2 rc=0 finished=3/3 failed=0
+[10-10 07:57:21] start snake-decaf_ctgan-s2 pid=613734 (0/3 already finished)
+[10-10 08:14:24] exit snake-decaf_ctgan-s2 rc=0 finished=3/3 failed=0
+[10-10 08:14:24] start sbo-decaf_ctgan-s2 pid=616652 (0/3 already finished)
+[10-10 08:43:52] exit sbo-decaf_ctgan-s2 rc=0 finished=3/3 failed=0
+[10-10 08:44:12] nothing left to schedule
