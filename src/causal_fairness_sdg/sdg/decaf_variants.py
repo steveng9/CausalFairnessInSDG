@@ -37,7 +37,7 @@ from typing import Any, Dict, List, Optional, Sequence, Tuple
 import numpy as np
 import pandas as pd
 
-from ..data.causal_graphs import CAUSAL_GRAPHS, as_digraph
+from ..data.causal_graphs import as_digraph, resolve_graph
 from ..fairness.base import AttributeRoles, FairnessMechanism
 from .base import SDGMethod, SDGResult, borrow_untuned_settings
 
@@ -67,21 +67,28 @@ class _BaseDECAFVariant(SDGMethod):
         self.overrides = overrides
         self._cache: Dict[Tuple, Any] = {}
 
+    #: Which graph the generator is given: "hand" (the hand-drawn DAG in
+    #: `data.causal_graphs`) or "fges" (discovered from the training rows as
+    #: in the DECAF paper). Set through the same overrides as the training
+    #: settings, e.g. `--set graph=fges`; only recorded on a run when set.
+    graph_setting = "graph"
+
     def _settings_for(self, dataset_name: Optional[str]) -> Dict[str, Any]:
         base = dict(self.settings.get(dataset_name or "", {}))
         base.update(self.overrides)
         return base
 
-    @staticmethod
-    def _dag(data: pd.DataFrame, dataset_name: Optional[str]):
-        if dataset_name not in CAUSAL_GRAPHS:
-            raise ValueError(
-                f"No causal graph registered for dataset_name={dataset_name!r}; "
-                f"available: {sorted(CAUSAL_GRAPHS)}"
-            )
+    def _trainer_settings(self, dataset_name: Optional[str]) -> Dict[str, Any]:
+        """`_settings_for` without the keys that are not trainer arguments."""
+        cfg = self._settings_for(dataset_name)
+        cfg.pop(self.graph_setting, None)
+        return cfg
+
+    def _dag(self, data: pd.DataFrame, dataset_name: Optional[str]):
+        source = self._settings_for(dataset_name).get(self.graph_setting, "hand")
         columns = list(data.columns)
         col_index = {c: i for i, c in enumerate(columns)}
-        dag = as_digraph(CAUSAL_GRAPHS[dataset_name], columns)
+        dag = as_digraph(resolve_graph(dataset_name, data, source), columns)
         dag_seed = [[col_index[p], col_index[c]] for p, c in dag.edges]
         return columns, col_index, dag, dag_seed
 
@@ -192,7 +199,7 @@ class DECAFDPGANMethod(_BaseDECAFVariant):
     ) -> SDGResult:
         self._require_backend()
         columns, col_index, dag, dag_seed = self._dag(data, dataset_name)
-        cfg = self._settings_for(dataset_name)
+        cfg = self._trainer_settings(dataset_name)
         values = data.to_numpy(dtype="float32")
 
         key = (
@@ -280,8 +287,10 @@ class DECAFCTGANMethod(_BaseDECAFVariant):
         #           that cannot beat guessing has no usable fairness signal.
         "compas": {"max_epochs": 500, "batch_size": 500},
         "adult": {"max_epochs": 600, "batch_size": 500},
-        "snake": {"max_epochs": 30, "batch_size": 500},
-        "sbo": {"max_epochs": 30, "batch_size": 500},
+        # 30 -> 100 on 2026-10-13 from the FAccT pilots: at least as good as
+        # 30 nearly everywhere, and the two fits that collapsed at 30 do not.
+        "snake": {"max_epochs": 100, "batch_size": 500},
+        "sbo": {"max_epochs": 100, "batch_size": 500},
     }
 
     #: Subclass hook -- the DP variant flips this.
@@ -301,7 +310,7 @@ class DECAFCTGANMethod(_BaseDECAFVariant):
     ) -> SDGResult:
         self._require_backend()
         columns, col_index, dag, dag_seed = self._dag(data, dataset_name)
-        cfg = self._settings_for(dataset_name)
+        cfg = self._trainer_settings(dataset_name)
         codes = data.to_numpy()
         blocks = ColumnBlocks(columns, domain)
 
@@ -421,7 +430,7 @@ class DECAFDiffusionMethod(_BaseDECAFVariant):
     ) -> SDGResult:
         self._require_backend()
         columns, col_index, dag, dag_seed = self._dag(data, dataset_name)
-        cfg = self._settings_for(dataset_name)
+        cfg = self._trainer_settings(dataset_name)
         codes = data.to_numpy()
         blocks = ColumnBlocks(columns, domain)
 

@@ -70,8 +70,8 @@ class SDGMethod(ABC):
 
         `dataset_name` (the key into `data.datasets.DATASETS`) is unused by
         methods that discover their own structure privately (MST, PrivBayes,
-        AIM, PrivSyn). DECAF needs it to look up its ground-truth causal DAG
-        from `data.causal_graphs.CAUSAL_GRAPHS`, since -- unlike the others --
-        it doesn't discover a structure at all, it requires one as input.
+        AIM, PrivSyn). The DECAF-style generators need it to look up their
+        causal DAG (`data.causal_graphs.resolve_graph`), since -- unlike the
+        others -- they take a structure as input.
         """
         raise NotImplementedError

@@ -32,7 +32,7 @@ from typing import Dict, Optional, Tuple
 import numpy as np
 import pandas as pd
 
-from ..data.causal_graphs import CAUSAL_GRAPHS, as_digraph
+from ..data.causal_graphs import as_digraph, resolve_graph
 from ..fairness.base import AttributeRoles, FairnessMechanism
 from .base import SDGMethod, SDGResult
 
@@ -60,7 +60,11 @@ class DECAFMethod(SDGMethod):
         devices="auto",
         output_activation: Optional[str] = "sigmoid",
         cache_trained_models: bool = True,
+        graph: str = "hand",
     ):
+        # "hand" (the hand-drawn DAG) or "fges" (discovered from the training
+        # rows as in the DECAF paper); see `data.causal_graphs.resolve_graph`.
+        self.graph = graph
         self.max_epochs = max_epochs
         self.h_dim = h_dim
         self.batch_size = batch_size
@@ -153,18 +157,12 @@ class DECAFMethod(SDGMethod):
                 "pip install -e '.[decaf]' (decaf-synthetic-data, torch, "
                 "pytorch-lightning)."
             ) from _IMPORT_ERROR
-        if dataset_name not in CAUSAL_GRAPHS:
-            raise ValueError(
-                f"No causal graph registered for dataset_name={dataset_name!r}; "
-                f"available: {sorted(CAUSAL_GRAPHS)}"
-            )
-
         if seed is not None:
             pl.seed_everything(seed)
 
         columns = list(data.columns)
         col_index = {c: i for i, c in enumerate(columns)}
-        dag = as_digraph(CAUSAL_GRAPHS[dataset_name], columns)
+        dag = as_digraph(resolve_graph(dataset_name, data, self.graph), columns)
         dag_seed = [[col_index[p], col_index[c]] for p, c in dag.edges]
 
         # Min-max scale onto [0, 1] iff the generator's heads are bounded to

@@ -113,8 +113,11 @@ SEEDS = [0]
 DECAF_SETTINGS = {
     "adult": {"max_epochs": 300, "output_activation": "sigmoid"},
     "compas": {"max_epochs": 1000, "output_activation": None},
-    "snake": {"max_epochs": 30, "output_activation": "sigmoid"},
-    "sbo": {"max_epochs": 30, "output_activation": "sigmoid"},
+    # 30 -> 100 on 2026-10-13 from the FAccT pilots (`facct-tune-e30-`,
+    # `-e100-2026-10-09`, `-e100-newds-2026-10-10`): 100 epochs is at least as
+    # good as 30 nearly everywhere and never collapses.
+    "snake": {"max_epochs": 100, "output_activation": "sigmoid"},
+    "sbo": {"max_epochs": 100, "output_activation": "sigmoid"},
 }
 # Datasets not tuned yet run on SNAKE's entry -- see `sdg.base.UNTUNED_DATASETS`.
 borrow_untuned_settings(DECAF_SETTINGS)

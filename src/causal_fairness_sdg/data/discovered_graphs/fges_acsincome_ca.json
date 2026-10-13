@@ -1,0 +1,322 @@
+{
+ "graphs": {
+  "3f1515ac3d25c02b262ee652c0882eb5f5a20971": {
+   "seed": 0,
+   "n_rows": 35000,
+   "n_directed": 12,
+   "n_undirected": 0,
+   "undirected_in_cpdag": [],
+   "edges": [
+    [
+     "HISP",
+     "SCHL"
+    ],
+    [
+     "WAOB",
+     "SCHL"
+    ],
+    [
+     "AGEP",
+     "MAR"
+    ],
+    [
+     "SEX",
+     "MAR"
+    ],
+    [
+     "AGEP",
+     "RELP"
+    ],
+    [
+     "MAR",
+     "RELP"
+    ],
+    [
+     "SEX",
+     "OCCP"
+    ],
+    [
+     "SCHL",
+     "OCCP"
+    ],
+    [
+     "OCCP",
+     "COW"
+    ],
+    [
+     "OCCP",
+     "WKHP"
+    ],
+    [
+     "OCCP",
+     "high_income"
+    ],
+    [
+     "WKHP",
+     "high_income"
+    ]
+   ],
+   "seconds": 1.0
+  },
+  "e32a536f87ab9f48845917854be8ae726ce29135": {
+   "seed": 1,
+   "n_rows": 35000,
+   "n_directed": 13,
+   "n_undirected": 0,
+   "undirected_in_cpdag": [],
+   "edges": [
+    [
+     "HISP",
+     "SCHL"
+    ],
+    [
+     "WAOB",
+     "SCHL"
+    ],
+    [
+     "AGEP",
+     "MAR"
+    ],
+    [
+     "SEX",
+     "MAR"
+    ],
+    [
+     "RELP",
+     "MAR"
+    ],
+    [
+     "AGEP",
+     "RELP"
+    ],
+    [
+     "HISP",
+     "RELP"
+    ],
+    [
+     "SEX",
+     "OCCP"
+    ],
+    [
+     "SCHL",
+     "OCCP"
+    ],
+    [
+     "OCCP",
+     "COW"
+    ],
+    [
+     "OCCP",
+     "WKHP"
+    ],
+    [
+     "OCCP",
+     "high_income"
+    ],
+    [
+     "WKHP",
+     "high_income"
+    ]
+   ],
+   "seconds": 1.0
+  },
+  "525f91cb62f933c9eff2b7b5c293fb676f94f2c8": {
+   "seed": 2,
+   "n_rows": 35000,
+   "n_directed": 12,
+   "n_undirected": 0,
+   "undirected_in_cpdag": [],
+   "edges": [
+    [
+     "HISP",
+     "SCHL"
+    ],
+    [
+     "WAOB",
+     "SCHL"
+    ],
+    [
+     "AGEP",
+     "MAR"
+    ],
+    [
+     "SEX",
+     "MAR"
+    ],
+    [
+     "AGEP",
+     "RELP"
+    ],
+    [
+     "MAR",
+     "RELP"
+    ],
+    [
+     "SEX",
+     "OCCP"
+    ],
+    [
+     "SCHL",
+     "OCCP"
+    ],
+    [
+     "OCCP",
+     "COW"
+    ],
+    [
+     "OCCP",
+     "WKHP"
+    ],
+    [
+     "OCCP",
+     "high_income"
+    ],
+    [
+     "WKHP",
+     "high_income"
+    ]
+   ],
+   "seconds": 1.0
+  },
+  "d0f131b6f068019eac71aa3d073c454c081b3acb": {
+   "seed": 3,
+   "n_rows": 35000,
+   "n_directed": 12,
+   "n_undirected": 0,
+   "undirected_in_cpdag": [],
+   "edges": [
+    [
+     "HISP",
+     "SCHL"
+    ],
+    [
+     "WAOB",
+     "SCHL"
+    ],
+    [
+     "AGEP",
+     "MAR"
+    ],
+    [
+     "SEX",
+     "MAR"
+    ],
+    [
+     "AGEP",
+     "RELP"
+    ],
+    [
+     "MAR",
+     "RELP"
+    ],
+    [
+     "SEX",
+     "OCCP"
+    ],
+    [
+     "SCHL",
+     "OCCP"
+    ],
+    [
+     "OCCP",
+     "COW"
+    ],
+    [
+     "OCCP",
+     "WKHP"
+    ],
+    [
+     "OCCP",
+     "high_income"
+    ],
+    [
+     "WKHP",
+     "high_income"
+    ]
+   ],
+   "seconds": 0.9
+  },
+  "409e72cb0cae088e8f6b3e4f0d84baaeb7389a75": {
+   "seed": 4,
+   "n_rows": 35000,
+   "n_directed": 12,
+   "n_undirected": 0,
+   "undirected_in_cpdag": [],
+   "edges": [
+    [
+     "HISP",
+     "SCHL"
+    ],
+    [
+     "WAOB",
+     "SCHL"
+    ],
+    [
+     "AGEP",
+     "MAR"
+    ],
+    [
+     "SEX",
+     "MAR"
+    ],
+    [
+     "AGEP",
+     "RELP"
+    ],
+    [
+     "MAR",
+     "RELP"
+    ],
+    [
+     "SEX",
+     "OCCP"
+    ],
+    [
+     "SCHL",
+     "OCCP"
+    ],
+    [
+     "OCCP",
+     "COW"
+    ],
+    [
+     "OCCP",
+     "WKHP"
+    ],
+    [
+     "OCCP",
+     "high_income"
+    ],
+    [
+     "WKHP",
+     "high_income"
+    ]
+   ],
+   "seconds": 1.0
+  }
+ },
+ "dataset": "acsincome_ca",
+ "algorithm": "FGES (Tetrad, causal-cmd 1.4.1)",
+ "tetrad_jar_sha1": "887ff1cca0a2379e8f7e4d09768e1181c0b2f9bd",
+ "score": "bdeu-score",
+ "parameters": {
+  "priorEquivalentSampleSize": 10.0,
+  "structurePrior": 1.0,
+  "maxDegree": 1000,
+  "faithfulnessAssumed": false,
+  "symmetricFirstStep": false,
+  "note": "Tetrad defaults for this build, as printed in its output"
+ },
+ "knowledge": {
+  "roots": [
+   "AGEP",
+   "HISP",
+   "RAC1P",
+   "SEX",
+   "WAOB"
+  ],
+  "sink": "high_income"
+ },
+ "rows": "training split only (test_size=0.3, random_state=seed)",
+ "dag_from_cpdag": "Dor-Tarsi consistent extension, last column first"
+}
