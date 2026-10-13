@@ -1,0 +1,331 @@
+dataset,seed,graph,role_config,n_columns,n_edges,n_outcome_parents,outcome_parents,protected_with_path_to_outcome,n_cut_ftu,cut_ftu,n_cut_cf,cut_cf,n_cut_dp,cut_dp
+hmda_ca,0,hand,ecoa_underwriting_adm,17,65,16,age aus coapplicant dti ethnicity income jumbo loan_amount loan_purpose loan_term loan_type ltv race sex tract_income tract_minority,age ethnicity race sex,4,age ethnicity race sex,10,age aus coapplicant ethnicity loan_purpose loan_type race sex tract_income tract_minority,16,age aus coapplicant dti ethnicity income jumbo loan_amount loan_purpose loan_term loan_type ltv race sex tract_income tract_minority
+hmda_ca,0,hand,sex_only_broad_adm,17,65,16,age aus coapplicant dti ethnicity income jumbo loan_amount loan_purpose loan_term loan_type ltv race sex tract_income tract_minority,sex,1,sex,2,coapplicant sex,13,aus coapplicant dti income jumbo loan_amount loan_purpose loan_term loan_type ltv sex tract_income tract_minority
+hmda_ca,0,hand,race_narrow_adm,17,65,16,age aus coapplicant dti ethnicity income jumbo loan_amount loan_purpose loan_term loan_type ltv race sex tract_income tract_minority,ethnicity race,2,ethnicity race,12,aus coapplicant ethnicity income jumbo loan_amount loan_purpose loan_term loan_type race tract_income tract_minority,14,aus coapplicant dti ethnicity income jumbo loan_amount loan_purpose loan_term loan_type ltv race tract_income tract_minority
+hmda_ca,0,fges,ecoa_underwriting_adm,17,37,3,dti loan_purpose loan_type,age ethnicity race sex,0,,2,loan_purpose loan_type,3,dti loan_purpose loan_type
+hmda_ca,0,fges,sex_only_broad_adm,17,37,3,dti loan_purpose loan_type,sex,0,,0,,2,dti loan_type
+hmda_ca,0,fges,race_narrow_adm,17,37,3,dti loan_purpose loan_type,ethnicity race,0,,1,loan_type,2,dti loan_type
+hmda_ca,1,hand,ecoa_underwriting_adm,17,65,16,age aus coapplicant dti ethnicity income jumbo loan_amount loan_purpose loan_term loan_type ltv race sex tract_income tract_minority,age ethnicity race sex,4,age ethnicity race sex,10,age aus coapplicant ethnicity loan_purpose loan_type race sex tract_income tract_minority,16,age aus coapplicant dti ethnicity income jumbo loan_amount loan_purpose loan_term loan_type ltv race sex tract_income tract_minority
+hmda_ca,1,hand,sex_only_broad_adm,17,65,16,age aus coapplicant dti ethnicity income jumbo loan_amount loan_purpose loan_term loan_type ltv race sex tract_income tract_minority,sex,1,sex,2,coapplicant sex,13,aus coapplicant dti income jumbo loan_amount loan_purpose loan_term loan_type ltv sex tract_income tract_minority
+hmda_ca,1,hand,race_narrow_adm,17,65,16,age aus coapplicant dti ethnicity income jumbo loan_amount loan_purpose loan_term loan_type ltv race sex tract_income tract_minority,ethnicity race,2,ethnicity race,12,aus coapplicant ethnicity income jumbo loan_amount loan_purpose loan_term loan_type race tract_income tract_minority,14,aus coapplicant dti ethnicity income jumbo loan_amount loan_purpose loan_term loan_type ltv race tract_income tract_minority
+hmda_ca,1,fges,ecoa_underwriting_adm,17,37,3,aus dti loan_purpose,age ethnicity sex,0,,2,aus loan_purpose,3,aus dti loan_purpose
+hmda_ca,1,fges,sex_only_broad_adm,17,37,3,aus dti loan_purpose,sex,0,,0,,3,aus dti loan_purpose
+hmda_ca,1,fges,race_narrow_adm,17,37,3,aus dti loan_purpose,ethnicity,0,,2,aus loan_purpose,3,aus dti loan_purpose
+hmda_ca,2,hand,ecoa_underwriting_adm,17,65,16,age aus coapplicant dti ethnicity income jumbo loan_amount loan_purpose loan_term loan_type ltv race sex tract_income tract_minority,age ethnicity race sex,4,age ethnicity race sex,10,age aus coapplicant ethnicity loan_purpose loan_type race sex tract_income tract_minority,16,age aus coapplicant dti ethnicity income jumbo loan_amount loan_purpose loan_term loan_type ltv race sex tract_income tract_minority
+hmda_ca,2,hand,sex_only_broad_adm,17,65,16,age aus coapplicant dti ethnicity income jumbo loan_amount loan_purpose loan_term loan_type ltv race sex tract_income tract_minority,sex,1,sex,2,coapplicant sex,13,aus coapplicant dti income jumbo loan_amount loan_purpose loan_term loan_type ltv sex tract_income tract_minority
+hmda_ca,2,hand,race_narrow_adm,17,65,16,age aus coapplicant dti ethnicity income jumbo loan_amount loan_purpose loan_term loan_type ltv race sex tract_income tract_minority,ethnicity race,2,ethnicity race,12,aus coapplicant ethnicity income jumbo loan_amount loan_purpose loan_term loan_type race tract_income tract_minority,14,aus coapplicant dti ethnicity income jumbo loan_amount loan_purpose loan_term loan_type ltv race tract_income tract_minority
+hmda_ca,2,fges,ecoa_underwriting_adm,17,37,3,aus dti loan_purpose,age ethnicity race sex,0,,2,aus loan_purpose,3,aus dti loan_purpose
+hmda_ca,2,fges,sex_only_broad_adm,17,37,3,aus dti loan_purpose,sex,0,,0,,2,aus dti
+hmda_ca,2,fges,race_narrow_adm,17,37,3,aus dti loan_purpose,ethnicity race,0,,1,aus,2,aus dti
+hmda_ca,3,hand,ecoa_underwriting_adm,17,65,16,age aus coapplicant dti ethnicity income jumbo loan_amount loan_purpose loan_term loan_type ltv race sex tract_income tract_minority,age ethnicity race sex,4,age ethnicity race sex,10,age aus coapplicant ethnicity loan_purpose loan_type race sex tract_income tract_minority,16,age aus coapplicant dti ethnicity income jumbo loan_amount loan_purpose loan_term loan_type ltv race sex tract_income tract_minority
+hmda_ca,3,hand,sex_only_broad_adm,17,65,16,age aus coapplicant dti ethnicity income jumbo loan_amount loan_purpose loan_term loan_type ltv race sex tract_income tract_minority,sex,1,sex,2,coapplicant sex,13,aus coapplicant dti income jumbo loan_amount loan_purpose loan_term loan_type ltv sex tract_income tract_minority
+hmda_ca,3,hand,race_narrow_adm,17,65,16,age aus coapplicant dti ethnicity income jumbo loan_amount loan_purpose loan_term loan_type ltv race sex tract_income tract_minority,ethnicity race,2,ethnicity race,12,aus coapplicant ethnicity income jumbo loan_amount loan_purpose loan_term loan_type race tract_income tract_minority,14,aus coapplicant dti ethnicity income jumbo loan_amount loan_purpose loan_term loan_type ltv race tract_income tract_minority
+hmda_ca,3,fges,ecoa_underwriting_adm,17,38,3,aus dti loan_purpose,age ethnicity race sex,0,,2,aus loan_purpose,3,aus dti loan_purpose
+hmda_ca,3,fges,sex_only_broad_adm,17,38,3,aus dti loan_purpose,sex,0,,0,,2,aus dti
+hmda_ca,3,fges,race_narrow_adm,17,38,3,aus dti loan_purpose,ethnicity race,0,,1,aus,2,aus dti
+hmda_ca,4,hand,ecoa_underwriting_adm,17,65,16,age aus coapplicant dti ethnicity income jumbo loan_amount loan_purpose loan_term loan_type ltv race sex tract_income tract_minority,age ethnicity race sex,4,age ethnicity race sex,10,age aus coapplicant ethnicity loan_purpose loan_type race sex tract_income tract_minority,16,age aus coapplicant dti ethnicity income jumbo loan_amount loan_purpose loan_term loan_type ltv race sex tract_income tract_minority
+hmda_ca,4,hand,sex_only_broad_adm,17,65,16,age aus coapplicant dti ethnicity income jumbo loan_amount loan_purpose loan_term loan_type ltv race sex tract_income tract_minority,sex,1,sex,2,coapplicant sex,13,aus coapplicant dti income jumbo loan_amount loan_purpose loan_term loan_type ltv sex tract_income tract_minority
+hmda_ca,4,hand,race_narrow_adm,17,65,16,age aus coapplicant dti ethnicity income jumbo loan_amount loan_purpose loan_term loan_type ltv race sex tract_income tract_minority,ethnicity race,2,ethnicity race,12,aus coapplicant ethnicity income jumbo loan_amount loan_purpose loan_term loan_type race tract_income tract_minority,14,aus coapplicant dti ethnicity income jumbo loan_amount loan_purpose loan_term loan_type ltv race tract_income tract_minority
+hmda_ca,4,fges,ecoa_underwriting_adm,17,37,3,aus dti loan_purpose,age ethnicity race sex,0,,2,aus loan_purpose,3,aus dti loan_purpose
+hmda_ca,4,fges,sex_only_broad_adm,17,37,3,aus dti loan_purpose,sex,0,,0,,2,aus dti
+hmda_ca,4,fges,race_narrow_adm,17,37,3,aus dti loan_purpose,ethnicity race,0,,1,aus,2,aus dti
+hmda_tx,0,hand,ecoa_underwriting_adm,17,65,16,age aus coapplicant dti ethnicity income jumbo loan_amount loan_purpose loan_term loan_type ltv race sex tract_income tract_minority,age ethnicity race sex,4,age ethnicity race sex,10,age aus coapplicant ethnicity loan_purpose loan_type race sex tract_income tract_minority,16,age aus coapplicant dti ethnicity income jumbo loan_amount loan_purpose loan_term loan_type ltv race sex tract_income tract_minority
+hmda_tx,0,hand,sex_only_broad_adm,17,65,16,age aus coapplicant dti ethnicity income jumbo loan_amount loan_purpose loan_term loan_type ltv race sex tract_income tract_minority,sex,1,sex,2,coapplicant sex,13,aus coapplicant dti income jumbo loan_amount loan_purpose loan_term loan_type ltv sex tract_income tract_minority
+hmda_tx,0,hand,race_narrow_adm,17,65,16,age aus coapplicant dti ethnicity income jumbo loan_amount loan_purpose loan_term loan_type ltv race sex tract_income tract_minority,ethnicity race,2,ethnicity race,12,aus coapplicant ethnicity income jumbo loan_amount loan_purpose loan_term loan_type race tract_income tract_minority,14,aus coapplicant dti ethnicity income jumbo loan_amount loan_purpose loan_term loan_type ltv race tract_income tract_minority
+hmda_tx,0,fges,ecoa_underwriting_adm,17,31,3,aus dti loan_purpose,age ethnicity,0,,0,,3,aus dti loan_purpose
+hmda_tx,0,fges,sex_only_broad_adm,17,31,3,aus dti loan_purpose,,0,,0,,0,
+hmda_tx,0,fges,race_narrow_adm,17,31,3,aus dti loan_purpose,ethnicity,0,,2,aus loan_purpose,3,aus dti loan_purpose
+hmda_tx,1,hand,ecoa_underwriting_adm,17,65,16,age aus coapplicant dti ethnicity income jumbo loan_amount loan_purpose loan_term loan_type ltv race sex tract_income tract_minority,age ethnicity race sex,4,age ethnicity race sex,10,age aus coapplicant ethnicity loan_purpose loan_type race sex tract_income tract_minority,16,age aus coapplicant dti ethnicity income jumbo loan_amount loan_purpose loan_term loan_type ltv race sex tract_income tract_minority
+hmda_tx,1,hand,sex_only_broad_adm,17,65,16,age aus coapplicant dti ethnicity income jumbo loan_amount loan_purpose loan_term loan_type ltv race sex tract_income tract_minority,sex,1,sex,2,coapplicant sex,13,aus coapplicant dti income jumbo loan_amount loan_purpose loan_term loan_type ltv sex tract_income tract_minority
+hmda_tx,1,hand,race_narrow_adm,17,65,16,age aus coapplicant dti ethnicity income jumbo loan_amount loan_purpose loan_term loan_type ltv race sex tract_income tract_minority,ethnicity race,2,ethnicity race,12,aus coapplicant ethnicity income jumbo loan_amount loan_purpose loan_term loan_type race tract_income tract_minority,14,aus coapplicant dti ethnicity income jumbo loan_amount loan_purpose loan_term loan_type ltv race tract_income tract_minority
+hmda_tx,1,fges,ecoa_underwriting_adm,17,29,3,dti loan_purpose loan_type,age ethnicity,0,,0,,3,dti loan_purpose loan_type
+hmda_tx,1,fges,sex_only_broad_adm,17,29,3,dti loan_purpose loan_type,,0,,0,,0,
+hmda_tx,1,fges,race_narrow_adm,17,29,3,dti loan_purpose loan_type,ethnicity,0,,2,loan_purpose loan_type,3,dti loan_purpose loan_type
+hmda_tx,2,hand,ecoa_underwriting_adm,17,65,16,age aus coapplicant dti ethnicity income jumbo loan_amount loan_purpose loan_term loan_type ltv race sex tract_income tract_minority,age ethnicity race sex,4,age ethnicity race sex,10,age aus coapplicant ethnicity loan_purpose loan_type race sex tract_income tract_minority,16,age aus coapplicant dti ethnicity income jumbo loan_amount loan_purpose loan_term loan_type ltv race sex tract_income tract_minority
+hmda_tx,2,hand,sex_only_broad_adm,17,65,16,age aus coapplicant dti ethnicity income jumbo loan_amount loan_purpose loan_term loan_type ltv race sex tract_income tract_minority,sex,1,sex,2,coapplicant sex,13,aus coapplicant dti income jumbo loan_amount loan_purpose loan_term loan_type ltv sex tract_income tract_minority
+hmda_tx,2,hand,race_narrow_adm,17,65,16,age aus coapplicant dti ethnicity income jumbo loan_amount loan_purpose loan_term loan_type ltv race sex tract_income tract_minority,ethnicity race,2,ethnicity race,12,aus coapplicant ethnicity income jumbo loan_amount loan_purpose loan_term loan_type race tract_income tract_minority,14,aus coapplicant dti ethnicity income jumbo loan_amount loan_purpose loan_term loan_type ltv race tract_income tract_minority
+hmda_tx,2,fges,ecoa_underwriting_adm,17,30,3,aus dti loan_purpose,age ethnicity,0,,0,,3,aus dti loan_purpose
+hmda_tx,2,fges,sex_only_broad_adm,17,30,3,aus dti loan_purpose,,0,,0,,0,
+hmda_tx,2,fges,race_narrow_adm,17,30,3,aus dti loan_purpose,ethnicity,0,,2,aus loan_purpose,3,aus dti loan_purpose
+hmda_tx,3,hand,ecoa_underwriting_adm,17,65,16,age aus coapplicant dti ethnicity income jumbo loan_amount loan_purpose loan_term loan_type ltv race sex tract_income tract_minority,age ethnicity race sex,4,age ethnicity race sex,10,age aus coapplicant ethnicity loan_purpose loan_type race sex tract_income tract_minority,16,age aus coapplicant dti ethnicity income jumbo loan_amount loan_purpose loan_term loan_type ltv race sex tract_income tract_minority
+hmda_tx,3,hand,sex_only_broad_adm,17,65,16,age aus coapplicant dti ethnicity income jumbo loan_amount loan_purpose loan_term loan_type ltv race sex tract_income tract_minority,sex,1,sex,2,coapplicant sex,13,aus coapplicant dti income jumbo loan_amount loan_purpose loan_term loan_type ltv sex tract_income tract_minority
+hmda_tx,3,hand,race_narrow_adm,17,65,16,age aus coapplicant dti ethnicity income jumbo loan_amount loan_purpose loan_term loan_type ltv race sex tract_income tract_minority,ethnicity race,2,ethnicity race,12,aus coapplicant ethnicity income jumbo loan_amount loan_purpose loan_term loan_type race tract_income tract_minority,14,aus coapplicant dti ethnicity income jumbo loan_amount loan_purpose loan_term loan_type ltv race tract_income tract_minority
+hmda_tx,3,fges,ecoa_underwriting_adm,17,31,3,aus dti loan_purpose,age ethnicity,0,,0,,3,aus dti loan_purpose
+hmda_tx,3,fges,sex_only_broad_adm,17,31,3,aus dti loan_purpose,,0,,0,,0,
+hmda_tx,3,fges,race_narrow_adm,17,31,3,aus dti loan_purpose,ethnicity,0,,2,aus loan_purpose,3,aus dti loan_purpose
+hmda_tx,4,hand,ecoa_underwriting_adm,17,65,16,age aus coapplicant dti ethnicity income jumbo loan_amount loan_purpose loan_term loan_type ltv race sex tract_income tract_minority,age ethnicity race sex,4,age ethnicity race sex,10,age aus coapplicant ethnicity loan_purpose loan_type race sex tract_income tract_minority,16,age aus coapplicant dti ethnicity income jumbo loan_amount loan_purpose loan_term loan_type ltv race sex tract_income tract_minority
+hmda_tx,4,hand,sex_only_broad_adm,17,65,16,age aus coapplicant dti ethnicity income jumbo loan_amount loan_purpose loan_term loan_type ltv race sex tract_income tract_minority,sex,1,sex,2,coapplicant sex,13,aus coapplicant dti income jumbo loan_amount loan_purpose loan_term loan_type ltv sex tract_income tract_minority
+hmda_tx,4,hand,race_narrow_adm,17,65,16,age aus coapplicant dti ethnicity income jumbo loan_amount loan_purpose loan_term loan_type ltv race sex tract_income tract_minority,ethnicity race,2,ethnicity race,12,aus coapplicant ethnicity income jumbo loan_amount loan_purpose loan_term loan_type race tract_income tract_minority,14,aus coapplicant dti ethnicity income jumbo loan_amount loan_purpose loan_term loan_type ltv race tract_income tract_minority
+hmda_tx,4,fges,ecoa_underwriting_adm,17,31,3,aus dti loan_purpose,age ethnicity,0,,0,,3,aus dti loan_purpose
+hmda_tx,4,fges,sex_only_broad_adm,17,31,3,aus dti loan_purpose,,0,,0,,0,
+hmda_tx,4,fges,race_narrow_adm,17,31,3,aus dti loan_purpose,ethnicity,0,,2,aus loan_purpose,3,aus dti loan_purpose
+acsincome_ca,0,hand,prefair_like,12,34,10,AGEP COW HISP MAR OCCP RAC1P RELP SCHL SEX WKHP,HISP RAC1P SEX WAOB,3,HISP RAC1P SEX,5,HISP MAR RAC1P RELP SEX,9,COW HISP MAR OCCP RAC1P RELP SCHL SEX WKHP
+acsincome_ca,0,hand,sex_only_broad_adm,12,34,10,AGEP COW HISP MAR OCCP RAC1P RELP SCHL SEX WKHP,SEX,1,SEX,3,MAR RELP SEX,7,COW MAR OCCP RELP SCHL SEX WKHP
+acsincome_ca,0,hand,sex_race_narrow_adm,12,34,10,AGEP COW HISP MAR OCCP RAC1P RELP SCHL SEX WKHP,HISP RAC1P SEX,3,HISP RAC1P SEX,7,COW HISP MAR OCCP RAC1P RELP SEX,9,COW HISP MAR OCCP RAC1P RELP SCHL SEX WKHP
+acsincome_ca,0,fges,prefair_like,12,12,2,OCCP WKHP,HISP SEX WAOB,0,,0,,2,OCCP WKHP
+acsincome_ca,0,fges,sex_only_broad_adm,12,12,2,OCCP WKHP,SEX,0,,0,,2,OCCP WKHP
+acsincome_ca,0,fges,sex_race_narrow_adm,12,12,2,OCCP WKHP,HISP SEX,0,,1,OCCP,2,OCCP WKHP
+acsincome_ca,1,hand,prefair_like,12,34,10,AGEP COW HISP MAR OCCP RAC1P RELP SCHL SEX WKHP,HISP RAC1P SEX WAOB,3,HISP RAC1P SEX,5,HISP MAR RAC1P RELP SEX,9,COW HISP MAR OCCP RAC1P RELP SCHL SEX WKHP
+acsincome_ca,1,hand,sex_only_broad_adm,12,34,10,AGEP COW HISP MAR OCCP RAC1P RELP SCHL SEX WKHP,SEX,1,SEX,3,MAR RELP SEX,7,COW MAR OCCP RELP SCHL SEX WKHP
+acsincome_ca,1,hand,sex_race_narrow_adm,12,34,10,AGEP COW HISP MAR OCCP RAC1P RELP SCHL SEX WKHP,HISP RAC1P SEX,3,HISP RAC1P SEX,7,COW HISP MAR OCCP RAC1P RELP SEX,9,COW HISP MAR OCCP RAC1P RELP SCHL SEX WKHP
+acsincome_ca,1,fges,prefair_like,12,13,2,OCCP WKHP,HISP SEX WAOB,0,,0,,2,OCCP WKHP
+acsincome_ca,1,fges,sex_only_broad_adm,12,13,2,OCCP WKHP,SEX,0,,0,,2,OCCP WKHP
+acsincome_ca,1,fges,sex_race_narrow_adm,12,13,2,OCCP WKHP,HISP SEX,0,,1,OCCP,2,OCCP WKHP
+acsincome_ca,2,hand,prefair_like,12,34,10,AGEP COW HISP MAR OCCP RAC1P RELP SCHL SEX WKHP,HISP RAC1P SEX WAOB,3,HISP RAC1P SEX,5,HISP MAR RAC1P RELP SEX,9,COW HISP MAR OCCP RAC1P RELP SCHL SEX WKHP
+acsincome_ca,2,hand,sex_only_broad_adm,12,34,10,AGEP COW HISP MAR OCCP RAC1P RELP SCHL SEX WKHP,SEX,1,SEX,3,MAR RELP SEX,7,COW MAR OCCP RELP SCHL SEX WKHP
+acsincome_ca,2,hand,sex_race_narrow_adm,12,34,10,AGEP COW HISP MAR OCCP RAC1P RELP SCHL SEX WKHP,HISP RAC1P SEX,3,HISP RAC1P SEX,7,COW HISP MAR OCCP RAC1P RELP SEX,9,COW HISP MAR OCCP RAC1P RELP SCHL SEX WKHP
+acsincome_ca,2,fges,prefair_like,12,12,2,OCCP WKHP,HISP SEX WAOB,0,,0,,2,OCCP WKHP
+acsincome_ca,2,fges,sex_only_broad_adm,12,12,2,OCCP WKHP,SEX,0,,0,,2,OCCP WKHP
+acsincome_ca,2,fges,sex_race_narrow_adm,12,12,2,OCCP WKHP,HISP SEX,0,,1,OCCP,2,OCCP WKHP
+acsincome_ca,3,hand,prefair_like,12,34,10,AGEP COW HISP MAR OCCP RAC1P RELP SCHL SEX WKHP,HISP RAC1P SEX WAOB,3,HISP RAC1P SEX,5,HISP MAR RAC1P RELP SEX,9,COW HISP MAR OCCP RAC1P RELP SCHL SEX WKHP
+acsincome_ca,3,hand,sex_only_broad_adm,12,34,10,AGEP COW HISP MAR OCCP RAC1P RELP SCHL SEX WKHP,SEX,1,SEX,3,MAR RELP SEX,7,COW MAR OCCP RELP SCHL SEX WKHP
+acsincome_ca,3,hand,sex_race_narrow_adm,12,34,10,AGEP COW HISP MAR OCCP RAC1P RELP SCHL SEX WKHP,HISP RAC1P SEX,3,HISP RAC1P SEX,7,COW HISP MAR OCCP RAC1P RELP SEX,9,COW HISP MAR OCCP RAC1P RELP SCHL SEX WKHP
+acsincome_ca,3,fges,prefair_like,12,12,2,OCCP WKHP,HISP SEX WAOB,0,,0,,2,OCCP WKHP
+acsincome_ca,3,fges,sex_only_broad_adm,12,12,2,OCCP WKHP,SEX,0,,0,,2,OCCP WKHP
+acsincome_ca,3,fges,sex_race_narrow_adm,12,12,2,OCCP WKHP,HISP SEX,0,,1,OCCP,2,OCCP WKHP
+acsincome_ca,4,hand,prefair_like,12,34,10,AGEP COW HISP MAR OCCP RAC1P RELP SCHL SEX WKHP,HISP RAC1P SEX WAOB,3,HISP RAC1P SEX,5,HISP MAR RAC1P RELP SEX,9,COW HISP MAR OCCP RAC1P RELP SCHL SEX WKHP
+acsincome_ca,4,hand,sex_only_broad_adm,12,34,10,AGEP COW HISP MAR OCCP RAC1P RELP SCHL SEX WKHP,SEX,1,SEX,3,MAR RELP SEX,7,COW MAR OCCP RELP SCHL SEX WKHP
+acsincome_ca,4,hand,sex_race_narrow_adm,12,34,10,AGEP COW HISP MAR OCCP RAC1P RELP SCHL SEX WKHP,HISP RAC1P SEX,3,HISP RAC1P SEX,7,COW HISP MAR OCCP RAC1P RELP SEX,9,COW HISP MAR OCCP RAC1P RELP SCHL SEX WKHP
+acsincome_ca,4,fges,prefair_like,12,12,2,OCCP WKHP,HISP SEX WAOB,0,,0,,2,OCCP WKHP
+acsincome_ca,4,fges,sex_only_broad_adm,12,12,2,OCCP WKHP,SEX,0,,0,,2,OCCP WKHP
+acsincome_ca,4,fges,sex_race_narrow_adm,12,12,2,OCCP WKHP,HISP SEX,0,,1,OCCP,2,OCCP WKHP
+acsincome_tx,0,hand,prefair_like,12,34,10,AGEP COW HISP MAR OCCP RAC1P RELP SCHL SEX WKHP,HISP RAC1P SEX WAOB,3,HISP RAC1P SEX,5,HISP MAR RAC1P RELP SEX,9,COW HISP MAR OCCP RAC1P RELP SCHL SEX WKHP
+acsincome_tx,0,hand,sex_only_broad_adm,12,34,10,AGEP COW HISP MAR OCCP RAC1P RELP SCHL SEX WKHP,SEX,1,SEX,3,MAR RELP SEX,7,COW MAR OCCP RELP SCHL SEX WKHP
+acsincome_tx,0,hand,sex_race_narrow_adm,12,34,10,AGEP COW HISP MAR OCCP RAC1P RELP SCHL SEX WKHP,HISP RAC1P SEX,3,HISP RAC1P SEX,7,COW HISP MAR OCCP RAC1P RELP SEX,9,COW HISP MAR OCCP RAC1P RELP SCHL SEX WKHP
+acsincome_tx,0,fges,prefair_like,12,12,2,OCCP WKHP,HISP SEX,0,,0,,2,OCCP WKHP
+acsincome_tx,0,fges,sex_only_broad_adm,12,12,2,OCCP WKHP,SEX,0,,0,,2,OCCP WKHP
+acsincome_tx,0,fges,sex_race_narrow_adm,12,12,2,OCCP WKHP,HISP SEX,0,,1,OCCP,2,OCCP WKHP
+acsincome_tx,1,hand,prefair_like,12,34,10,AGEP COW HISP MAR OCCP RAC1P RELP SCHL SEX WKHP,HISP RAC1P SEX WAOB,3,HISP RAC1P SEX,5,HISP MAR RAC1P RELP SEX,9,COW HISP MAR OCCP RAC1P RELP SCHL SEX WKHP
+acsincome_tx,1,hand,sex_only_broad_adm,12,34,10,AGEP COW HISP MAR OCCP RAC1P RELP SCHL SEX WKHP,SEX,1,SEX,3,MAR RELP SEX,7,COW MAR OCCP RELP SCHL SEX WKHP
+acsincome_tx,1,hand,sex_race_narrow_adm,12,34,10,AGEP COW HISP MAR OCCP RAC1P RELP SCHL SEX WKHP,HISP RAC1P SEX,3,HISP RAC1P SEX,7,COW HISP MAR OCCP RAC1P RELP SEX,9,COW HISP MAR OCCP RAC1P RELP SCHL SEX WKHP
+acsincome_tx,1,fges,prefair_like,12,12,2,OCCP WKHP,HISP SEX,0,,0,,2,OCCP WKHP
+acsincome_tx,1,fges,sex_only_broad_adm,12,12,2,OCCP WKHP,SEX,0,,0,,2,OCCP WKHP
+acsincome_tx,1,fges,sex_race_narrow_adm,12,12,2,OCCP WKHP,HISP SEX,0,,1,OCCP,2,OCCP WKHP
+acsincome_tx,2,hand,prefair_like,12,34,10,AGEP COW HISP MAR OCCP RAC1P RELP SCHL SEX WKHP,HISP RAC1P SEX WAOB,3,HISP RAC1P SEX,5,HISP MAR RAC1P RELP SEX,9,COW HISP MAR OCCP RAC1P RELP SCHL SEX WKHP
+acsincome_tx,2,hand,sex_only_broad_adm,12,34,10,AGEP COW HISP MAR OCCP RAC1P RELP SCHL SEX WKHP,SEX,1,SEX,3,MAR RELP SEX,7,COW MAR OCCP RELP SCHL SEX WKHP
+acsincome_tx,2,hand,sex_race_narrow_adm,12,34,10,AGEP COW HISP MAR OCCP RAC1P RELP SCHL SEX WKHP,HISP RAC1P SEX,3,HISP RAC1P SEX,7,COW HISP MAR OCCP RAC1P RELP SEX,9,COW HISP MAR OCCP RAC1P RELP SCHL SEX WKHP
+acsincome_tx,2,fges,prefair_like,12,12,2,OCCP WKHP,HISP SEX,0,,0,,2,OCCP WKHP
+acsincome_tx,2,fges,sex_only_broad_adm,12,12,2,OCCP WKHP,SEX,0,,0,,2,OCCP WKHP
+acsincome_tx,2,fges,sex_race_narrow_adm,12,12,2,OCCP WKHP,HISP SEX,0,,1,OCCP,2,OCCP WKHP
+acsincome_tx,3,hand,prefair_like,12,34,10,AGEP COW HISP MAR OCCP RAC1P RELP SCHL SEX WKHP,HISP RAC1P SEX WAOB,3,HISP RAC1P SEX,5,HISP MAR RAC1P RELP SEX,9,COW HISP MAR OCCP RAC1P RELP SCHL SEX WKHP
+acsincome_tx,3,hand,sex_only_broad_adm,12,34,10,AGEP COW HISP MAR OCCP RAC1P RELP SCHL SEX WKHP,SEX,1,SEX,3,MAR RELP SEX,7,COW MAR OCCP RELP SCHL SEX WKHP
+acsincome_tx,3,hand,sex_race_narrow_adm,12,34,10,AGEP COW HISP MAR OCCP RAC1P RELP SCHL SEX WKHP,HISP RAC1P SEX,3,HISP RAC1P SEX,7,COW HISP MAR OCCP RAC1P RELP SEX,9,COW HISP MAR OCCP RAC1P RELP SCHL SEX WKHP
+acsincome_tx,3,fges,prefair_like,12,12,2,OCCP WKHP,HISP SEX,0,,0,,2,OCCP WKHP
+acsincome_tx,3,fges,sex_only_broad_adm,12,12,2,OCCP WKHP,SEX,0,,0,,2,OCCP WKHP
+acsincome_tx,3,fges,sex_race_narrow_adm,12,12,2,OCCP WKHP,HISP SEX,0,,1,OCCP,2,OCCP WKHP
+acsincome_tx,4,hand,prefair_like,12,34,10,AGEP COW HISP MAR OCCP RAC1P RELP SCHL SEX WKHP,HISP RAC1P SEX WAOB,3,HISP RAC1P SEX,5,HISP MAR RAC1P RELP SEX,9,COW HISP MAR OCCP RAC1P RELP SCHL SEX WKHP
+acsincome_tx,4,hand,sex_only_broad_adm,12,34,10,AGEP COW HISP MAR OCCP RAC1P RELP SCHL SEX WKHP,SEX,1,SEX,3,MAR RELP SEX,7,COW MAR OCCP RELP SCHL SEX WKHP
+acsincome_tx,4,hand,sex_race_narrow_adm,12,34,10,AGEP COW HISP MAR OCCP RAC1P RELP SCHL SEX WKHP,HISP RAC1P SEX,3,HISP RAC1P SEX,7,COW HISP MAR OCCP RAC1P RELP SEX,9,COW HISP MAR OCCP RAC1P RELP SCHL SEX WKHP
+acsincome_tx,4,fges,prefair_like,12,12,2,OCCP WKHP,HISP SEX,0,,0,,2,OCCP WKHP
+acsincome_tx,4,fges,sex_only_broad_adm,12,12,2,OCCP WKHP,SEX,0,,0,,2,OCCP WKHP
+acsincome_tx,4,fges,sex_race_narrow_adm,12,12,2,OCCP WKHP,HISP SEX,0,,1,OCCP,2,OCCP WKHP
+acspubcov_ca,0,hand,eligibility_adm,20,60,12,AGEP CIT DIS ESP ESR FER HISP MAR MIL PINCP RAC1P SEX,HISP NATIVITY RAC1P SEX,3,HISP RAC1P SEX,7,CIT ESP HISP MAR MIL RAC1P SEX,11,CIT DIS ESP ESR FER HISP MAR MIL PINCP RAC1P SEX
+acspubcov_ca,0,hand,race_only_broad_adm,20,60,12,AGEP CIT DIS ESP ESR FER HISP MAR MIL PINCP RAC1P SEX,HISP RAC1P,2,HISP RAC1P,2,HISP RAC1P,9,CIT ESP ESR FER HISP MAR MIL PINCP RAC1P
+acspubcov_ca,0,hand,disability_protected_narrow_adm,20,60,12,AGEP CIT DIS ESP ESR FER HISP MAR MIL PINCP RAC1P SEX,DIS HISP RAC1P SEX,4,DIS HISP RAC1P SEX,10,CIT DIS ESP ESR FER HISP MAR MIL RAC1P SEX,11,CIT DIS ESP ESR FER HISP MAR MIL PINCP RAC1P SEX
+acspubcov_ca,0,fges,eligibility_adm,20,44,4,DIS ESR HISP MAR,HISP NATIVITY SEX,1,HISP,2,HISP MAR,4,DIS ESR HISP MAR
+acspubcov_ca,0,fges,race_only_broad_adm,20,44,4,DIS ESR HISP MAR,HISP,1,HISP,1,HISP,1,HISP
+acspubcov_ca,0,fges,disability_protected_narrow_adm,20,44,4,DIS ESR HISP MAR,DIS HISP SEX,2,DIS HISP,4,DIS ESR HISP MAR,4,DIS ESR HISP MAR
+acspubcov_ca,1,hand,eligibility_adm,20,60,12,AGEP CIT DIS ESP ESR FER HISP MAR MIL PINCP RAC1P SEX,HISP NATIVITY RAC1P SEX,3,HISP RAC1P SEX,7,CIT ESP HISP MAR MIL RAC1P SEX,11,CIT DIS ESP ESR FER HISP MAR MIL PINCP RAC1P SEX
+acspubcov_ca,1,hand,race_only_broad_adm,20,60,12,AGEP CIT DIS ESP ESR FER HISP MAR MIL PINCP RAC1P SEX,HISP RAC1P,2,HISP RAC1P,2,HISP RAC1P,9,CIT ESP ESR FER HISP MAR MIL PINCP RAC1P
+acspubcov_ca,1,hand,disability_protected_narrow_adm,20,60,12,AGEP CIT DIS ESP ESR FER HISP MAR MIL PINCP RAC1P SEX,DIS HISP RAC1P SEX,4,DIS HISP RAC1P SEX,10,CIT DIS ESP ESR FER HISP MAR MIL RAC1P SEX,11,CIT DIS ESP ESR FER HISP MAR MIL PINCP RAC1P SEX
+acspubcov_ca,1,fges,eligibility_adm,20,44,4,DIS ESR HISP MAR,HISP NATIVITY SEX,1,HISP,2,HISP MAR,4,DIS ESR HISP MAR
+acspubcov_ca,1,fges,race_only_broad_adm,20,44,4,DIS ESR HISP MAR,HISP,1,HISP,1,HISP,1,HISP
+acspubcov_ca,1,fges,disability_protected_narrow_adm,20,44,4,DIS ESR HISP MAR,DIS HISP SEX,2,DIS HISP,4,DIS ESR HISP MAR,4,DIS ESR HISP MAR
+acspubcov_ca,2,hand,eligibility_adm,20,60,12,AGEP CIT DIS ESP ESR FER HISP MAR MIL PINCP RAC1P SEX,HISP NATIVITY RAC1P SEX,3,HISP RAC1P SEX,7,CIT ESP HISP MAR MIL RAC1P SEX,11,CIT DIS ESP ESR FER HISP MAR MIL PINCP RAC1P SEX
+acspubcov_ca,2,hand,race_only_broad_adm,20,60,12,AGEP CIT DIS ESP ESR FER HISP MAR MIL PINCP RAC1P SEX,HISP RAC1P,2,HISP RAC1P,2,HISP RAC1P,9,CIT ESP ESR FER HISP MAR MIL PINCP RAC1P
+acspubcov_ca,2,hand,disability_protected_narrow_adm,20,60,12,AGEP CIT DIS ESP ESR FER HISP MAR MIL PINCP RAC1P SEX,DIS HISP RAC1P SEX,4,DIS HISP RAC1P SEX,10,CIT DIS ESP ESR FER HISP MAR MIL RAC1P SEX,11,CIT DIS ESP ESR FER HISP MAR MIL PINCP RAC1P SEX
+acspubcov_ca,2,fges,eligibility_adm,20,44,4,DIS ESR HISP MAR,HISP NATIVITY SEX,1,HISP,2,HISP MAR,4,DIS ESR HISP MAR
+acspubcov_ca,2,fges,race_only_broad_adm,20,44,4,DIS ESR HISP MAR,HISP,1,HISP,1,HISP,1,HISP
+acspubcov_ca,2,fges,disability_protected_narrow_adm,20,44,4,DIS ESR HISP MAR,DIS HISP SEX,2,DIS HISP,4,DIS ESR HISP MAR,4,DIS ESR HISP MAR
+acspubcov_ca,3,hand,eligibility_adm,20,60,12,AGEP CIT DIS ESP ESR FER HISP MAR MIL PINCP RAC1P SEX,HISP NATIVITY RAC1P SEX,3,HISP RAC1P SEX,7,CIT ESP HISP MAR MIL RAC1P SEX,11,CIT DIS ESP ESR FER HISP MAR MIL PINCP RAC1P SEX
+acspubcov_ca,3,hand,race_only_broad_adm,20,60,12,AGEP CIT DIS ESP ESR FER HISP MAR MIL PINCP RAC1P SEX,HISP RAC1P,2,HISP RAC1P,2,HISP RAC1P,9,CIT ESP ESR FER HISP MAR MIL PINCP RAC1P
+acspubcov_ca,3,hand,disability_protected_narrow_adm,20,60,12,AGEP CIT DIS ESP ESR FER HISP MAR MIL PINCP RAC1P SEX,DIS HISP RAC1P SEX,4,DIS HISP RAC1P SEX,10,CIT DIS ESP ESR FER HISP MAR MIL RAC1P SEX,11,CIT DIS ESP ESR FER HISP MAR MIL PINCP RAC1P SEX
+acspubcov_ca,3,fges,eligibility_adm,20,44,4,DIS ESR HISP MAR,HISP NATIVITY SEX,1,HISP,2,HISP MAR,4,DIS ESR HISP MAR
+acspubcov_ca,3,fges,race_only_broad_adm,20,44,4,DIS ESR HISP MAR,HISP,1,HISP,1,HISP,2,DIS HISP
+acspubcov_ca,3,fges,disability_protected_narrow_adm,20,44,4,DIS ESR HISP MAR,DIS HISP SEX,2,DIS HISP,4,DIS ESR HISP MAR,4,DIS ESR HISP MAR
+acspubcov_ca,4,hand,eligibility_adm,20,60,12,AGEP CIT DIS ESP ESR FER HISP MAR MIL PINCP RAC1P SEX,HISP NATIVITY RAC1P SEX,3,HISP RAC1P SEX,7,CIT ESP HISP MAR MIL RAC1P SEX,11,CIT DIS ESP ESR FER HISP MAR MIL PINCP RAC1P SEX
+acspubcov_ca,4,hand,race_only_broad_adm,20,60,12,AGEP CIT DIS ESP ESR FER HISP MAR MIL PINCP RAC1P SEX,HISP RAC1P,2,HISP RAC1P,2,HISP RAC1P,9,CIT ESP ESR FER HISP MAR MIL PINCP RAC1P
+acspubcov_ca,4,hand,disability_protected_narrow_adm,20,60,12,AGEP CIT DIS ESP ESR FER HISP MAR MIL PINCP RAC1P SEX,DIS HISP RAC1P SEX,4,DIS HISP RAC1P SEX,10,CIT DIS ESP ESR FER HISP MAR MIL RAC1P SEX,11,CIT DIS ESP ESR FER HISP MAR MIL PINCP RAC1P SEX
+acspubcov_ca,4,fges,eligibility_adm,20,44,4,DIS ESR HISP MAR,HISP NATIVITY SEX,1,HISP,2,HISP MAR,4,DIS ESR HISP MAR
+acspubcov_ca,4,fges,race_only_broad_adm,20,44,4,DIS ESR HISP MAR,HISP,1,HISP,1,HISP,1,HISP
+acspubcov_ca,4,fges,disability_protected_narrow_adm,20,44,4,DIS ESR HISP MAR,DIS HISP SEX,2,DIS HISP,4,DIS ESR HISP MAR,4,DIS ESR HISP MAR
+acspubcov_tx,0,hand,eligibility_adm,20,60,12,AGEP CIT DIS ESP ESR FER HISP MAR MIL PINCP RAC1P SEX,HISP NATIVITY RAC1P SEX,3,HISP RAC1P SEX,7,CIT ESP HISP MAR MIL RAC1P SEX,11,CIT DIS ESP ESR FER HISP MAR MIL PINCP RAC1P SEX
+acspubcov_tx,0,hand,race_only_broad_adm,20,60,12,AGEP CIT DIS ESP ESR FER HISP MAR MIL PINCP RAC1P SEX,HISP RAC1P,2,HISP RAC1P,2,HISP RAC1P,9,CIT ESP ESR FER HISP MAR MIL PINCP RAC1P
+acspubcov_tx,0,hand,disability_protected_narrow_adm,20,60,12,AGEP CIT DIS ESP ESR FER HISP MAR MIL PINCP RAC1P SEX,DIS HISP RAC1P SEX,4,DIS HISP RAC1P SEX,10,CIT DIS ESP ESR FER HISP MAR MIL RAC1P SEX,11,CIT DIS ESP ESR FER HISP MAR MIL PINCP RAC1P SEX
+acspubcov_tx,0,fges,eligibility_adm,20,42,3,DIS ESR PINCP,NATIVITY SEX,0,,0,,3,DIS ESR PINCP
+acspubcov_tx,0,fges,race_only_broad_adm,20,42,3,DIS ESR PINCP,,0,,0,,0,
+acspubcov_tx,0,fges,disability_protected_narrow_adm,20,42,3,DIS ESR PINCP,DIS SEX,1,DIS,2,DIS ESR,3,DIS ESR PINCP
+acspubcov_tx,1,hand,eligibility_adm,20,60,12,AGEP CIT DIS ESP ESR FER HISP MAR MIL PINCP RAC1P SEX,HISP NATIVITY RAC1P SEX,3,HISP RAC1P SEX,7,CIT ESP HISP MAR MIL RAC1P SEX,11,CIT DIS ESP ESR FER HISP MAR MIL PINCP RAC1P SEX
+acspubcov_tx,1,hand,race_only_broad_adm,20,60,12,AGEP CIT DIS ESP ESR FER HISP MAR MIL PINCP RAC1P SEX,HISP RAC1P,2,HISP RAC1P,2,HISP RAC1P,9,CIT ESP ESR FER HISP MAR MIL PINCP RAC1P
+acspubcov_tx,1,hand,disability_protected_narrow_adm,20,60,12,AGEP CIT DIS ESP ESR FER HISP MAR MIL PINCP RAC1P SEX,DIS HISP RAC1P SEX,4,DIS HISP RAC1P SEX,10,CIT DIS ESP ESR FER HISP MAR MIL RAC1P SEX,11,CIT DIS ESP ESR FER HISP MAR MIL PINCP RAC1P SEX
+acspubcov_tx,1,fges,eligibility_adm,20,42,4,DIS ESP ESR PINCP,NATIVITY SEX,0,,1,ESP,4,DIS ESP ESR PINCP
+acspubcov_tx,1,fges,race_only_broad_adm,20,42,4,DIS ESP ESR PINCP,,0,,0,,0,
+acspubcov_tx,1,fges,disability_protected_narrow_adm,20,42,4,DIS ESP ESR PINCP,DIS SEX,1,DIS,3,DIS ESP ESR,4,DIS ESP ESR PINCP
+acspubcov_tx,2,hand,eligibility_adm,20,60,12,AGEP CIT DIS ESP ESR FER HISP MAR MIL PINCP RAC1P SEX,HISP NATIVITY RAC1P SEX,3,HISP RAC1P SEX,7,CIT ESP HISP MAR MIL RAC1P SEX,11,CIT DIS ESP ESR FER HISP MAR MIL PINCP RAC1P SEX
+acspubcov_tx,2,hand,race_only_broad_adm,20,60,12,AGEP CIT DIS ESP ESR FER HISP MAR MIL PINCP RAC1P SEX,HISP RAC1P,2,HISP RAC1P,2,HISP RAC1P,9,CIT ESP ESR FER HISP MAR MIL PINCP RAC1P
+acspubcov_tx,2,hand,disability_protected_narrow_adm,20,60,12,AGEP CIT DIS ESP ESR FER HISP MAR MIL PINCP RAC1P SEX,DIS HISP RAC1P SEX,4,DIS HISP RAC1P SEX,10,CIT DIS ESP ESR FER HISP MAR MIL RAC1P SEX,11,CIT DIS ESP ESR FER HISP MAR MIL PINCP RAC1P SEX
+acspubcov_tx,2,fges,eligibility_adm,20,43,4,DIS ESP ESR PINCP,NATIVITY SEX,0,,1,ESP,4,DIS ESP ESR PINCP
+acspubcov_tx,2,fges,race_only_broad_adm,20,43,4,DIS ESP ESR PINCP,,0,,0,,0,
+acspubcov_tx,2,fges,disability_protected_narrow_adm,20,43,4,DIS ESP ESR PINCP,DIS SEX,1,DIS,3,DIS ESP ESR,4,DIS ESP ESR PINCP
+acspubcov_tx,3,hand,eligibility_adm,20,60,12,AGEP CIT DIS ESP ESR FER HISP MAR MIL PINCP RAC1P SEX,HISP NATIVITY RAC1P SEX,3,HISP RAC1P SEX,7,CIT ESP HISP MAR MIL RAC1P SEX,11,CIT DIS ESP ESR FER HISP MAR MIL PINCP RAC1P SEX
+acspubcov_tx,3,hand,race_only_broad_adm,20,60,12,AGEP CIT DIS ESP ESR FER HISP MAR MIL PINCP RAC1P SEX,HISP RAC1P,2,HISP RAC1P,2,HISP RAC1P,9,CIT ESP ESR FER HISP MAR MIL PINCP RAC1P
+acspubcov_tx,3,hand,disability_protected_narrow_adm,20,60,12,AGEP CIT DIS ESP ESR FER HISP MAR MIL PINCP RAC1P SEX,DIS HISP RAC1P SEX,4,DIS HISP RAC1P SEX,10,CIT DIS ESP ESR FER HISP MAR MIL RAC1P SEX,11,CIT DIS ESP ESR FER HISP MAR MIL PINCP RAC1P SEX
+acspubcov_tx,3,fges,eligibility_adm,20,44,4,DIS ESR MIL PINCP,NATIVITY SEX,0,,1,MIL,4,DIS ESR MIL PINCP
+acspubcov_tx,3,fges,race_only_broad_adm,20,44,4,DIS ESR MIL PINCP,,0,,0,,0,
+acspubcov_tx,3,fges,disability_protected_narrow_adm,20,44,4,DIS ESR MIL PINCP,DIS SEX,1,DIS,3,DIS ESR MIL,4,DIS ESR MIL PINCP
+acspubcov_tx,4,hand,eligibility_adm,20,60,12,AGEP CIT DIS ESP ESR FER HISP MAR MIL PINCP RAC1P SEX,HISP NATIVITY RAC1P SEX,3,HISP RAC1P SEX,7,CIT ESP HISP MAR MIL RAC1P SEX,11,CIT DIS ESP ESR FER HISP MAR MIL PINCP RAC1P SEX
+acspubcov_tx,4,hand,race_only_broad_adm,20,60,12,AGEP CIT DIS ESP ESR FER HISP MAR MIL PINCP RAC1P SEX,HISP RAC1P,2,HISP RAC1P,2,HISP RAC1P,9,CIT ESP ESR FER HISP MAR MIL PINCP RAC1P
+acspubcov_tx,4,hand,disability_protected_narrow_adm,20,60,12,AGEP CIT DIS ESP ESR FER HISP MAR MIL PINCP RAC1P SEX,DIS HISP RAC1P SEX,4,DIS HISP RAC1P SEX,10,CIT DIS ESP ESR FER HISP MAR MIL RAC1P SEX,11,CIT DIS ESP ESR FER HISP MAR MIL PINCP RAC1P SEX
+acspubcov_tx,4,fges,eligibility_adm,20,45,3,DIS ESR PINCP,NATIVITY SEX,0,,0,,3,DIS ESR PINCP
+acspubcov_tx,4,fges,race_only_broad_adm,20,45,3,DIS ESR PINCP,,0,,0,,0,
+acspubcov_tx,4,fges,disability_protected_narrow_adm,20,45,3,DIS ESR PINCP,DIS SEX,1,DIS,2,DIS ESR,3,DIS ESR PINCP
+cdc_diabetes,0,hand,ses_clinical_adm,22,93,15,Age AnyHealthcare BMI CholCheck DiffWalk Education GenHlth HeartDiseaseorAttack HighBP HighChol HvyAlcoholConsump Income PhysActivity Sex Smoker,Education Income Sex,3,Education Income Sex,9,AnyHealthcare CholCheck Education GenHlth HvyAlcoholConsump Income PhysActivity Sex Smoker,14,AnyHealthcare BMI CholCheck DiffWalk Education GenHlth HeartDiseaseorAttack HighBP HighChol HvyAlcoholConsump Income PhysActivity Sex Smoker
+cdc_diabetes,0,hand,sex_only_broad_adm,22,93,15,Age AnyHealthcare BMI CholCheck DiffWalk Education GenHlth HeartDiseaseorAttack HighBP HighChol HvyAlcoholConsump Income PhysActivity Sex Smoker,Sex,1,Sex,5,AnyHealthcare CholCheck Education Income Sex,14,AnyHealthcare BMI CholCheck DiffWalk Education GenHlth HeartDiseaseorAttack HighBP HighChol HvyAlcoholConsump Income PhysActivity Sex Smoker
+cdc_diabetes,0,hand,ses_narrow_adm,22,93,15,Age AnyHealthcare BMI CholCheck DiffWalk Education GenHlth HeartDiseaseorAttack HighBP HighChol HvyAlcoholConsump Income PhysActivity Sex Smoker,Education Income Sex,3,Education Income Sex,13,AnyHealthcare CholCheck DiffWalk Education GenHlth HeartDiseaseorAttack HighBP HighChol HvyAlcoholConsump Income PhysActivity Sex Smoker,14,AnyHealthcare BMI CholCheck DiffWalk Education GenHlth HeartDiseaseorAttack HighBP HighChol HvyAlcoholConsump Income PhysActivity Sex Smoker
+cdc_diabetes,0,fges,ses_clinical_adm,22,52,4,GenHlth HighBP HighChol HvyAlcoholConsump,Income Sex,0,,1,HvyAlcoholConsump,4,GenHlth HighBP HighChol HvyAlcoholConsump
+cdc_diabetes,0,fges,sex_only_broad_adm,22,52,4,GenHlth HighBP HighChol HvyAlcoholConsump,Sex,0,,0,,4,GenHlth HighBP HighChol HvyAlcoholConsump
+cdc_diabetes,0,fges,ses_narrow_adm,22,52,4,GenHlth HighBP HighChol HvyAlcoholConsump,Income Sex,0,,4,GenHlth HighBP HighChol HvyAlcoholConsump,4,GenHlth HighBP HighChol HvyAlcoholConsump
+cdc_diabetes,1,hand,ses_clinical_adm,22,93,15,Age AnyHealthcare BMI CholCheck DiffWalk Education GenHlth HeartDiseaseorAttack HighBP HighChol HvyAlcoholConsump Income PhysActivity Sex Smoker,Education Income Sex,3,Education Income Sex,9,AnyHealthcare CholCheck Education GenHlth HvyAlcoholConsump Income PhysActivity Sex Smoker,14,AnyHealthcare BMI CholCheck DiffWalk Education GenHlth HeartDiseaseorAttack HighBP HighChol HvyAlcoholConsump Income PhysActivity Sex Smoker
+cdc_diabetes,1,hand,sex_only_broad_adm,22,93,15,Age AnyHealthcare BMI CholCheck DiffWalk Education GenHlth HeartDiseaseorAttack HighBP HighChol HvyAlcoholConsump Income PhysActivity Sex Smoker,Sex,1,Sex,5,AnyHealthcare CholCheck Education Income Sex,14,AnyHealthcare BMI CholCheck DiffWalk Education GenHlth HeartDiseaseorAttack HighBP HighChol HvyAlcoholConsump Income PhysActivity Sex Smoker
+cdc_diabetes,1,hand,ses_narrow_adm,22,93,15,Age AnyHealthcare BMI CholCheck DiffWalk Education GenHlth HeartDiseaseorAttack HighBP HighChol HvyAlcoholConsump Income PhysActivity Sex Smoker,Education Income Sex,3,Education Income Sex,13,AnyHealthcare CholCheck DiffWalk Education GenHlth HeartDiseaseorAttack HighBP HighChol HvyAlcoholConsump Income PhysActivity Sex Smoker,14,AnyHealthcare BMI CholCheck DiffWalk Education GenHlth HeartDiseaseorAttack HighBP HighChol HvyAlcoholConsump Income PhysActivity Sex Smoker
+cdc_diabetes,1,fges,ses_clinical_adm,22,50,3,GenHlth HighBP HighChol,Sex,0,,0,,3,GenHlth HighBP HighChol
+cdc_diabetes,1,fges,sex_only_broad_adm,22,50,3,GenHlth HighBP HighChol,Sex,0,,0,,3,GenHlth HighBP HighChol
+cdc_diabetes,1,fges,ses_narrow_adm,22,50,3,GenHlth HighBP HighChol,Sex,0,,3,GenHlth HighBP HighChol,3,GenHlth HighBP HighChol
+cdc_diabetes,2,hand,ses_clinical_adm,22,93,15,Age AnyHealthcare BMI CholCheck DiffWalk Education GenHlth HeartDiseaseorAttack HighBP HighChol HvyAlcoholConsump Income PhysActivity Sex Smoker,Education Income Sex,3,Education Income Sex,9,AnyHealthcare CholCheck Education GenHlth HvyAlcoholConsump Income PhysActivity Sex Smoker,14,AnyHealthcare BMI CholCheck DiffWalk Education GenHlth HeartDiseaseorAttack HighBP HighChol HvyAlcoholConsump Income PhysActivity Sex Smoker
+cdc_diabetes,2,hand,sex_only_broad_adm,22,93,15,Age AnyHealthcare BMI CholCheck DiffWalk Education GenHlth HeartDiseaseorAttack HighBP HighChol HvyAlcoholConsump Income PhysActivity Sex Smoker,Sex,1,Sex,5,AnyHealthcare CholCheck Education Income Sex,14,AnyHealthcare BMI CholCheck DiffWalk Education GenHlth HeartDiseaseorAttack HighBP HighChol HvyAlcoholConsump Income PhysActivity Sex Smoker
+cdc_diabetes,2,hand,ses_narrow_adm,22,93,15,Age AnyHealthcare BMI CholCheck DiffWalk Education GenHlth HeartDiseaseorAttack HighBP HighChol HvyAlcoholConsump Income PhysActivity Sex Smoker,Education Income Sex,3,Education Income Sex,13,AnyHealthcare CholCheck DiffWalk Education GenHlth HeartDiseaseorAttack HighBP HighChol HvyAlcoholConsump Income PhysActivity Sex Smoker,14,AnyHealthcare BMI CholCheck DiffWalk Education GenHlth HeartDiseaseorAttack HighBP HighChol HvyAlcoholConsump Income PhysActivity Sex Smoker
+cdc_diabetes,2,fges,ses_clinical_adm,22,50,4,CholCheck GenHlth HighBP HighChol,Income Sex,0,,1,CholCheck,4,CholCheck GenHlth HighBP HighChol
+cdc_diabetes,2,fges,sex_only_broad_adm,22,50,4,CholCheck GenHlth HighBP HighChol,Sex,0,,1,CholCheck,4,CholCheck GenHlth HighBP HighChol
+cdc_diabetes,2,fges,ses_narrow_adm,22,50,4,CholCheck GenHlth HighBP HighChol,Income Sex,0,,4,CholCheck GenHlth HighBP HighChol,4,CholCheck GenHlth HighBP HighChol
+cdc_diabetes,3,hand,ses_clinical_adm,22,93,15,Age AnyHealthcare BMI CholCheck DiffWalk Education GenHlth HeartDiseaseorAttack HighBP HighChol HvyAlcoholConsump Income PhysActivity Sex Smoker,Education Income Sex,3,Education Income Sex,9,AnyHealthcare CholCheck Education GenHlth HvyAlcoholConsump Income PhysActivity Sex Smoker,14,AnyHealthcare BMI CholCheck DiffWalk Education GenHlth HeartDiseaseorAttack HighBP HighChol HvyAlcoholConsump Income PhysActivity Sex Smoker
+cdc_diabetes,3,hand,sex_only_broad_adm,22,93,15,Age AnyHealthcare BMI CholCheck DiffWalk Education GenHlth HeartDiseaseorAttack HighBP HighChol HvyAlcoholConsump Income PhysActivity Sex Smoker,Sex,1,Sex,5,AnyHealthcare CholCheck Education Income Sex,14,AnyHealthcare BMI CholCheck DiffWalk Education GenHlth HeartDiseaseorAttack HighBP HighChol HvyAlcoholConsump Income PhysActivity Sex Smoker
+cdc_diabetes,3,hand,ses_narrow_adm,22,93,15,Age AnyHealthcare BMI CholCheck DiffWalk Education GenHlth HeartDiseaseorAttack HighBP HighChol HvyAlcoholConsump Income PhysActivity Sex Smoker,Education Income Sex,3,Education Income Sex,13,AnyHealthcare CholCheck DiffWalk Education GenHlth HeartDiseaseorAttack HighBP HighChol HvyAlcoholConsump Income PhysActivity Sex Smoker,14,AnyHealthcare BMI CholCheck DiffWalk Education GenHlth HeartDiseaseorAttack HighBP HighChol HvyAlcoholConsump Income PhysActivity Sex Smoker
+cdc_diabetes,3,fges,ses_clinical_adm,22,51,4,CholCheck GenHlth HighBP HighChol,Income Sex,0,,1,CholCheck,4,CholCheck GenHlth HighBP HighChol
+cdc_diabetes,3,fges,sex_only_broad_adm,22,51,4,CholCheck GenHlth HighBP HighChol,Sex,0,,1,CholCheck,4,CholCheck GenHlth HighBP HighChol
+cdc_diabetes,3,fges,ses_narrow_adm,22,51,4,CholCheck GenHlth HighBP HighChol,Income Sex,0,,4,CholCheck GenHlth HighBP HighChol,4,CholCheck GenHlth HighBP HighChol
+cdc_diabetes,4,hand,ses_clinical_adm,22,93,15,Age AnyHealthcare BMI CholCheck DiffWalk Education GenHlth HeartDiseaseorAttack HighBP HighChol HvyAlcoholConsump Income PhysActivity Sex Smoker,Education Income Sex,3,Education Income Sex,9,AnyHealthcare CholCheck Education GenHlth HvyAlcoholConsump Income PhysActivity Sex Smoker,14,AnyHealthcare BMI CholCheck DiffWalk Education GenHlth HeartDiseaseorAttack HighBP HighChol HvyAlcoholConsump Income PhysActivity Sex Smoker
+cdc_diabetes,4,hand,sex_only_broad_adm,22,93,15,Age AnyHealthcare BMI CholCheck DiffWalk Education GenHlth HeartDiseaseorAttack HighBP HighChol HvyAlcoholConsump Income PhysActivity Sex Smoker,Sex,1,Sex,5,AnyHealthcare CholCheck Education Income Sex,14,AnyHealthcare BMI CholCheck DiffWalk Education GenHlth HeartDiseaseorAttack HighBP HighChol HvyAlcoholConsump Income PhysActivity Sex Smoker
+cdc_diabetes,4,hand,ses_narrow_adm,22,93,15,Age AnyHealthcare BMI CholCheck DiffWalk Education GenHlth HeartDiseaseorAttack HighBP HighChol HvyAlcoholConsump Income PhysActivity Sex Smoker,Education Income Sex,3,Education Income Sex,13,AnyHealthcare CholCheck DiffWalk Education GenHlth HeartDiseaseorAttack HighBP HighChol HvyAlcoholConsump Income PhysActivity Sex Smoker,14,AnyHealthcare BMI CholCheck DiffWalk Education GenHlth HeartDiseaseorAttack HighBP HighChol HvyAlcoholConsump Income PhysActivity Sex Smoker
+cdc_diabetes,4,fges,ses_clinical_adm,22,50,3,BMI GenHlth HighBP,Sex,0,,0,,3,BMI GenHlth HighBP
+cdc_diabetes,4,fges,sex_only_broad_adm,22,50,3,BMI GenHlth HighBP,Sex,0,,0,,3,BMI GenHlth HighBP
+cdc_diabetes,4,fges,ses_narrow_adm,22,50,3,BMI GenHlth HighBP,Sex,0,,2,GenHlth HighBP,3,BMI GenHlth HighBP
+adult,0,hand,prefair,14,26,9,capital-gain capital-loss education hours-per-week marital-status occupation race relationship workclass,native-country race sex,1,race,3,marital-status race relationship,9,capital-gain capital-loss education hours-per-week marital-status occupation race relationship workclass
+adult,0,hand,sex_only_broad_adm,14,26,9,capital-gain capital-loss education hours-per-week marital-status occupation race relationship workclass,sex,0,,2,marital-status relationship,8,capital-gain capital-loss education hours-per-week marital-status occupation relationship workclass
+adult,0,hand,sex_race_narrow_adm,14,26,9,capital-gain capital-loss education hours-per-week marital-status occupation race relationship workclass,race sex,1,race,8,capital-gain capital-loss education marital-status occupation race relationship workclass,9,capital-gain capital-loss education hours-per-week marital-status occupation race relationship workclass
+adult,0,fges,prefair,14,17,2,education relationship,sex,0,,1,relationship,2,education relationship
+adult,0,fges,sex_only_broad_adm,14,17,2,education relationship,sex,0,,1,relationship,2,education relationship
+adult,0,fges,sex_race_narrow_adm,14,17,2,education relationship,sex,0,,2,education relationship,2,education relationship
+adult,1,hand,prefair,14,26,9,capital-gain capital-loss education hours-per-week marital-status occupation race relationship workclass,native-country race sex,1,race,3,marital-status race relationship,9,capital-gain capital-loss education hours-per-week marital-status occupation race relationship workclass
+adult,1,hand,sex_only_broad_adm,14,26,9,capital-gain capital-loss education hours-per-week marital-status occupation race relationship workclass,sex,0,,2,marital-status relationship,8,capital-gain capital-loss education hours-per-week marital-status occupation relationship workclass
+adult,1,hand,sex_race_narrow_adm,14,26,9,capital-gain capital-loss education hours-per-week marital-status occupation race relationship workclass,race sex,1,race,8,capital-gain capital-loss education marital-status occupation race relationship workclass,9,capital-gain capital-loss education hours-per-week marital-status occupation race relationship workclass
+adult,1,fges,prefair,14,17,2,education-num relationship,sex,0,,1,relationship,2,education-num relationship
+adult,1,fges,sex_only_broad_adm,14,17,2,education-num relationship,sex,0,,1,relationship,2,education-num relationship
+adult,1,fges,sex_race_narrow_adm,14,17,2,education-num relationship,sex,0,,1,relationship,2,education-num relationship
+adult,2,hand,prefair,14,26,9,capital-gain capital-loss education hours-per-week marital-status occupation race relationship workclass,native-country race sex,1,race,3,marital-status race relationship,9,capital-gain capital-loss education hours-per-week marital-status occupation race relationship workclass
+adult,2,hand,sex_only_broad_adm,14,26,9,capital-gain capital-loss education hours-per-week marital-status occupation race relationship workclass,sex,0,,2,marital-status relationship,8,capital-gain capital-loss education hours-per-week marital-status occupation relationship workclass
+adult,2,hand,sex_race_narrow_adm,14,26,9,capital-gain capital-loss education hours-per-week marital-status occupation race relationship workclass,race sex,1,race,8,capital-gain capital-loss education marital-status occupation race relationship workclass,9,capital-gain capital-loss education hours-per-week marital-status occupation race relationship workclass
+adult,2,fges,prefair,14,17,2,education-num relationship,sex,0,,1,relationship,2,education-num relationship
+adult,2,fges,sex_only_broad_adm,14,17,2,education-num relationship,sex,0,,1,relationship,2,education-num relationship
+adult,2,fges,sex_race_narrow_adm,14,17,2,education-num relationship,sex,0,,1,relationship,2,education-num relationship
+adult,3,hand,prefair,14,26,9,capital-gain capital-loss education hours-per-week marital-status occupation race relationship workclass,native-country race sex,1,race,3,marital-status race relationship,9,capital-gain capital-loss education hours-per-week marital-status occupation race relationship workclass
+adult,3,hand,sex_only_broad_adm,14,26,9,capital-gain capital-loss education hours-per-week marital-status occupation race relationship workclass,sex,0,,2,marital-status relationship,8,capital-gain capital-loss education hours-per-week marital-status occupation relationship workclass
+adult,3,hand,sex_race_narrow_adm,14,26,9,capital-gain capital-loss education hours-per-week marital-status occupation race relationship workclass,race sex,1,race,8,capital-gain capital-loss education marital-status occupation race relationship workclass,9,capital-gain capital-loss education hours-per-week marital-status occupation race relationship workclass
+adult,3,fges,prefair,14,17,2,education-num relationship,sex,0,,1,relationship,2,education-num relationship
+adult,3,fges,sex_only_broad_adm,14,17,2,education-num relationship,sex,0,,1,relationship,2,education-num relationship
+adult,3,fges,sex_race_narrow_adm,14,17,2,education-num relationship,sex,0,,1,relationship,2,education-num relationship
+adult,4,hand,prefair,14,26,9,capital-gain capital-loss education hours-per-week marital-status occupation race relationship workclass,native-country race sex,1,race,3,marital-status race relationship,9,capital-gain capital-loss education hours-per-week marital-status occupation race relationship workclass
+adult,4,hand,sex_only_broad_adm,14,26,9,capital-gain capital-loss education hours-per-week marital-status occupation race relationship workclass,sex,0,,2,marital-status relationship,8,capital-gain capital-loss education hours-per-week marital-status occupation relationship workclass
+adult,4,hand,sex_race_narrow_adm,14,26,9,capital-gain capital-loss education hours-per-week marital-status occupation race relationship workclass,race sex,1,race,8,capital-gain capital-loss education marital-status occupation race relationship workclass,9,capital-gain capital-loss education hours-per-week marital-status occupation race relationship workclass
+adult,4,fges,prefair,14,18,2,education relationship,sex,0,,1,relationship,2,education relationship
+adult,4,fges,sex_only_broad_adm,14,18,2,education relationship,sex,0,,1,relationship,2,education relationship
+adult,4,fges,sex_race_narrow_adm,14,18,2,education relationship,sex,0,,2,education relationship,2,education relationship
+compas,0,hand,prefair,8,16,4,age_cat c_charge_degree priors_count race,race sex,1,race,1,race,3,c_charge_degree priors_count race
+compas,0,hand,race_only_broad_adm,8,16,4,age_cat c_charge_degree priors_count race,race,1,race,1,race,3,c_charge_degree priors_count race
+compas,0,hand,sex_race_age_narrow_adm,8,16,4,age_cat c_charge_degree priors_count race,age_cat race sex,2,age_cat race,3,age_cat priors_count race,4,age_cat c_charge_degree priors_count race
+compas,0,fges,prefair,8,10,2,age_cat priors_count,race,0,,0,,1,priors_count
+compas,0,fges,race_only_broad_adm,8,10,2,age_cat priors_count,race,0,,0,,1,priors_count
+compas,0,fges,sex_race_age_narrow_adm,8,10,2,age_cat priors_count,age_cat race,1,age_cat,2,age_cat priors_count,2,age_cat priors_count
+compas,1,hand,prefair,8,16,4,age_cat c_charge_degree priors_count race,race sex,1,race,1,race,3,c_charge_degree priors_count race
+compas,1,hand,race_only_broad_adm,8,16,4,age_cat c_charge_degree priors_count race,race,1,race,1,race,3,c_charge_degree priors_count race
+compas,1,hand,sex_race_age_narrow_adm,8,16,4,age_cat c_charge_degree priors_count race,age_cat race sex,2,age_cat race,3,age_cat priors_count race,4,age_cat c_charge_degree priors_count race
+compas,1,fges,prefair,8,10,2,age_cat priors_count,race,0,,0,,1,priors_count
+compas,1,fges,race_only_broad_adm,8,10,2,age_cat priors_count,race,0,,0,,1,priors_count
+compas,1,fges,sex_race_age_narrow_adm,8,10,2,age_cat priors_count,age_cat race,1,age_cat,2,age_cat priors_count,2,age_cat priors_count
+compas,2,hand,prefair,8,16,4,age_cat c_charge_degree priors_count race,race sex,1,race,1,race,3,c_charge_degree priors_count race
+compas,2,hand,race_only_broad_adm,8,16,4,age_cat c_charge_degree priors_count race,race,1,race,1,race,3,c_charge_degree priors_count race
+compas,2,hand,sex_race_age_narrow_adm,8,16,4,age_cat c_charge_degree priors_count race,age_cat race sex,2,age_cat race,3,age_cat priors_count race,4,age_cat c_charge_degree priors_count race
+compas,2,fges,prefair,8,10,2,age_cat priors_count,race,0,,0,,1,priors_count
+compas,2,fges,race_only_broad_adm,8,10,2,age_cat priors_count,race,0,,0,,1,priors_count
+compas,2,fges,sex_race_age_narrow_adm,8,10,2,age_cat priors_count,age_cat race,1,age_cat,2,age_cat priors_count,2,age_cat priors_count
+compas,3,hand,prefair,8,16,4,age_cat c_charge_degree priors_count race,race sex,1,race,1,race,3,c_charge_degree priors_count race
+compas,3,hand,race_only_broad_adm,8,16,4,age_cat c_charge_degree priors_count race,race,1,race,1,race,3,c_charge_degree priors_count race
+compas,3,hand,sex_race_age_narrow_adm,8,16,4,age_cat c_charge_degree priors_count race,age_cat race sex,2,age_cat race,3,age_cat priors_count race,4,age_cat c_charge_degree priors_count race
+compas,3,fges,prefair,8,10,2,age_cat priors_count,race,0,,0,,1,priors_count
+compas,3,fges,race_only_broad_adm,8,10,2,age_cat priors_count,race,0,,0,,1,priors_count
+compas,3,fges,sex_race_age_narrow_adm,8,10,2,age_cat priors_count,age_cat race,1,age_cat,2,age_cat priors_count,2,age_cat priors_count
+compas,4,hand,prefair,8,16,4,age_cat c_charge_degree priors_count race,race sex,1,race,1,race,3,c_charge_degree priors_count race
+compas,4,hand,race_only_broad_adm,8,16,4,age_cat c_charge_degree priors_count race,race,1,race,1,race,3,c_charge_degree priors_count race
+compas,4,hand,sex_race_age_narrow_adm,8,16,4,age_cat c_charge_degree priors_count race,age_cat race sex,2,age_cat race,3,age_cat priors_count race,4,age_cat c_charge_degree priors_count race
+compas,4,fges,prefair,8,10,2,age_cat priors_count,race,0,,0,,1,priors_count
+compas,4,fges,race_only_broad_adm,8,10,2,age_cat priors_count,race,0,,0,,1,priors_count
+compas,4,fges,sex_race_age_narrow_adm,8,10,2,age_cat priors_count,age_cat race,1,age_cat,2,age_cat priors_count,2,age_cat priors_count
+snake,0,hand,prefair_like,15,39,11,age cow1 female ftptstat gradeatn hoursut married mind16 mocc10 statefips wbhaom,citistat female wbhaom,2,female wbhaom,3,female married wbhaom,9,cow1 female ftptstat gradeatn hoursut married mind16 mocc10 wbhaom
+snake,0,hand,sex_only_broad_adm,15,39,11,age cow1 female ftptstat gradeatn hoursut married mind16 mocc10 statefips wbhaom,female,1,female,2,female married,8,cow1 female ftptstat gradeatn hoursut married mind16 mocc10
+snake,0,hand,sex_race_narrow_adm,15,39,11,age cow1 female ftptstat gradeatn hoursut married mind16 mocc10 statefips wbhaom,female wbhaom,2,female wbhaom,7,cow1 female ftptstat married mind16 mocc10 wbhaom,9,cow1 female ftptstat gradeatn hoursut married mind16 mocc10 wbhaom
+snake,0,fges,prefair_like,15,22,2,citistat gradeatn,citistat female,1,citistat,1,citistat,2,citistat gradeatn
+snake,0,fges,sex_only_broad_adm,15,22,2,citistat gradeatn,female,0,,0,,1,gradeatn
+snake,0,fges,sex_race_narrow_adm,15,22,2,citistat gradeatn,female,0,,0,,1,gradeatn
+snake,1,hand,prefair_like,15,39,11,age cow1 female ftptstat gradeatn hoursut married mind16 mocc10 statefips wbhaom,citistat female wbhaom,2,female wbhaom,3,female married wbhaom,9,cow1 female ftptstat gradeatn hoursut married mind16 mocc10 wbhaom
+snake,1,hand,sex_only_broad_adm,15,39,11,age cow1 female ftptstat gradeatn hoursut married mind16 mocc10 statefips wbhaom,female,1,female,2,female married,8,cow1 female ftptstat gradeatn hoursut married mind16 mocc10
+snake,1,hand,sex_race_narrow_adm,15,39,11,age cow1 female ftptstat gradeatn hoursut married mind16 mocc10 statefips wbhaom,female wbhaom,2,female wbhaom,7,cow1 female ftptstat married mind16 mocc10 wbhaom,9,cow1 female ftptstat gradeatn hoursut married mind16 mocc10 wbhaom
+snake,1,fges,prefair_like,15,21,2,citistat gradeatn,citistat female,1,citistat,1,citistat,2,citistat gradeatn
+snake,1,fges,sex_only_broad_adm,15,21,2,citistat gradeatn,female,0,,0,,1,gradeatn
+snake,1,fges,sex_race_narrow_adm,15,21,2,citistat gradeatn,female,0,,0,,1,gradeatn
+snake,2,hand,prefair_like,15,39,11,age cow1 female ftptstat gradeatn hoursut married mind16 mocc10 statefips wbhaom,citistat female wbhaom,2,female wbhaom,3,female married wbhaom,9,cow1 female ftptstat gradeatn hoursut married mind16 mocc10 wbhaom
+snake,2,hand,sex_only_broad_adm,15,39,11,age cow1 female ftptstat gradeatn hoursut married mind16 mocc10 statefips wbhaom,female,1,female,2,female married,8,cow1 female ftptstat gradeatn hoursut married mind16 mocc10
+snake,2,hand,sex_race_narrow_adm,15,39,11,age cow1 female ftptstat gradeatn hoursut married mind16 mocc10 statefips wbhaom,female wbhaom,2,female wbhaom,7,cow1 female ftptstat married mind16 mocc10 wbhaom,9,cow1 female ftptstat gradeatn hoursut married mind16 mocc10 wbhaom
+snake,2,fges,prefair_like,15,22,2,citistat gradeatn,citistat female,1,citistat,1,citistat,2,citistat gradeatn
+snake,2,fges,sex_only_broad_adm,15,22,2,citistat gradeatn,female,0,,0,,1,gradeatn
+snake,2,fges,sex_race_narrow_adm,15,22,2,citistat gradeatn,female,0,,0,,1,gradeatn
+snake,3,hand,prefair_like,15,39,11,age cow1 female ftptstat gradeatn hoursut married mind16 mocc10 statefips wbhaom,citistat female wbhaom,2,female wbhaom,3,female married wbhaom,9,cow1 female ftptstat gradeatn hoursut married mind16 mocc10 wbhaom
+snake,3,hand,sex_only_broad_adm,15,39,11,age cow1 female ftptstat gradeatn hoursut married mind16 mocc10 statefips wbhaom,female,1,female,2,female married,8,cow1 female ftptstat gradeatn hoursut married mind16 mocc10
+snake,3,hand,sex_race_narrow_adm,15,39,11,age cow1 female ftptstat gradeatn hoursut married mind16 mocc10 statefips wbhaom,female wbhaom,2,female wbhaom,7,cow1 female ftptstat married mind16 mocc10 wbhaom,9,cow1 female ftptstat gradeatn hoursut married mind16 mocc10 wbhaom
+snake,3,fges,prefair_like,15,21,2,citistat gradeatn,citistat female,1,citistat,1,citistat,2,citistat gradeatn
+snake,3,fges,sex_only_broad_adm,15,21,2,citistat gradeatn,female,0,,0,,1,gradeatn
+snake,3,fges,sex_race_narrow_adm,15,21,2,citistat gradeatn,female,0,,0,,1,gradeatn
+snake,4,hand,prefair_like,15,39,11,age cow1 female ftptstat gradeatn hoursut married mind16 mocc10 statefips wbhaom,citistat female wbhaom,2,female wbhaom,3,female married wbhaom,9,cow1 female ftptstat gradeatn hoursut married mind16 mocc10 wbhaom
+snake,4,hand,sex_only_broad_adm,15,39,11,age cow1 female ftptstat gradeatn hoursut married mind16 mocc10 statefips wbhaom,female,1,female,2,female married,8,cow1 female ftptstat gradeatn hoursut married mind16 mocc10
+snake,4,hand,sex_race_narrow_adm,15,39,11,age cow1 female ftptstat gradeatn hoursut married mind16 mocc10 statefips wbhaom,female wbhaom,2,female wbhaom,7,cow1 female ftptstat married mind16 mocc10 wbhaom,9,cow1 female ftptstat gradeatn hoursut married mind16 mocc10 wbhaom
+snake,4,fges,prefair_like,15,22,2,citistat gradeatn,citistat female,1,citistat,1,citistat,2,citistat gradeatn
+snake,4,fges,sex_only_broad_adm,15,22,2,citistat gradeatn,female,0,,0,,1,gradeatn
+snake,4,fges,sex_race_narrow_adm,15,22,2,citistat gradeatn,female,0,,0,,1,gradeatn
+sbo,0,hand,owner_demographics,25,68,15,ECOMMERCE EMPLOYMENT_NOISY ESTABLISHED EXPORTS FIPST FRANCHISE HOMEBASED HOURS1 NUMOWNERS PAYROLL_NOISY PRMINC1 RACE1 SECTOR SEX1 WEBSITE,BORNUS1 ETH1 RACE1 SEX1 VET1,2,RACE1 SEX1,2,RACE1 SEX1,14,ECOMMERCE EMPLOYMENT_NOISY ESTABLISHED EXPORTS FRANCHISE HOMEBASED HOURS1 NUMOWNERS PAYROLL_NOISY PRMINC1 RACE1 SECTOR SEX1 WEBSITE
+sbo,0,hand,sex_race_broad_adm,25,68,15,ECOMMERCE EMPLOYMENT_NOISY ESTABLISHED EXPORTS FIPST FRANCHISE HOMEBASED HOURS1 NUMOWNERS PAYROLL_NOISY PRMINC1 RACE1 SECTOR SEX1 WEBSITE,RACE1 SEX1,2,RACE1 SEX1,2,RACE1 SEX1,14,ECOMMERCE EMPLOYMENT_NOISY ESTABLISHED EXPORTS FRANCHISE HOMEBASED HOURS1 NUMOWNERS PAYROLL_NOISY PRMINC1 RACE1 SECTOR SEX1 WEBSITE
+sbo,0,hand,sex_race_no_sector,25,68,15,ECOMMERCE EMPLOYMENT_NOISY ESTABLISHED EXPORTS FIPST FRANCHISE HOMEBASED HOURS1 NUMOWNERS PAYROLL_NOISY PRMINC1 RACE1 SECTOR SEX1 WEBSITE,ETH1 RACE1 SEX1,2,RACE1 SEX1,12,ECOMMERCE EMPLOYMENT_NOISY EXPORTS FRANCHISE HOMEBASED NUMOWNERS PAYROLL_NOISY PRMINC1 RACE1 SECTOR SEX1 WEBSITE,14,ECOMMERCE EMPLOYMENT_NOISY ESTABLISHED EXPORTS FRANCHISE HOMEBASED HOURS1 NUMOWNERS PAYROLL_NOISY PRMINC1 RACE1 SECTOR SEX1 WEBSITE
+sbo,0,fges,owner_demographics,25,45,2,PAYROLL_NOISY SECTOR,BORNUS1 SEX1,0,,1,PAYROLL_NOISY,2,PAYROLL_NOISY SECTOR
+sbo,0,fges,sex_race_broad_adm,25,45,2,PAYROLL_NOISY SECTOR,SEX1,0,,1,PAYROLL_NOISY,2,PAYROLL_NOISY SECTOR
+sbo,0,fges,sex_race_no_sector,25,45,2,PAYROLL_NOISY SECTOR,SEX1,0,,1,PAYROLL_NOISY,2,PAYROLL_NOISY SECTOR
+sbo,1,hand,owner_demographics,25,68,15,ECOMMERCE EMPLOYMENT_NOISY ESTABLISHED EXPORTS FIPST FRANCHISE HOMEBASED HOURS1 NUMOWNERS PAYROLL_NOISY PRMINC1 RACE1 SECTOR SEX1 WEBSITE,BORNUS1 ETH1 RACE1 SEX1 VET1,2,RACE1 SEX1,2,RACE1 SEX1,14,ECOMMERCE EMPLOYMENT_NOISY ESTABLISHED EXPORTS FRANCHISE HOMEBASED HOURS1 NUMOWNERS PAYROLL_NOISY PRMINC1 RACE1 SECTOR SEX1 WEBSITE
+sbo,1,hand,sex_race_broad_adm,25,68,15,ECOMMERCE EMPLOYMENT_NOISY ESTABLISHED EXPORTS FIPST FRANCHISE HOMEBASED HOURS1 NUMOWNERS PAYROLL_NOISY PRMINC1 RACE1 SECTOR SEX1 WEBSITE,RACE1 SEX1,2,RACE1 SEX1,2,RACE1 SEX1,14,ECOMMERCE EMPLOYMENT_NOISY ESTABLISHED EXPORTS FRANCHISE HOMEBASED HOURS1 NUMOWNERS PAYROLL_NOISY PRMINC1 RACE1 SECTOR SEX1 WEBSITE
+sbo,1,hand,sex_race_no_sector,25,68,15,ECOMMERCE EMPLOYMENT_NOISY ESTABLISHED EXPORTS FIPST FRANCHISE HOMEBASED HOURS1 NUMOWNERS PAYROLL_NOISY PRMINC1 RACE1 SECTOR SEX1 WEBSITE,ETH1 RACE1 SEX1,2,RACE1 SEX1,12,ECOMMERCE EMPLOYMENT_NOISY EXPORTS FRANCHISE HOMEBASED NUMOWNERS PAYROLL_NOISY PRMINC1 RACE1 SECTOR SEX1 WEBSITE,14,ECOMMERCE EMPLOYMENT_NOISY ESTABLISHED EXPORTS FRANCHISE HOMEBASED HOURS1 NUMOWNERS PAYROLL_NOISY PRMINC1 RACE1 SECTOR SEX1 WEBSITE
+sbo,1,fges,owner_demographics,25,45,2,PAYROLL_NOISY SECTOR,BORNUS1 SEX1,0,,1,PAYROLL_NOISY,2,PAYROLL_NOISY SECTOR
+sbo,1,fges,sex_race_broad_adm,25,45,2,PAYROLL_NOISY SECTOR,SEX1,0,,1,PAYROLL_NOISY,1,PAYROLL_NOISY
+sbo,1,fges,sex_race_no_sector,25,45,2,PAYROLL_NOISY SECTOR,SEX1,0,,1,PAYROLL_NOISY,1,PAYROLL_NOISY
+sbo,2,hand,owner_demographics,25,68,15,ECOMMERCE EMPLOYMENT_NOISY ESTABLISHED EXPORTS FIPST FRANCHISE HOMEBASED HOURS1 NUMOWNERS PAYROLL_NOISY PRMINC1 RACE1 SECTOR SEX1 WEBSITE,BORNUS1 ETH1 RACE1 SEX1 VET1,2,RACE1 SEX1,2,RACE1 SEX1,14,ECOMMERCE EMPLOYMENT_NOISY ESTABLISHED EXPORTS FRANCHISE HOMEBASED HOURS1 NUMOWNERS PAYROLL_NOISY PRMINC1 RACE1 SECTOR SEX1 WEBSITE
+sbo,2,hand,sex_race_broad_adm,25,68,15,ECOMMERCE EMPLOYMENT_NOISY ESTABLISHED EXPORTS FIPST FRANCHISE HOMEBASED HOURS1 NUMOWNERS PAYROLL_NOISY PRMINC1 RACE1 SECTOR SEX1 WEBSITE,RACE1 SEX1,2,RACE1 SEX1,2,RACE1 SEX1,14,ECOMMERCE EMPLOYMENT_NOISY ESTABLISHED EXPORTS FRANCHISE HOMEBASED HOURS1 NUMOWNERS PAYROLL_NOISY PRMINC1 RACE1 SECTOR SEX1 WEBSITE
+sbo,2,hand,sex_race_no_sector,25,68,15,ECOMMERCE EMPLOYMENT_NOISY ESTABLISHED EXPORTS FIPST FRANCHISE HOMEBASED HOURS1 NUMOWNERS PAYROLL_NOISY PRMINC1 RACE1 SECTOR SEX1 WEBSITE,ETH1 RACE1 SEX1,2,RACE1 SEX1,12,ECOMMERCE EMPLOYMENT_NOISY EXPORTS FRANCHISE HOMEBASED NUMOWNERS PAYROLL_NOISY PRMINC1 RACE1 SECTOR SEX1 WEBSITE,14,ECOMMERCE EMPLOYMENT_NOISY ESTABLISHED EXPORTS FRANCHISE HOMEBASED HOURS1 NUMOWNERS PAYROLL_NOISY PRMINC1 RACE1 SECTOR SEX1 WEBSITE
+sbo,2,fges,owner_demographics,25,46,2,PAYROLL_NOISY SECTOR,BORNUS1 SEX1,0,,0,,2,PAYROLL_NOISY SECTOR
+sbo,2,fges,sex_race_broad_adm,25,46,2,PAYROLL_NOISY SECTOR,SEX1,0,,0,,2,PAYROLL_NOISY SECTOR
+sbo,2,fges,sex_race_no_sector,25,46,2,PAYROLL_NOISY SECTOR,SEX1,0,,0,,2,PAYROLL_NOISY SECTOR
+sbo,3,hand,owner_demographics,25,68,15,ECOMMERCE EMPLOYMENT_NOISY ESTABLISHED EXPORTS FIPST FRANCHISE HOMEBASED HOURS1 NUMOWNERS PAYROLL_NOISY PRMINC1 RACE1 SECTOR SEX1 WEBSITE,BORNUS1 ETH1 RACE1 SEX1 VET1,2,RACE1 SEX1,2,RACE1 SEX1,14,ECOMMERCE EMPLOYMENT_NOISY ESTABLISHED EXPORTS FRANCHISE HOMEBASED HOURS1 NUMOWNERS PAYROLL_NOISY PRMINC1 RACE1 SECTOR SEX1 WEBSITE
+sbo,3,hand,sex_race_broad_adm,25,68,15,ECOMMERCE EMPLOYMENT_NOISY ESTABLISHED EXPORTS FIPST FRANCHISE HOMEBASED HOURS1 NUMOWNERS PAYROLL_NOISY PRMINC1 RACE1 SECTOR SEX1 WEBSITE,RACE1 SEX1,2,RACE1 SEX1,2,RACE1 SEX1,14,ECOMMERCE EMPLOYMENT_NOISY ESTABLISHED EXPORTS FRANCHISE HOMEBASED HOURS1 NUMOWNERS PAYROLL_NOISY PRMINC1 RACE1 SECTOR SEX1 WEBSITE
+sbo,3,hand,sex_race_no_sector,25,68,15,ECOMMERCE EMPLOYMENT_NOISY ESTABLISHED EXPORTS FIPST FRANCHISE HOMEBASED HOURS1 NUMOWNERS PAYROLL_NOISY PRMINC1 RACE1 SECTOR SEX1 WEBSITE,ETH1 RACE1 SEX1,2,RACE1 SEX1,12,ECOMMERCE EMPLOYMENT_NOISY EXPORTS FRANCHISE HOMEBASED NUMOWNERS PAYROLL_NOISY PRMINC1 RACE1 SECTOR SEX1 WEBSITE,14,ECOMMERCE EMPLOYMENT_NOISY ESTABLISHED EXPORTS FRANCHISE HOMEBASED HOURS1 NUMOWNERS PAYROLL_NOISY PRMINC1 RACE1 SECTOR SEX1 WEBSITE
+sbo,3,fges,owner_demographics,25,46,2,PAYROLL_NOISY SECTOR,BORNUS1 SEX1,0,,1,PAYROLL_NOISY,2,PAYROLL_NOISY SECTOR
+sbo,3,fges,sex_race_broad_adm,25,46,2,PAYROLL_NOISY SECTOR,SEX1,0,,0,,2,PAYROLL_NOISY SECTOR
+sbo,3,fges,sex_race_no_sector,25,46,2,PAYROLL_NOISY SECTOR,SEX1,0,,0,,2,PAYROLL_NOISY SECTOR
+sbo,4,hand,owner_demographics,25,68,15,ECOMMERCE EMPLOYMENT_NOISY ESTABLISHED EXPORTS FIPST FRANCHISE HOMEBASED HOURS1 NUMOWNERS PAYROLL_NOISY PRMINC1 RACE1 SECTOR SEX1 WEBSITE,BORNUS1 ETH1 RACE1 SEX1 VET1,2,RACE1 SEX1,2,RACE1 SEX1,14,ECOMMERCE EMPLOYMENT_NOISY ESTABLISHED EXPORTS FRANCHISE HOMEBASED HOURS1 NUMOWNERS PAYROLL_NOISY PRMINC1 RACE1 SECTOR SEX1 WEBSITE
+sbo,4,hand,sex_race_broad_adm,25,68,15,ECOMMERCE EMPLOYMENT_NOISY ESTABLISHED EXPORTS FIPST FRANCHISE HOMEBASED HOURS1 NUMOWNERS PAYROLL_NOISY PRMINC1 RACE1 SECTOR SEX1 WEBSITE,RACE1 SEX1,2,RACE1 SEX1,2,RACE1 SEX1,14,ECOMMERCE EMPLOYMENT_NOISY ESTABLISHED EXPORTS FRANCHISE HOMEBASED HOURS1 NUMOWNERS PAYROLL_NOISY PRMINC1 RACE1 SECTOR SEX1 WEBSITE
+sbo,4,hand,sex_race_no_sector,25,68,15,ECOMMERCE EMPLOYMENT_NOISY ESTABLISHED EXPORTS FIPST FRANCHISE HOMEBASED HOURS1 NUMOWNERS PAYROLL_NOISY PRMINC1 RACE1 SECTOR SEX1 WEBSITE,ETH1 RACE1 SEX1,2,RACE1 SEX1,12,ECOMMERCE EMPLOYMENT_NOISY EXPORTS FRANCHISE HOMEBASED NUMOWNERS PAYROLL_NOISY PRMINC1 RACE1 SECTOR SEX1 WEBSITE,14,ECOMMERCE EMPLOYMENT_NOISY ESTABLISHED EXPORTS FRANCHISE HOMEBASED HOURS1 NUMOWNERS PAYROLL_NOISY PRMINC1 RACE1 SECTOR SEX1 WEBSITE
+sbo,4,fges,owner_demographics,25,46,2,PAYROLL_NOISY SECTOR,BORNUS1 SEX1,0,,0,,2,PAYROLL_NOISY SECTOR
+sbo,4,fges,sex_race_broad_adm,25,46,2,PAYROLL_NOISY SECTOR,SEX1,0,,0,,2,PAYROLL_NOISY SECTOR
+sbo,4,fges,sex_race_no_sector,25,46,2,PAYROLL_NOISY SECTOR,SEX1,0,,0,,2,PAYROLL_NOISY SECTOR

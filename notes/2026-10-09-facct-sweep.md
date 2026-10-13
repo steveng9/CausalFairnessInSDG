@@ -328,3 +328,101 @@ would still pick up the real association between mediators and the protected
 attribute, so the gap on the real holdout would not close. That trade-off, and the
 partial-cut curve above, are what to compare FairPFN against. A cut-position variant
 was not implemented; it changes the mechanism's definition and needs a decision.
+
+## 13. Update, 2026-10-13 — causal families rerun on DECAF-style discovered graphs
+
+**Correction.** Earlier notes and code said DECAF takes its graph as given. It does
+not, on real data. Re-read of arXiv 2110.12884:
+
+- §5: "We assume the underlying DGP's graph G is known; otherwise, G needs to be
+  approximated first using any causal discovery method, see Section 6."
+- §6: "In both experiments, the ground-truth DAG is unknown. We use causal discovery
+  to uncover the underlying DAG."
+- Adult (§6.1, App. D.2): the graph "discovered and presented by Zhang et al." (2017);
+  the Discussion says it was found with the PC algorithm in Tetrad.
+- Credit Approval (§6.2, App. D.3): "found using the Fast Greedy Equivalence Search
+  (FGES) with the pycausal library. We provide the prior knowledge that age and
+  ethnicity are root nodes to the FGES algorithm." Score and parameters not given.
+- §5.1 / App. B: any graph in the discovered Markov equivalence class is compatible
+  with the data and can be used; FTU and DP need only some independence statements
+  right, CF needs edge directions.
+- In both graphs the paper draws (Figs. 6, 7) the target is a sink.
+- Edge removal (Cor. 1-3, App. D.2) is as we implement it: DP removes every edge into
+  the target from a parent that has the protected attribute as an ancestor, CF spares
+  the admissible parents, FTU removes the direct edge. With protected attributes as
+  roots and the outcome a sink, our directed-path rule equals the paper's
+  d-separation rule for FTU and DP.
+
+**What was built** (commit `b9eb89c`).
+
+- `scripts/discover_graphs.py`: Tetrad's FGES (causal-cmd 1.4.1 from Maven Central,
+  kept at `~/external/tetrad/`, runs on the system Java 8), BDeu score, Tetrad's default
+  parameters (equivalent sample size 10, structure prior 1, max degree 1000), on each
+  seed's **training split**. Knowledge: age and the birth-fixed protected attributes
+  are roots (`causal_graphs.DISCOVERY_ROOTS`), the outcome is a sink. The CPDAG is
+  oriented by a Dor-Tarsi consistent extension (needed for one edge, on Adult only).
+  About one second per graph; re-running gives identical graphs.
+- Graphs: `src/causal_fairness_sdg/data/discovered_graphs/fges_<dataset>.json`, one
+  per training split, keyed by a hash of the training table. A generator asked for
+  `graph=fges` on rows it has no graph for raises an error.
+- Generators: setting `graph` (`hand` default, `fges`), for `decaf`, the GAN/diffusion
+  variants and `decaf_tabpfn`. Recorded in `extra_params` only when set; hand-graph
+  behaviour is unchanged. Each run's edges are in its `graph_edges` table as before.
+- `scripts/summarize_graphs.py` -> `report/data/facct/graphs_summary.csv`.
+
+**Three choices here are ours, not the paper's**: the outcome declared a sink; discovery
+on the training rows only, per seed (the paper used the whole table, once); and the
+BDeu score with default parameters (the paper does not say). Adult uses the same FGES
+recipe as every other dataset, not Zhang et al.'s graph, so Adult is still not a
+like-for-like reproduction of DECAF's Adult numbers.
+
+**The discovered graphs are much sparser than the hand-drawn ones** (means over seeds
+and role splits; cut = outcome parents the mechanism shuffles):
+
+| dataset | edges hand / FGES | outcome parents hand / FGES | FTU cut | CF cut | DP cut |
+|---|---|---|---|---|---|
+| acsincome_ca | 34 / 12 | 10 / 2 (OCCP, WKHP) | 2.3 / 0 | 5.0 / 0.3 | 8.3 / 2.0 |
+| acsincome_tx | 34 / 12 | 10 / 2 | 2.3 / 0 | 5.0 / 0.3 | 8.3 / 2.0 |
+| acspubcov_ca | 60 / 44 | 12 / 4 | 3.0 / 1.3 | 6.3 / 2.3 | 10.3 / 3.1 |
+| acspubcov_tx | 60 / 43 | 12 / 3.6 | 3.0 / 0.3 | 6.3 / 1.1 | 10.3 / 2.4 |
+| adult | 26 / 17 | 9 / 2 (education, relationship) | 0.7 / 0 | 4.3 / 1.1 | 8.7 / 2.0 |
+| cdc_diabetes | 93 / 51 | 15 / 3.6 | 2.3 / 0 | 9.0 / 1.5 | 14.0 / 3.6 |
+| compas | 16 / 10 | 4 / 2 (age_cat, priors_count) | 1.3 / 0.3 | 1.7 / 0.7 | 3.3 / 1.3 |
+| hmda_ca | 65 / 37 | 16 / 3 | 2.3 / 0 | 8.0 / 1.1 | 14.3 / 2.5 |
+| hmda_tx | 65 / 30 | 16 / 3 | 2.3 / 0 | 8.0 / 0.7 | 14.3 / 2.0 |
+| sbo | 68 / 46 | 15 / 2 (PAYROLL_NOISY, SECTOR) | 2.0 / 0 | 5.3 / 0.5 | 14.0 / 1.9 |
+| snake | 39 / 22 | 11 / 2 (citistat, gradeatn) | 1.7 / 0.3 | 4.0 / 0.3 | 8.7 / 1.3 |
+
+Consequences to expect in the results:
+
+- **FTU cuts nothing in 135 of 165 (dataset, seed, split) cells**: FGES finds a direct
+  protected-to-outcome edge only on PublicCoverage (HISP, DIS), SNAKE (citistat) and
+  COMPAS (age_cat, when age is protected). In those cells FTU rows equal the `none`
+  rows. CF cuts nothing in 75 of 165, DP in 10 of 165.
+- The outcome is generated from 2-4 parents, so the `none` rows may lose accuracy
+  against the hand-graph runs. BDeu scores a full conditional table, which penalises a
+  wide parent set on columns with up to 25 levels; a different score or penalty would
+  give denser graphs. Untested.
+- The hand-drawn graphs put a direct protected-to-outcome edge in every dataset by
+  convention. The data-driven graphs mostly do not support it.
+
+**Running.**
+
+- `facct-fges-2026-10-13`: 11 datasets x 5 seeds x {decaf, decaf_ctgan,
+  decaf_diffusion, decaf_tabpfn} x 3 splits x 4 mechanisms = 2,640 runs, 220 shards.
+  Non-private families only: a graph learned from the training rows without noise
+  would void the DP variants' guarantee, so `decaf_dpgan` / `decaf_dpdiffusion` are
+  left out pending a decision.
+- Torch shards: 14 CPU workers on cores 32-47, started 03:49 UTC. Epochs are the
+  settings tables as of `b9eb89c` (100 for the SNAKE-like datasets, per the pilots).
+- `decaf_tabpfn` shards: one worker on GPU 1, queued behind the existing GPU 1 queue
+  (`sweeps/chain-gpu1-fges-2026-10-13.sh` waits on that queue's PID).
+- The torch families have no hand-graph main-sweep rows (that half was held for this
+  decision). The hand-graph counterpart exists for `decaf_tabpfn` only.
+
+```
+python scripts/sweep.py status --batch facct-fges-2026-10-13
+tail sweeps/facct-fges-2026-10-13/scheduler-cpu.out sweeps/chain-gpu1-fges-2026-10-13.log
+python scripts/discover_graphs.py            # regenerate the graphs
+python scripts/summarize_graphs.py           # regenerate the comparison table
+```
