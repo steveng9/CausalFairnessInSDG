@@ -1,0 +1,446 @@
+{
+ "graphs": {
+  "d5a1eb76d74845396e45578ced1c7723b3c70cc1": {
+   "seed": 0,
+   "n_rows": 21113,
+   "n_directed": 16,
+   "n_undirected": 1,
+   "undirected_in_cpdag": [
+    [
+     "capital-gain",
+     "capital-loss"
+    ]
+   ],
+   "edges": [
+    [
+     "occupation",
+     "workclass"
+    ],
+    [
+     "sex",
+     "workclass"
+    ],
+    [
+     "occupation",
+     "education"
+    ],
+    [
+     "education",
+     "education-num"
+    ],
+    [
+     "age",
+     "marital-status"
+    ],
+    [
+     "relationship",
+     "marital-status"
+    ],
+    [
+     "relationship",
+     "occupation"
+    ],
+    [
+     "sex",
+     "occupation"
+    ],
+    [
+     "age",
+     "relationship"
+    ],
+    [
+     "sex",
+     "relationship"
+    ],
+    [
+     "hours-per-week",
+     "capital-gain"
+    ],
+    [
+     "capital-gain",
+     "capital-loss"
+    ],
+    [
+     "hours-per-week",
+     "capital-loss"
+    ],
+    [
+     "occupation",
+     "hours-per-week"
+    ],
+    [
+     "sex",
+     "hours-per-week"
+    ],
+    [
+     "education",
+     "income"
+    ],
+    [
+     "relationship",
+     "income"
+    ]
+   ],
+   "seconds": 0.9
+  },
+  "0c64f7e3fc37ebbf07c33e62c97941b15b1d23b5": {
+   "seed": 1,
+   "n_rows": 21113,
+   "n_directed": 16,
+   "n_undirected": 1,
+   "undirected_in_cpdag": [
+    [
+     "capital-gain",
+     "capital-loss"
+    ]
+   ],
+   "edges": [
+    [
+     "occupation",
+     "workclass"
+    ],
+    [
+     "sex",
+     "workclass"
+    ],
+    [
+     "occupation",
+     "education"
+    ],
+    [
+     "education",
+     "education-num"
+    ],
+    [
+     "age",
+     "marital-status"
+    ],
+    [
+     "relationship",
+     "marital-status"
+    ],
+    [
+     "relationship",
+     "occupation"
+    ],
+    [
+     "sex",
+     "occupation"
+    ],
+    [
+     "age",
+     "relationship"
+    ],
+    [
+     "sex",
+     "relationship"
+    ],
+    [
+     "hours-per-week",
+     "capital-gain"
+    ],
+    [
+     "capital-gain",
+     "capital-loss"
+    ],
+    [
+     "hours-per-week",
+     "capital-loss"
+    ],
+    [
+     "occupation",
+     "hours-per-week"
+    ],
+    [
+     "sex",
+     "hours-per-week"
+    ],
+    [
+     "education-num",
+     "income"
+    ],
+    [
+     "relationship",
+     "income"
+    ]
+   ],
+   "seconds": 0.9
+  },
+  "40092ddb013b31b2dff3d9f972867fd87d4a9302": {
+   "seed": 2,
+   "n_rows": 21113,
+   "n_directed": 16,
+   "n_undirected": 1,
+   "undirected_in_cpdag": [
+    [
+     "capital-gain",
+     "capital-loss"
+    ]
+   ],
+   "edges": [
+    [
+     "occupation",
+     "workclass"
+    ],
+    [
+     "sex",
+     "workclass"
+    ],
+    [
+     "education-num",
+     "education"
+    ],
+    [
+     "occupation",
+     "education-num"
+    ],
+    [
+     "age",
+     "marital-status"
+    ],
+    [
+     "relationship",
+     "marital-status"
+    ],
+    [
+     "relationship",
+     "occupation"
+    ],
+    [
+     "sex",
+     "occupation"
+    ],
+    [
+     "age",
+     "relationship"
+    ],
+    [
+     "sex",
+     "relationship"
+    ],
+    [
+     "hours-per-week",
+     "capital-gain"
+    ],
+    [
+     "capital-gain",
+     "capital-loss"
+    ],
+    [
+     "hours-per-week",
+     "capital-loss"
+    ],
+    [
+     "occupation",
+     "hours-per-week"
+    ],
+    [
+     "sex",
+     "hours-per-week"
+    ],
+    [
+     "education-num",
+     "income"
+    ],
+    [
+     "relationship",
+     "income"
+    ]
+   ],
+   "seconds": 0.9
+  },
+  "5930b436fe78a068234f946d438a9112f4ddf553": {
+   "seed": 3,
+   "n_rows": 21113,
+   "n_directed": 16,
+   "n_undirected": 1,
+   "undirected_in_cpdag": [
+    [
+     "capital-gain",
+     "capital-loss"
+    ]
+   ],
+   "edges": [
+    [
+     "occupation",
+     "workclass"
+    ],
+    [
+     "sex",
+     "workclass"
+    ],
+    [
+     "occupation",
+     "education"
+    ],
+    [
+     "education",
+     "education-num"
+    ],
+    [
+     "age",
+     "marital-status"
+    ],
+    [
+     "relationship",
+     "marital-status"
+    ],
+    [
+     "relationship",
+     "occupation"
+    ],
+    [
+     "sex",
+     "occupation"
+    ],
+    [
+     "age",
+     "relationship"
+    ],
+    [
+     "sex",
+     "relationship"
+    ],
+    [
+     "hours-per-week",
+     "capital-gain"
+    ],
+    [
+     "capital-gain",
+     "capital-loss"
+    ],
+    [
+     "hours-per-week",
+     "capital-loss"
+    ],
+    [
+     "occupation",
+     "hours-per-week"
+    ],
+    [
+     "sex",
+     "hours-per-week"
+    ],
+    [
+     "education-num",
+     "income"
+    ],
+    [
+     "relationship",
+     "income"
+    ]
+   ],
+   "seconds": 0.9
+  },
+  "cce53a12d3a44278612709d7941b00332a026866": {
+   "seed": 4,
+   "n_rows": 21113,
+   "n_directed": 17,
+   "n_undirected": 1,
+   "undirected_in_cpdag": [
+    [
+     "capital-gain",
+     "capital-loss"
+    ]
+   ],
+   "edges": [
+    [
+     "occupation",
+     "workclass"
+    ],
+    [
+     "sex",
+     "workclass"
+    ],
+    [
+     "occupation",
+     "education"
+    ],
+    [
+     "education",
+     "education-num"
+    ],
+    [
+     "age",
+     "marital-status"
+    ],
+    [
+     "relationship",
+     "marital-status"
+    ],
+    [
+     "age",
+     "occupation"
+    ],
+    [
+     "sex",
+     "occupation"
+    ],
+    [
+     "age",
+     "relationship"
+    ],
+    [
+     "sex",
+     "relationship"
+    ],
+    [
+     "hours-per-week",
+     "relationship"
+    ],
+    [
+     "hours-per-week",
+     "capital-gain"
+    ],
+    [
+     "capital-gain",
+     "capital-loss"
+    ],
+    [
+     "hours-per-week",
+     "capital-loss"
+    ],
+    [
+     "occupation",
+     "hours-per-week"
+    ],
+    [
+     "sex",
+     "hours-per-week"
+    ],
+    [
+     "education",
+     "income"
+    ],
+    [
+     "relationship",
+     "income"
+    ]
+   ],
+   "seconds": 0.9
+  }
+ },
+ "dataset": "adult",
+ "algorithm": "FGES (Tetrad, causal-cmd 1.4.1)",
+ "tetrad_jar_sha1": "887ff1cca0a2379e8f7e4d09768e1181c0b2f9bd",
+ "score": "bdeu-score",
+ "parameters": {
+  "priorEquivalentSampleSize": 10.0,
+  "structurePrior": 1.0,
+  "maxDegree": 1000,
+  "faithfulnessAssumed": false,
+  "symmetricFirstStep": false,
+  "note": "Tetrad defaults for this build, as printed in its output"
+ },
+ "knowledge": {
+  "roots": [
+   "age",
+   "native-country",
+   "race",
+   "sex"
+  ],
+  "sink": "income"
+ },
+ "rows": "training split only (test_size=0.3, random_state=seed)",
+ "dag_from_cpdag": "Dor-Tarsi consistent extension, last column first"
+}

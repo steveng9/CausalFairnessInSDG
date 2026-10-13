@@ -1,0 +1,261 @@
+diff --git a/src/causal_fairness_sdg/data/causal_graphs.py b/src/causal_fairness_sdg/data/causal_graphs.py
+index 44bd25c..15994e0 100644
+--- a/src/causal_fairness_sdg/data/causal_graphs.py
++++ b/src/causal_fairness_sdg/data/causal_graphs.py
+@@ -1,14 +1,20 @@
+-"""Ground-truth causal DAGs for DECAF (`sdg/decaf.py`).
++"""Causal DAGs for the DECAF-style generators (`sdg/decaf*.py`).
+ 
+-Unlike MST/PrivBayes/AIM, DECAF does not discover a graph privately from
+-data -- it needs the *true* causal structure as an input (`dag_seed`), and
+-applies fairness by selectively shuffling parent contributions at generation
+-time (see `fairness/base.py::select_biased_edges`). Neither DECAF's own repo
+-nor PreFair's paper ships a DAG for Adult or COMPAS with this project's exact
+-attribute set, so these are our own constructions -- documented here rather
+-than treated as ground truth, consistent with standard practice in this
+-literature (DECAF's and Kusner et al.'s own real-data DAGs are author-
+-asserted, not derived from causal discovery).
++Unlike MST/PrivBayes/AIM, these generators do not select a structure
++privately -- they take a DAG as an input (`dag_seed`) and apply fairness by
++shuffling parent contributions at generation time (see
++`fairness/base.py::select_biased_edges`). Two sources of graph are available,
++chosen by the generators' `graph` setting (`resolve_graph`):
++
++  "hand"  (default) The hand-drawn graphs in this file, one per dataset, from
++          domain knowledge. Our own constructions, not ground truth.
++  "fges"  Graphs discovered from the training rows the way the DECAF paper
++          does it for Credit Approval (FGES in Tetrad, with age and the
++          protected demographic attributes declared root nodes); see
++          `scripts/discover_graphs.py`. The DECAF paper's real-data graphs
++          are all discovered (Section 6: "the ground-truth DAG is unknown. We
++          use causal discovery"): Adult's is the PC-algorithm graph of Zhang
++          et al. 2017, Credit Approval's is FGES.
+ 
+ Edges are `(parent, child)` pairs over attribute *names*; `as_digraph`
+ resolves them against a concrete column list (so index positions match
+@@ -17,9 +23,15 @@ whatever `data/datasets.py` produced for a given run).
+ 
+ from __future__ import annotations
+ 
++import hashlib
++import json
++from functools import lru_cache
++from pathlib import Path
+ from typing import Dict, List, Tuple
+ 
+ import networkx as nx
++import numpy as np
++import pandas as pd
+ 
+ Edge = Tuple[str, str]
+ 
+@@ -572,3 +584,74 @@ def as_digraph(edges: List[Edge], columns: List[str]) -> nx.DiGraph:
+     if not nx.is_directed_acyclic_graph(dag):
+         raise ValueError("causal graph is not acyclic")
+     return dag
++
++
++GRAPH_SOURCES = ("hand", "fges")
++
++#: Where `scripts/discover_graphs.py` writes, one file per dataset.
++DISCOVERED_GRAPH_DIR = Path(__file__).resolve().parent / "discovered_graphs"
++
++#: Prior knowledge given to the discovery algorithm: these attributes are root
++#: nodes. DECAF's Credit Approval graph was discovered with "the prior
++#: knowledge that age and ethnicity are root nodes" (App. D.3) -- age plus the
++#: protected attribute. The same rule here: age, and the protected demographic
++#: attributes a person is born with (sex, race, ethnicity, birthplace).
++#: Protected attributes acquired later in some role splits (disability,
++#: veteran status, education, income) are left to the algorithm.
++DISCOVERY_ROOTS: Dict[str, Tuple[str, ...]] = {
++    "adult": ("age", "sex", "race", "native-country"),
++    "compas": ("age_cat", "sex", "race"),
++    "snake": ("age", "female", "wbhaom", "citistat"),
++    "sbo": ("AGE1", "SEX1", "RACE1", "ETH1", "BORNUS1"),
++    "acsincome_ca": ("AGEP", "SEX", "RAC1P", "HISP", "WAOB"),
++    "acsincome_tx": ("AGEP", "SEX", "RAC1P", "HISP", "WAOB"),
++    "acspubcov_ca": ("AGEP", "SEX", "RAC1P", "HISP", "NATIVITY"),
++    "acspubcov_tx": ("AGEP", "SEX", "RAC1P", "HISP", "NATIVITY"),
++    "cdc_diabetes": ("Age", "Sex"),
++    "hmda_ca": ("age", "sex", "race", "ethnicity"),
++    "hmda_tx": ("age", "sex", "race", "ethnicity"),
++}
++
++
++def table_key(data: pd.DataFrame) -> str:
++    """Identifies a training table: a discovered graph belongs to the exact
++    rows it was discovered on."""
++    payload = "\t".join(map(str, data.columns)).encode()
++    payload += np.ascontiguousarray(data.to_numpy(dtype=np.int64)).tobytes()
++    return hashlib.sha1(payload).hexdigest()
++
++
++@lru_cache(maxsize=None)
++def _discovered(source: str, dataset_name: str) -> Dict[str, List[Edge]]:
++    path = DISCOVERED_GRAPH_DIR / f"{source}_{dataset_name}.json"
++    if not path.exists():
++        raise ValueError(
++            f"No {source!r} graph discovered for dataset {dataset_name!r} "
++            f"({path} is missing); run scripts/discover_graphs.py"
++        )
++    record = json.loads(path.read_text())
++    return {
++        key: [(p, c) for p, c in graph["edges"]]
++        for key, graph in record["graphs"].items()
++    }
++
++
++def resolve_graph(dataset_name: str, data: pd.DataFrame, source: str = "hand") -> List[Edge]:
++    """The edge list a DECAF-style generator should use for `data`."""
++    if source == "hand":
++        if dataset_name not in CAUSAL_GRAPHS:
++            raise ValueError(
++                f"No causal graph registered for dataset_name={dataset_name!r}; "
++                f"available: {sorted(CAUSAL_GRAPHS)}"
++            )
++        return CAUSAL_GRAPHS[dataset_name]
++    if source not in GRAPH_SOURCES:
++        raise ValueError(f"unknown graph source {source!r}; one of {GRAPH_SOURCES}")
++    graphs = _discovered(source, dataset_name)
++    key = table_key(data)
++    if key not in graphs:
++        raise ValueError(
++            f"No {source!r} graph for this training table of {dataset_name!r} "
++            f"(key {key[:12]}); run scripts/discover_graphs.py for this seed"
++        )
++    return graphs[key]
+diff --git a/src/causal_fairness_sdg/sdg/decaf.py b/src/causal_fairness_sdg/sdg/decaf.py
+index 7619c64..e560d3a 100644
+--- a/src/causal_fairness_sdg/sdg/decaf.py
++++ b/src/causal_fairness_sdg/sdg/decaf.py
+@@ -32,7 +32,7 @@ from typing import Dict, Optional, Tuple
+ import numpy as np
+ import pandas as pd
+ 
+-from ..data.causal_graphs import CAUSAL_GRAPHS, as_digraph
++from ..data.causal_graphs import as_digraph, resolve_graph
+ from ..fairness.base import AttributeRoles, FairnessMechanism
+ from .base import SDGMethod, SDGResult
+ 
+@@ -60,7 +60,11 @@ class DECAFMethod(SDGMethod):
+         devices="auto",
+         output_activation: Optional[str] = "sigmoid",
+         cache_trained_models: bool = True,
++        graph: str = "hand",
+     ):
++        # "hand" (the hand-drawn DAG) or "fges" (discovered from the training
++        # rows as in the DECAF paper); see `data.causal_graphs.resolve_graph`.
++        self.graph = graph
+         self.max_epochs = max_epochs
+         self.h_dim = h_dim
+         self.batch_size = batch_size
+@@ -153,18 +157,12 @@ class DECAFMethod(SDGMethod):
+                 "pip install -e '.[decaf]' (decaf-synthetic-data, torch, "
+                 "pytorch-lightning)."
+             ) from _IMPORT_ERROR
+-        if dataset_name not in CAUSAL_GRAPHS:
+-            raise ValueError(
+-                f"No causal graph registered for dataset_name={dataset_name!r}; "
+-                f"available: {sorted(CAUSAL_GRAPHS)}"
+-            )
+-
+         if seed is not None:
+             pl.seed_everything(seed)
+ 
+         columns = list(data.columns)
+         col_index = {c: i for i, c in enumerate(columns)}
+-        dag = as_digraph(CAUSAL_GRAPHS[dataset_name], columns)
++        dag = as_digraph(resolve_graph(dataset_name, data, self.graph), columns)
+         dag_seed = [[col_index[p], col_index[c]] for p, c in dag.edges]
+ 
+         # Min-max scale onto [0, 1] iff the generator's heads are bounded to
+diff --git a/src/causal_fairness_sdg/sdg/decaf_tabpfn.py b/src/causal_fairness_sdg/sdg/decaf_tabpfn.py
+index 3d5fd03..06e1d17 100644
+--- a/src/causal_fairness_sdg/sdg/decaf_tabpfn.py
++++ b/src/causal_fairness_sdg/sdg/decaf_tabpfn.py
+@@ -199,7 +199,7 @@ class DECAFTabPFNMethod(_BaseDECAFVariant):
+     ) -> SDGResult:
+         self._require_backend()
+         columns, col_index, dag, dag_seed = self._dag(data, dataset_name)
+-        cfg = self._settings_for(dataset_name)
++        cfg = self._trainer_settings(dataset_name)
+         cards = np.array([domain[c] for c in columns], dtype=np.int64)
+         # Same convention as `_decaf_ctgan.ColumnBlocks.encode`: Adult's
+         # `education-num` runs 1..16 against a declared domain of 16.
+diff --git a/src/causal_fairness_sdg/sdg/decaf_variants.py b/src/causal_fairness_sdg/sdg/decaf_variants.py
+index 422974c..bcf75c1 100644
+--- a/src/causal_fairness_sdg/sdg/decaf_variants.py
++++ b/src/causal_fairness_sdg/sdg/decaf_variants.py
+@@ -37,7 +37,7 @@ from typing import Any, Dict, List, Optional, Sequence, Tuple
+ import numpy as np
+ import pandas as pd
+ 
+-from ..data.causal_graphs import CAUSAL_GRAPHS, as_digraph
++from ..data.causal_graphs import as_digraph, resolve_graph
+ from ..fairness.base import AttributeRoles, FairnessMechanism
+ from .base import SDGMethod, SDGResult, borrow_untuned_settings
+ 
+@@ -67,21 +67,28 @@ class _BaseDECAFVariant(SDGMethod):
+         self.overrides = overrides
+         self._cache: Dict[Tuple, Any] = {}
+ 
++    #: Which graph the generator is given: "hand" (the hand-drawn DAG in
++    #: `data.causal_graphs`) or "fges" (discovered from the training rows as
++    #: in the DECAF paper). Set through the same overrides as the training
++    #: settings, e.g. `--set graph=fges`; only recorded on a run when set.
++    graph_setting = "graph"
++
+     def _settings_for(self, dataset_name: Optional[str]) -> Dict[str, Any]:
+         base = dict(self.settings.get(dataset_name or "", {}))
+         base.update(self.overrides)
+         return base
+ 
+-    @staticmethod
+-    def _dag(data: pd.DataFrame, dataset_name: Optional[str]):
+-        if dataset_name not in CAUSAL_GRAPHS:
+-            raise ValueError(
+-                f"No causal graph registered for dataset_name={dataset_name!r}; "
+-                f"available: {sorted(CAUSAL_GRAPHS)}"
+-            )
++    def _trainer_settings(self, dataset_name: Optional[str]) -> Dict[str, Any]:
++        """`_settings_for` without the keys that are not trainer arguments."""
++        cfg = self._settings_for(dataset_name)
++        cfg.pop(self.graph_setting, None)
++        return cfg
++
++    def _dag(self, data: pd.DataFrame, dataset_name: Optional[str]):
++        source = self._settings_for(dataset_name).get(self.graph_setting, "hand")
+         columns = list(data.columns)
+         col_index = {c: i for i, c in enumerate(columns)}
+-        dag = as_digraph(CAUSAL_GRAPHS[dataset_name], columns)
++        dag = as_digraph(resolve_graph(dataset_name, data, source), columns)
+         dag_seed = [[col_index[p], col_index[c]] for p, c in dag.edges]
+         return columns, col_index, dag, dag_seed
+ 
+@@ -192,7 +199,7 @@ class DECAFDPGANMethod(_BaseDECAFVariant):
+     ) -> SDGResult:
+         self._require_backend()
+         columns, col_index, dag, dag_seed = self._dag(data, dataset_name)
+-        cfg = self._settings_for(dataset_name)
++        cfg = self._trainer_settings(dataset_name)
+         values = data.to_numpy(dtype="float32")
+ 
+         key = (
+@@ -301,7 +308,7 @@ class DECAFCTGANMethod(_BaseDECAFVariant):
+     ) -> SDGResult:
+         self._require_backend()
+         columns, col_index, dag, dag_seed = self._dag(data, dataset_name)
+-        cfg = self._settings_for(dataset_name)
++        cfg = self._trainer_settings(dataset_name)
+         codes = data.to_numpy()
+         blocks = ColumnBlocks(columns, domain)
+ 
+@@ -421,7 +428,7 @@ class DECAFDiffusionMethod(_BaseDECAFVariant):
+     ) -> SDGResult:
+         self._require_backend()
+         columns, col_index, dag, dag_seed = self._dag(data, dataset_name)
+-        cfg = self._settings_for(dataset_name)
++        cfg = self._trainer_settings(dataset_name)
+         codes = data.to_numpy()
+         blocks = ColumnBlocks(columns, domain)
+ 
