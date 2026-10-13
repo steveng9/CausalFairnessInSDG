@@ -1,9 +1,17 @@
 % =====================================================================
-%  Bibliography for "Causal fairness is portable"
+%  Bibliography for "Portable Causal Fairness Across SDG Families"
 %
-%  EVERY entry below was checked against the primary source (arXiv abs
-%  page, publisher page, or proceedings listing) on 2026-08-22.
+%  EVERY entry below was re-checked against the primary source (publisher
+%  page, proceedings listing, or arXiv abs page) on 2026-09-01.
 %  Do not add an entry without doing the same.
+%
+%  House style, applied uniformly:
+%    - A paper that appeared in a peer-reviewed venue is cited to that
+%      venue, with volume/number/pages where the venue assigns them. The
+%      arXiv id is not repeated.
+%    - A paper that has only ever been a preprint is cited as
+%      `arXiv preprint arXiv:NNNN.NNNNN`, and nothing else.
+%    - Datasets, challenges and other non-papers are @misc with a URL.
 % =====================================================================
 
 % ---------- the method this paper ports ----------
@@ -12,35 +20,34 @@
   author    = {van Breugel, Boris and Kyono, Trent and Berrevoets, Jeroen and van der Schaar, Mihaela},
   booktitle = {Advances in Neural Information Processing Systems},
   volume    = {34},
-  year      = {2021},
-  note      = {arXiv:2110.12884}
+  pages     = {22221--22233},
+  year      = {2021}
 }
 
 % ---------- closest prior work ----------
 @article{pujol2023prefair,
   title   = {{PreFair}: Privately Generating Justifiably Fair Synthetic Data},
   author  = {Pujol, David and Gilad, Amir and Machanavajjhala, Ashwin},
-  journal = {Proceedings of the VLDB Endowment},
+  journal = {Proceedings of the {VLDB} Endowment},
   volume  = {16},
   number  = {6},
   pages   = {1573--1586},
   year    = {2023}
 }
 
-% ---------- causal-DAG diffusion (fidelity, not fairness) ----------
-@article{zhang2025causaldifftab,
-  title         = {{CausalDiffTab}: Mixed-Type Causal-Aware Diffusion for Tabular Data Generation},
-  author        = {Zhang, Jia-Chen and Zhou, Zheng and Xiong, Yu-Jie and Xia, Chun-Ming and Dai, Fei},
-  journal       = {arXiv preprint arXiv:2506.14206},
-  year          = {2025}
+@article{angelozzi2026where,
+  title   = {Where to Intervene? {Benchmarking} Fairness-Aware Learning on Differentially Private Synthetic Tabular Data},
+  author  = {Angelozzi, Vin{\'i}cius Gabriel and Arcolezi, H{\'e}ber H.},
+  journal = {Proceedings on Privacy Enhancing Technologies},
+  year    = {2026}
 }
 
-@inproceedings{kotelnikov2023tabddpm,
-  title     = {{TabDDPM}: Modelling Tabular Data with Diffusion Models},
-  author    = {Kotelnikov, Akim and Baranchuk, Dmitry and Rubachev, Ivan and Babenko, Artem},
-  booktitle = {Proceedings of the 40th International Conference on Machine Learning},
-  year      = {2023},
-  note      = {arXiv:2209.15421}
+% ---------- causal-DAG generation targeting fidelity, not fairness ----------
+@article{zhang2025causaldifftab,
+  title   = {{CausalDiffTab}: Mixed-Type Causal-Aware Diffusion for Tabular Data Generation},
+  author  = {Zhang, Jia-Chen and Zhou, Zheng and Xiong, Yu-Jie and Xia, Chun-Ming and Dai, Fei},
+  journal = {arXiv preprint arXiv:2506.14206},
+  year    = {2025}
 }
 
 @article{jacob2026tabscm,
@@ -48,6 +55,14 @@
   author  = {Jacob, Sven and Prenkaj, Bardh and Shao, Weijia and Kasneci, Gjergji},
   journal = {arXiv preprint arXiv:2604.22337},
   year    = {2026}
+}
+
+@inproceedings{kotelnikov2023tabddpm,
+  title     = {{TabDDPM}: Modelling Tabular Data with Diffusion Models},
+  author    = {Kotelnikov, Akim and Baranchuk, Dmitry and Rubachev, Ivan and Babenko, Artem},
+  booktitle = {Proceedings of the 40th International Conference on Machine Learning},
+  pages     = {17564--17579},
+  year      = {2023}
 }
 
 % ---------- private / fair generation with other mechanisms ----------
@@ -72,12 +87,11 @@
   year    = {2024}
 }
 
-@article{nagesh2025faircausesyn,
-  title   = {{FairCauseSyn}: Towards Causally Fair {LLM}-Augmented Synthetic Data Generation},
-  author  = {Nagesh, Nitish and Wang, Ziyu and Rahmani, Amir M.},
-  journal = {arXiv preprint arXiv:2506.19082},
-  note    = {IEEE EMBC 2025},
-  year    = {2025}
+@inproceedings{nagesh2025faircausesyn,
+  title     = {{FairCauseSyn}: Towards Causally Fair {LLM}-Augmented Synthetic Data Generation},
+  author    = {Nagesh, Nitish and Wang, Ziyu and Rahmani, Amir M.},
+  booktitle = {47th Annual International Conference of the {IEEE} Engineering in Medicine and Biology Society ({EMBC})},
+  year      = {2025}
 }
 
 @article{jia2025pradagan,
@@ -87,40 +101,39 @@
   year    = {2025}
 }
 
-@article{angelozzi2026where,
-  title   = {Where to Intervene? Benchmarking Fairness-Aware Learning on Differentially Private Synthetic Tabular Data},
-  author  = {Angelozzi, Vin{\'i}cius Gabriel and Arcolezi, H{\'e}ber H.},
-  journal = {arXiv preprint arXiv:2607.07471},
-  note    = {Proceedings on Privacy Enhancing Technologies (PETS) 2026},
-  year    = {2026}
-}
-
 % ---------- the synthesizers we build on ----------
 @article{mckenna2021mst,
   title   = {Winning the {NIST} Contest: A Scalable and General Approach to Differentially Private Synthetic Data},
   author  = {McKenna, Ryan and Miklau, Gerome and Sheldon, Daniel},
-  journal = {arXiv preprint arXiv:2108.04978},
-  year    = {2021}
+  journal = {Journal of Privacy and Confidentiality},
+  volume  = {11},
+  number  = {3},
+  year    = {2021},
+  doi     = {10.29012/jpc.778}
 }
 
 @article{mckenna2022aim,
   title   = {{AIM}: An Adaptive and Iterative Mechanism for Differentially Private Synthetic Data},
   author  = {McKenna, Ryan and Mullins, Brett and Sheldon, Daniel and Miklau, Gerome},
-  journal = {arXiv preprint arXiv:2201.12677},
+  journal = {Proceedings of the {VLDB} Endowment},
+  volume  = {15},
+  number  = {11},
+  pages   = {2599--2612},
   year    = {2022}
 }
 
 @inproceedings{zhang2014privbayes,
   title     = {{PrivBayes}: Private Data Release via {Bayesian} Networks},
   author    = {Zhang, Jun and Cormode, Graham and Procopiuc, Cecilia M. and Srivastava, Divesh and Xiao, Xiaokui},
-  booktitle = {Proceedings of the 2014 ACM SIGMOD International Conference on Management of Data},
+  booktitle = {Proceedings of the 2014 {ACM} {SIGMOD} International Conference on Management of Data},
+  pages     = {1423--1434},
   year      = {2014}
 }
 
 @inproceedings{zhang2021privsyn,
   title     = {{PrivSyn}: Differentially Private Data Synthesis},
   author    = {Zhang, Zhikun and Wang, Tianhao and Li, Ninghui and Honorio, Jean and Backes, Michael and He, Shibo and Chen, Jiming and Zhang, Yang},
-  booktitle = {30th USENIX Security Symposium},
+  booktitle = {30th {USENIX} Security Symposium},
   pages     = {929--946},
   year      = {2021}
 }
@@ -130,51 +143,109 @@
   author    = {Xu, Lei and Skoularidou, Maria and Cuesta-Infante, Alfredo and Veeramachaneni, Kalyan},
   booktitle = {Advances in Neural Information Processing Systems},
   volume    = {32},
+  pages     = {7335--7345},
   year      = {2019}
 }
 
-% ---------- causal graphs we build the DAGs on ----------
+@inproceedings{gulrajani2017wgangp,
+  title     = {Improved Training of {Wasserstein} {GAN}s},
+  author    = {Gulrajani, Ishaan and Ahmed, Faruk and Arjovsky, Martin and Dumoulin, Vincent and Courville, Aaron},
+  booktitle = {Advances in Neural Information Processing Systems},
+  volume    = {30},
+  pages     = {5767--5777},
+  year      = {2017}
+}
+
+% ---------- causal fairness definitions the DAGs follow ----------
 @inproceedings{kusner2017counterfactual,
   title     = {Counterfactual Fairness},
   author    = {Kusner, Matt J. and Loftus, Joshua and Russell, Chris and Silva, Ricardo},
   booktitle = {Advances in Neural Information Processing Systems},
   volume    = {30},
+  pages     = {4066--4076},
   year      = {2017}
 }
 
 @inproceedings{zhang2017causalframework,
   title     = {A Causal Framework for Discovering and Removing Direct and Indirect Discrimination},
   author    = {Zhang, Lu and Wu, Yongkai and Wu, Xintao},
-  booktitle = {Proceedings of the Twenty-Sixth International Joint Conference on Artificial Intelligence (IJCAI-17)},
+  booktitle = {Proceedings of the 26th International Joint Conference on Artificial Intelligence ({IJCAI})},
   pages     = {3929--3935},
   year      = {2017},
   doi       = {10.24963/ijcai.2017/549}
 }
 
 % ---------- privacy machinery ----------
-@inproceedings{abadi2016dpsgd,
-  title     = {Deep Learning with Differential Privacy},
-  author    = {Abadi, Martin and Chu, Andy and Goodfellow, Ian and McMahan, H. Brendan and Mironov, Ilya and Talwar, Kunal and Zhang, Li},
-  booktitle = {Proceedings of the 2016 ACM SIGSAC Conference on Computer and Communications Security},
-  pages     = {308--318},
-  year      = {2016}
-}
-
 @inproceedings{dwork2006calibrating,
   title     = {Calibrating Noise to Sensitivity in Private Data Analysis},
   author    = {Dwork, Cynthia and McSherry, Frank and Nissim, Kobbi and Smith, Adam},
-  booktitle = {Theory of Cryptography Conference (TCC)},
+  booktitle = {Theory of Cryptography Conference ({TCC})},
   pages     = {265--284},
   year      = {2006}
 }
 
+@inproceedings{abadi2016dpsgd,
+  title     = {Deep Learning with Differential Privacy},
+  author    = {Abadi, Martin and Chu, Andy and Goodfellow, Ian and McMahan, H. Brendan and Mironov, Ilya and Talwar, Kunal and Zhang, Li},
+  booktitle = {Proceedings of the 2016 {ACM} {SIGSAC} Conference on Computer and Communications Security},
+  pages     = {308--318},
+  year      = {2016}
+}
+
+@inproceedings{bagdasaryan2019disparate,
+  title     = {Differential Privacy Has Disparate Impact on Model Accuracy},
+  author    = {Bagdasaryan, Eugene and Poursaeed, Omid and Shmatikov, Vitaly},
+  booktitle = {Advances in Neural Information Processing Systems},
+  volume    = {32},
+  pages     = {15479--15488},
+  year      = {2019}
+}
+
+% ---------- differentially private data release in practice ----------
+@article{abowd2022topdown,
+  title   = {The 2020 Census Disclosure Avoidance System {TopDown} Algorithm},
+  author  = {Abowd, John M. and Ashmead, Robert and Cumings-Menon, Ryan and Garfinkel, Simson and
+             Heineck, Micah and Heiss, Christine and Johns, Robert and Kifer, Daniel and
+             Leclerc, Philip and Machanavajjhala, Ashwin and Moran, Brett and Sexton, William and
+             Spence, Matthew and Zhuravlev, Pavel},
+  journal = {Harvard Data Science Review},
+  number  = {Special Issue 2},
+  year    = {2022},
+  doi     = {10.1162/99608f92.529e3cb9}
+}
+
+@misc{nist2018challenge,
+  author       = {{National Institute of Standards and Technology}},
+  title        = {2018 Differential Privacy Synthetic Data Challenge},
+  howpublished = {\url{https://www.nist.gov/ctl/pscr/open-innovation-prize-challenges/past-prize-challenges/2018-differential-privacy-synthetic}},
+  year         = {2019}
+}
+
+@misc{V-CHAMPS,
+  author       = {{FDA Office of Digital Transformation}},
+  title        = {The {Veterans} Cardiac Health and {AI} Model Predictions ({V-CHAMPS}) Challenge},
+  howpublished = {\url{https://precision.fda.gov/challenges/31/results}},
+  year         = {2023}
+}
+
+@article{vos2024,
+  title   = {Privacy-Preserving Membership Queries for Federated Anomaly Detection},
+  author  = {Vos, Jelle and Pentyala, Sikha and Golob, Steven and Maia, Ricardo and Kelley, Dean and
+             Erkin, Zekeriya and {De Cock}, Martine and Nascimento, Anderson},
+  journal = {Proceedings on Privacy Enhancing Technologies},
+  volume  = {2024},
+  number  = {3},
+  pages   = {186--201},
+  year    = {2024}
+}
+
 % ---------- datasets ----------
 @misc{becker1996adult,
-  title     = {Adult},
-  author    = {Becker, Barry and Kohavi, Ronny},
-  howpublished = {UCI Machine Learning Repository},
-  year      = {1996},
-  doi       = {10.24432/C5XW20}
+  title        = {Adult},
+  author       = {Becker, Barry and Kohavi, Ronny},
+  howpublished = {{UCI} Machine Learning Repository},
+  year         = {1996},
+  doi          = {10.24432/C5XW20}
 }
 
 @misc{angwin2016machinebias,
@@ -182,20 +253,4 @@
   author       = {Angwin, Julia and Larson, Jeff and Mattu, Surya and Kirchner, Lauren},
   howpublished = {ProPublica},
   year         = {2016}
-}
-
-@inproceedings{bagdasaryan2019disparate,
-  title     = {Differential Privacy Has Disparate Impact on Model Accuracy},
-  author    = {Bagdasaryan, Eugene and Poursaeed, Omid and Shmatikov, Vitaly},
-  booktitle = {Advances in Neural Information Processing Systems 32 (NeurIPS)},
-  year      = {2019}
-}
-
-@inproceedings{gulrajani2017wgangp,
-  title     = {Improved Training of {W}asserstein {GAN}s},
-  author    = {Gulrajani, Ishaan and Ahmed, Faruk and Arjovsky, Martin and
-               Dumoulin, Vincent and Courville, Aaron},
-  booktitle = {Advances in Neural Information Processing Systems 30 (NeurIPS)},
-  pages     = {5767--5777},
-  year      = {2017}
 }

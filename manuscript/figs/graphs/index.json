@@ -1,0 +1,1710 @@
+{
+ "batch": "facct-2026-10-09",
+ "epsilon": 1.0,
+ "dag": [
+  {
+   "dataset": "acsincome",
+   "role": "prefair_like",
+   "file": "dag_acsincome_prefair_like",
+   "protected": [
+    "HISP",
+    "RAC1P",
+    "SEX",
+    "WAOB"
+   ],
+   "admissible": [
+    "COW",
+    "OCCP",
+    "SCHL",
+    "WKHP"
+   ],
+   "outcome": [
+    "high_income"
+   ],
+   "nodes": 12,
+   "edges": 34,
+   "cuts": {
+    "ftu": [
+     "HISP → high_income",
+     "RAC1P → high_income",
+     "SEX → high_income"
+    ],
+    "cf": [
+     "HISP → high_income",
+     "MAR → high_income",
+     "RAC1P → high_income",
+     "RELP → high_income",
+     "SEX → high_income"
+    ],
+    "dp": [
+     "COW → high_income",
+     "HISP → high_income",
+     "MAR → high_income",
+     "OCCP → high_income",
+     "RAC1P → high_income",
+     "RELP → high_income",
+     "SCHL → high_income",
+     "SEX → high_income",
+     "WKHP → high_income"
+    ]
+   }
+  },
+  {
+   "dataset": "acsincome",
+   "role": "sex_only_broad_adm",
+   "file": "dag_acsincome_sex_only_broad_adm",
+   "protected": [
+    "SEX"
+   ],
+   "admissible": [
+    "COW",
+    "OCCP",
+    "SCHL",
+    "WKHP"
+   ],
+   "outcome": [
+    "high_income"
+   ],
+   "nodes": 12,
+   "edges": 34,
+   "cuts": {
+    "ftu": [
+     "SEX → high_income"
+    ],
+    "cf": [
+     "MAR → high_income",
+     "RELP → high_income",
+     "SEX → high_income"
+    ],
+    "dp": [
+     "COW → high_income",
+     "MAR → high_income",
+     "OCCP → high_income",
+     "RELP → high_income",
+     "SCHL → high_income",
+     "SEX → high_income",
+     "WKHP → high_income"
+    ]
+   }
+  },
+  {
+   "dataset": "acsincome",
+   "role": "sex_race_narrow_adm",
+   "file": "dag_acsincome_sex_race_narrow_adm",
+   "protected": [
+    "HISP",
+    "RAC1P",
+    "SEX"
+   ],
+   "admissible": [
+    "SCHL",
+    "WKHP"
+   ],
+   "outcome": [
+    "high_income"
+   ],
+   "nodes": 12,
+   "edges": 34,
+   "cuts": {
+    "ftu": [
+     "HISP → high_income",
+     "RAC1P → high_income",
+     "SEX → high_income"
+    ],
+    "cf": [
+     "COW → high_income",
+     "HISP → high_income",
+     "MAR → high_income",
+     "OCCP → high_income",
+     "RAC1P → high_income",
+     "RELP → high_income",
+     "SEX → high_income"
+    ],
+    "dp": [
+     "COW → high_income",
+     "HISP → high_income",
+     "MAR → high_income",
+     "OCCP → high_income",
+     "RAC1P → high_income",
+     "RELP → high_income",
+     "SCHL → high_income",
+     "SEX → high_income",
+     "WKHP → high_income"
+    ]
+   }
+  },
+  {
+   "dataset": "acspubcov",
+   "role": "eligibility_adm",
+   "file": "dag_acspubcov_eligibility_adm",
+   "protected": [
+    "HISP",
+    "NATIVITY",
+    "RAC1P",
+    "SEX"
+   ],
+   "admissible": [
+    "AGEP",
+    "DIS",
+    "ESR",
+    "FER",
+    "PINCP"
+   ],
+   "outcome": [
+    "public_coverage"
+   ],
+   "nodes": 20,
+   "edges": 60,
+   "cuts": {
+    "ftu": [
+     "HISP → public_coverage",
+     "RAC1P → public_coverage",
+     "SEX → public_coverage"
+    ],
+    "cf": [
+     "CIT → public_coverage",
+     "ESP → public_coverage",
+     "HISP → public_coverage",
+     "MAR → public_coverage",
+     "MIL → public_coverage",
+     "RAC1P → public_coverage",
+     "SEX → public_coverage"
+    ],
+    "dp": [
+     "CIT → public_coverage",
+     "DIS → public_coverage",
+     "ESP → public_coverage",
+     "ESR → public_coverage",
+     "FER → public_coverage",
+     "HISP → public_coverage",
+     "MAR → public_coverage",
+     "MIL → public_coverage",
+     "PINCP → public_coverage",
+     "RAC1P → public_coverage",
+     "SEX → public_coverage"
+    ]
+   }
+  },
+  {
+   "dataset": "acspubcov",
+   "role": "race_only_broad_adm",
+   "file": "dag_acspubcov_race_only_broad_adm",
+   "protected": [
+    "HISP",
+    "RAC1P"
+   ],
+   "admissible": [
+    "AGEP",
+    "CIT",
+    "DIS",
+    "ESR",
+    "FER",
+    "MAR",
+    "PINCP",
+    "SCHL"
+   ],
+   "outcome": [
+    "public_coverage"
+   ],
+   "nodes": 20,
+   "edges": 60,
+   "cuts": {
+    "ftu": [
+     "HISP → public_coverage",
+     "RAC1P → public_coverage"
+    ],
+    "cf": [
+     "HISP → public_coverage",
+     "RAC1P → public_coverage"
+    ],
+    "dp": [
+     "CIT → public_coverage",
+     "ESP → public_coverage",
+     "ESR → public_coverage",
+     "FER → public_coverage",
+     "HISP → public_coverage",
+     "MAR → public_coverage",
+     "MIL → public_coverage",
+     "PINCP → public_coverage",
+     "RAC1P → public_coverage"
+    ]
+   }
+  },
+  {
+   "dataset": "acspubcov",
+   "role": "disability_protected_narrow_adm",
+   "file": "dag_acspubcov_disability_protected_narrow_adm",
+   "protected": [
+    "DIS",
+    "HISP",
+    "RAC1P",
+    "SEX"
+   ],
+   "admissible": [
+    "AGEP",
+    "PINCP"
+   ],
+   "outcome": [
+    "public_coverage"
+   ],
+   "nodes": 20,
+   "edges": 60,
+   "cuts": {
+    "ftu": [
+     "DIS → public_coverage",
+     "HISP → public_coverage",
+     "RAC1P → public_coverage",
+     "SEX → public_coverage"
+    ],
+    "cf": [
+     "CIT → public_coverage",
+     "DIS → public_coverage",
+     "ESP → public_coverage",
+     "ESR → public_coverage",
+     "FER → public_coverage",
+     "HISP → public_coverage",
+     "MAR → public_coverage",
+     "MIL → public_coverage",
+     "RAC1P → public_coverage",
+     "SEX → public_coverage"
+    ],
+    "dp": [
+     "CIT → public_coverage",
+     "DIS → public_coverage",
+     "ESP → public_coverage",
+     "ESR → public_coverage",
+     "FER → public_coverage",
+     "HISP → public_coverage",
+     "MAR → public_coverage",
+     "MIL → public_coverage",
+     "PINCP → public_coverage",
+     "RAC1P → public_coverage",
+     "SEX → public_coverage"
+    ]
+   }
+  },
+  {
+   "dataset": "cdc_diabetes",
+   "role": "ses_clinical_adm",
+   "file": "dag_cdc_diabetes_ses_clinical_adm",
+   "protected": [
+    "Education",
+    "Income",
+    "Sex"
+   ],
+   "admissible": [
+    "Age",
+    "BMI",
+    "HeartDiseaseorAttack",
+    "HighBP",
+    "HighChol",
+    "Stroke"
+   ],
+   "outcome": [
+    "Diabetes_binary"
+   ],
+   "nodes": 22,
+   "edges": 93,
+   "cuts": {
+    "ftu": [
+     "Education → Diabetes_binary",
+     "Income → Diabetes_binary",
+     "Sex → Diabetes_binary"
+    ],
+    "cf": [
+     "AnyHealthcare → Diabetes_binary",
+     "CholCheck → Diabetes_binary",
+     "Education → Diabetes_binary",
+     "GenHlth → Diabetes_binary",
+     "HvyAlcoholConsump → Diabetes_binary",
+     "Income → Diabetes_binary",
+     "PhysActivity → Diabetes_binary",
+     "Sex → Diabetes_binary",
+     "Smoker → Diabetes_binary"
+    ],
+    "dp": [
+     "AnyHealthcare → Diabetes_binary",
+     "BMI → Diabetes_binary",
+     "CholCheck → Diabetes_binary",
+     "DiffWalk → Diabetes_binary",
+     "Education → Diabetes_binary",
+     "GenHlth → Diabetes_binary",
+     "HeartDiseaseorAttack → Diabetes_binary",
+     "HighBP → Diabetes_binary",
+     "HighChol → Diabetes_binary",
+     "HvyAlcoholConsump → Diabetes_binary",
+     "Income → Diabetes_binary",
+     "PhysActivity → Diabetes_binary",
+     "Sex → Diabetes_binary",
+     "Smoker → Diabetes_binary"
+    ]
+   }
+  },
+  {
+   "dataset": "cdc_diabetes",
+   "role": "sex_only_broad_adm",
+   "file": "dag_cdc_diabetes_sex_only_broad_adm",
+   "protected": [
+    "Sex"
+   ],
+   "admissible": [
+    "Age",
+    "BMI",
+    "DiffWalk",
+    "Fruits",
+    "GenHlth",
+    "HeartDiseaseorAttack",
+    "HighBP",
+    "HighChol",
+    "HvyAlcoholConsump",
+    "PhysActivity",
+    "Smoker",
+    "Stroke",
+    "Veggies"
+   ],
+   "outcome": [
+    "Diabetes_binary"
+   ],
+   "nodes": 22,
+   "edges": 93,
+   "cuts": {
+    "ftu": [
+     "Sex → Diabetes_binary"
+    ],
+    "cf": [
+     "AnyHealthcare → Diabetes_binary",
+     "CholCheck → Diabetes_binary",
+     "Education → Diabetes_binary",
+     "Income → Diabetes_binary",
+     "Sex → Diabetes_binary"
+    ],
+    "dp": [
+     "AnyHealthcare → Diabetes_binary",
+     "BMI → Diabetes_binary",
+     "CholCheck → Diabetes_binary",
+     "DiffWalk → Diabetes_binary",
+     "Education → Diabetes_binary",
+     "GenHlth → Diabetes_binary",
+     "HeartDiseaseorAttack → Diabetes_binary",
+     "HighBP → Diabetes_binary",
+     "HighChol → Diabetes_binary",
+     "HvyAlcoholConsump → Diabetes_binary",
+     "Income → Diabetes_binary",
+     "PhysActivity → Diabetes_binary",
+     "Sex → Diabetes_binary",
+     "Smoker → Diabetes_binary"
+    ]
+   }
+  },
+  {
+   "dataset": "cdc_diabetes",
+   "role": "ses_narrow_adm",
+   "file": "dag_cdc_diabetes_ses_narrow_adm",
+   "protected": [
+    "Education",
+    "Income",
+    "Sex"
+   ],
+   "admissible": [
+    "Age",
+    "BMI"
+   ],
+   "outcome": [
+    "Diabetes_binary"
+   ],
+   "nodes": 22,
+   "edges": 93,
+   "cuts": {
+    "ftu": [
+     "Education → Diabetes_binary",
+     "Income → Diabetes_binary",
+     "Sex → Diabetes_binary"
+    ],
+    "cf": [
+     "AnyHealthcare → Diabetes_binary",
+     "CholCheck → Diabetes_binary",
+     "DiffWalk → Diabetes_binary",
+     "Education → Diabetes_binary",
+     "GenHlth → Diabetes_binary",
+     "HeartDiseaseorAttack → Diabetes_binary",
+     "HighBP → Diabetes_binary",
+     "HighChol → Diabetes_binary",
+     "HvyAlcoholConsump → Diabetes_binary",
+     "Income → Diabetes_binary",
+     "PhysActivity → Diabetes_binary",
+     "Sex → Diabetes_binary",
+     "Smoker → Diabetes_binary"
+    ],
+    "dp": [
+     "AnyHealthcare → Diabetes_binary",
+     "BMI → Diabetes_binary",
+     "CholCheck → Diabetes_binary",
+     "DiffWalk → Diabetes_binary",
+     "Education → Diabetes_binary",
+     "GenHlth → Diabetes_binary",
+     "HeartDiseaseorAttack → Diabetes_binary",
+     "HighBP → Diabetes_binary",
+     "HighChol → Diabetes_binary",
+     "HvyAlcoholConsump → Diabetes_binary",
+     "Income → Diabetes_binary",
+     "PhysActivity → Diabetes_binary",
+     "Sex → Diabetes_binary",
+     "Smoker → Diabetes_binary"
+    ]
+   }
+  },
+  {
+   "dataset": "sbo",
+   "role": "owner_demographics",
+   "file": "dag_sbo_owner_demographics",
+   "protected": [
+    "BORNUS1",
+    "ETH1",
+    "RACE1",
+    "SEX1",
+    "VET1"
+   ],
+   "admissible": [
+    "AGE1",
+    "EDUC1",
+    "ESTABLISHED",
+    "HOURS1",
+    "NUMOWNERS",
+    "PRMINC1",
+    "SECTOR",
+    "SELFEMP1"
+   ],
+   "outcome": [
+    "high_receipts"
+   ],
+   "nodes": 25,
+   "edges": 68,
+   "cuts": {
+    "ftu": [
+     "RACE1 → high_receipts",
+     "SEX1 → high_receipts"
+    ],
+    "cf": [
+     "RACE1 → high_receipts",
+     "SEX1 → high_receipts"
+    ],
+    "dp": [
+     "ECOMMERCE → high_receipts",
+     "EMPLOYMENT_NOISY → high_receipts",
+     "ESTABLISHED → high_receipts",
+     "EXPORTS → high_receipts",
+     "FRANCHISE → high_receipts",
+     "HOMEBASED → high_receipts",
+     "HOURS1 → high_receipts",
+     "NUMOWNERS → high_receipts",
+     "PAYROLL_NOISY → high_receipts",
+     "PRMINC1 → high_receipts",
+     "RACE1 → high_receipts",
+     "SECTOR → high_receipts",
+     "SEX1 → high_receipts",
+     "WEBSITE → high_receipts"
+    ]
+   }
+  },
+  {
+   "dataset": "sbo",
+   "role": "sex_race_broad_adm",
+   "file": "dag_sbo_sex_race_broad_adm",
+   "protected": [
+    "RACE1",
+    "SEX1"
+   ],
+   "admissible": [
+    "EDUC1",
+    "EMPLOYMENT_NOISY",
+    "ESTABLISHED",
+    "HOURS1",
+    "NUMOWNERS",
+    "SECTOR"
+   ],
+   "outcome": [
+    "high_receipts"
+   ],
+   "nodes": 25,
+   "edges": 68,
+   "cuts": {
+    "ftu": [
+     "RACE1 → high_receipts",
+     "SEX1 → high_receipts"
+    ],
+    "cf": [
+     "RACE1 → high_receipts",
+     "SEX1 → high_receipts"
+    ],
+    "dp": [
+     "ECOMMERCE → high_receipts",
+     "EMPLOYMENT_NOISY → high_receipts",
+     "ESTABLISHED → high_receipts",
+     "EXPORTS → high_receipts",
+     "FRANCHISE → high_receipts",
+     "HOMEBASED → high_receipts",
+     "HOURS1 → high_receipts",
+     "NUMOWNERS → high_receipts",
+     "PAYROLL_NOISY → high_receipts",
+     "PRMINC1 → high_receipts",
+     "RACE1 → high_receipts",
+     "SECTOR → high_receipts",
+     "SEX1 → high_receipts",
+     "WEBSITE → high_receipts"
+    ]
+   }
+  },
+  {
+   "dataset": "sbo",
+   "role": "sex_race_no_sector",
+   "file": "dag_sbo_sex_race_no_sector",
+   "protected": [
+    "ETH1",
+    "RACE1",
+    "SEX1"
+   ],
+   "admissible": [
+    "EDUC1",
+    "ESTABLISHED",
+    "HOURS1"
+   ],
+   "outcome": [
+    "high_receipts"
+   ],
+   "nodes": 25,
+   "edges": 68,
+   "cuts": {
+    "ftu": [
+     "RACE1 → high_receipts",
+     "SEX1 → high_receipts"
+    ],
+    "cf": [
+     "ECOMMERCE → high_receipts",
+     "EMPLOYMENT_NOISY → high_receipts",
+     "EXPORTS → high_receipts",
+     "FRANCHISE → high_receipts",
+     "HOMEBASED → high_receipts",
+     "NUMOWNERS → high_receipts",
+     "PAYROLL_NOISY → high_receipts",
+     "PRMINC1 → high_receipts",
+     "RACE1 → high_receipts",
+     "SECTOR → high_receipts",
+     "SEX1 → high_receipts",
+     "WEBSITE → high_receipts"
+    ],
+    "dp": [
+     "ECOMMERCE → high_receipts",
+     "EMPLOYMENT_NOISY → high_receipts",
+     "ESTABLISHED → high_receipts",
+     "EXPORTS → high_receipts",
+     "FRANCHISE → high_receipts",
+     "HOMEBASED → high_receipts",
+     "HOURS1 → high_receipts",
+     "NUMOWNERS → high_receipts",
+     "PAYROLL_NOISY → high_receipts",
+     "PRMINC1 → high_receipts",
+     "RACE1 → high_receipts",
+     "SECTOR → high_receipts",
+     "SEX1 → high_receipts",
+     "WEBSITE → high_receipts"
+    ]
+   }
+  },
+  {
+   "dataset": "snake",
+   "role": "prefair_like",
+   "file": "dag_snake_prefair_like",
+   "protected": [
+    "citistat",
+    "female",
+    "wbhaom"
+   ],
+   "admissible": [
+    "cow1",
+    "ftptstat",
+    "gradeatn",
+    "hoursut",
+    "mind16",
+    "mocc10"
+   ],
+   "outcome": [
+    "high_income"
+   ],
+   "nodes": 15,
+   "edges": 39,
+   "cuts": {
+    "ftu": [
+     "female → high_income",
+     "wbhaom → high_income"
+    ],
+    "cf": [
+     "female → high_income",
+     "married → high_income",
+     "wbhaom → high_income"
+    ],
+    "dp": [
+     "cow1 → high_income",
+     "female → high_income",
+     "ftptstat → high_income",
+     "gradeatn → high_income",
+     "hoursut → high_income",
+     "married → high_income",
+     "mind16 → high_income",
+     "mocc10 → high_income",
+     "wbhaom → high_income"
+    ]
+   }
+  },
+  {
+   "dataset": "snake",
+   "role": "sex_only_broad_adm",
+   "file": "dag_snake_sex_only_broad_adm",
+   "protected": [
+    "female"
+   ],
+   "admissible": [
+    "ftptstat",
+    "gradeatn",
+    "hoursut",
+    "mocc10"
+   ],
+   "outcome": [
+    "high_income"
+   ],
+   "nodes": 15,
+   "edges": 39,
+   "cuts": {
+    "ftu": [
+     "female → high_income"
+    ],
+    "cf": [
+     "female → high_income",
+     "married → high_income"
+    ],
+    "dp": [
+     "cow1 → high_income",
+     "female → high_income",
+     "ftptstat → high_income",
+     "gradeatn → high_income",
+     "hoursut → high_income",
+     "married → high_income",
+     "mind16 → high_income",
+     "mocc10 → high_income"
+    ]
+   }
+  },
+  {
+   "dataset": "snake",
+   "role": "sex_race_narrow_adm",
+   "file": "dag_snake_sex_race_narrow_adm",
+   "protected": [
+    "female",
+    "wbhaom"
+   ],
+   "admissible": [
+    "gradeatn",
+    "hoursut"
+   ],
+   "outcome": [
+    "high_income"
+   ],
+   "nodes": 15,
+   "edges": 39,
+   "cuts": {
+    "ftu": [
+     "female → high_income",
+     "wbhaom → high_income"
+    ],
+    "cf": [
+     "cow1 → high_income",
+     "female → high_income",
+     "ftptstat → high_income",
+     "married → high_income",
+     "mind16 → high_income",
+     "mocc10 → high_income",
+     "wbhaom → high_income"
+    ],
+    "dp": [
+     "cow1 → high_income",
+     "female → high_income",
+     "ftptstat → high_income",
+     "gradeatn → high_income",
+     "hoursut → high_income",
+     "married → high_income",
+     "mind16 → high_income",
+     "mocc10 → high_income",
+     "wbhaom → high_income"
+    ]
+   }
+  }
+ ],
+ "marginal": [
+  {
+   "method": "mst",
+   "dataset": "acsincome_ca",
+   "role": "prefair_like",
+   "file": "mst_acsincome_ca_prefair_like_eps1",
+   "protected": [
+    "HISP",
+    "RAC1P",
+    "SEX",
+    "WAOB"
+   ],
+   "admissible": [
+    "COW",
+    "OCCP",
+    "SCHL",
+    "WKHP"
+   ],
+   "outcome": [
+    "high_income"
+   ],
+   "seeds": 5,
+   "epsilon": 1.0,
+   "changes": {
+    "none": {
+     "dropped": [],
+     "added": []
+    },
+    "ftu": {
+     "dropped": [],
+     "added": []
+    },
+    "cf": {
+     "dropped": [],
+     "added": []
+    },
+    "dp": {
+     "dropped": [
+      "HISP – SCHL",
+      "OCCP – SEX",
+      "OCCP – WKHP"
+     ],
+     "added": [
+      "RAC1P – SEX",
+      "SEX – WAOB"
+     ]
+    }
+   }
+  },
+  {
+   "method": "mst",
+   "dataset": "acsincome_ca",
+   "role": "sex_only_broad_adm",
+   "file": "mst_acsincome_ca_sex_only_broad_adm_eps1",
+   "protected": [
+    "SEX"
+   ],
+   "admissible": [
+    "COW",
+    "OCCP",
+    "SCHL",
+    "WKHP"
+   ],
+   "outcome": [
+    "high_income"
+   ],
+   "seeds": 5,
+   "epsilon": 1.0,
+   "changes": {
+    "none": {
+     "dropped": [],
+     "added": []
+    },
+    "ftu": {
+     "dropped": [],
+     "added": []
+    },
+    "cf": {
+     "dropped": [],
+     "added": []
+    },
+    "dp": {
+     "dropped": [
+      "OCCP – SEX",
+      "OCCP – WKHP"
+     ],
+     "added": []
+    }
+   }
+  },
+  {
+   "method": "mst",
+   "dataset": "acsincome_ca",
+   "role": "sex_race_narrow_adm",
+   "file": "mst_acsincome_ca_sex_race_narrow_adm_eps1",
+   "protected": [
+    "HISP",
+    "RAC1P",
+    "SEX"
+   ],
+   "admissible": [
+    "SCHL",
+    "WKHP"
+   ],
+   "outcome": [
+    "high_income"
+   ],
+   "seeds": 5,
+   "epsilon": 1.0,
+   "changes": {
+    "none": {
+     "dropped": [],
+     "added": []
+    },
+    "ftu": {
+     "dropped": [],
+     "added": []
+    },
+    "cf": {
+     "dropped": [
+      "OCCP – SEX",
+      "OCCP – WKHP"
+     ],
+     "added": [
+      "SEX – WKHP"
+     ]
+    },
+    "dp": {
+     "dropped": [
+      "HISP – SCHL",
+      "OCCP – SEX",
+      "OCCP – WKHP"
+     ],
+     "added": [
+      "RAC1P – SEX",
+      "SEX – WAOB"
+     ]
+    }
+   }
+  },
+  {
+   "method": "mst",
+   "dataset": "acsincome_tx",
+   "role": "prefair_like",
+   "file": "mst_acsincome_tx_prefair_like_eps1",
+   "protected": [
+    "HISP",
+    "RAC1P",
+    "SEX",
+    "WAOB"
+   ],
+   "admissible": [
+    "COW",
+    "OCCP",
+    "SCHL",
+    "WKHP"
+   ],
+   "outcome": [
+    "high_income"
+   ],
+   "seeds": 5,
+   "epsilon": 1.0,
+   "changes": {
+    "none": {
+     "dropped": [],
+     "added": []
+    },
+    "ftu": {
+     "dropped": [],
+     "added": []
+    },
+    "cf": {
+     "dropped": [],
+     "added": []
+    },
+    "dp": {
+     "dropped": [
+      "OCCP – high_income"
+     ],
+     "added": []
+    }
+   }
+  },
+  {
+   "method": "mst",
+   "dataset": "acsincome_tx",
+   "role": "sex_only_broad_adm",
+   "file": "mst_acsincome_tx_sex_only_broad_adm_eps1",
+   "protected": [
+    "SEX"
+   ],
+   "admissible": [
+    "COW",
+    "OCCP",
+    "SCHL",
+    "WKHP"
+   ],
+   "outcome": [
+    "high_income"
+   ],
+   "seeds": 5,
+   "epsilon": 1.0,
+   "changes": {
+    "none": {
+     "dropped": [],
+     "added": []
+    },
+    "ftu": {
+     "dropped": [],
+     "added": []
+    },
+    "cf": {
+     "dropped": [],
+     "added": []
+    },
+    "dp": {
+     "dropped": [
+      "OCCP – high_income"
+     ],
+     "added": []
+    }
+   }
+  },
+  {
+   "method": "mst",
+   "dataset": "acsincome_tx",
+   "role": "sex_race_narrow_adm",
+   "file": "mst_acsincome_tx_sex_race_narrow_adm_eps1",
+   "protected": [
+    "HISP",
+    "RAC1P",
+    "SEX"
+   ],
+   "admissible": [
+    "SCHL",
+    "WKHP"
+   ],
+   "outcome": [
+    "high_income"
+   ],
+   "seeds": 5,
+   "epsilon": 1.0,
+   "changes": {
+    "none": {
+     "dropped": [],
+     "added": []
+    },
+    "ftu": {
+     "dropped": [],
+     "added": []
+    },
+    "cf": {
+     "dropped": [
+      "OCCP – high_income"
+     ],
+     "added": [
+      "SCHL – high_income"
+     ]
+    },
+    "dp": {
+     "dropped": [
+      "OCCP – high_income"
+     ],
+     "added": []
+    }
+   }
+  },
+  {
+   "method": "mst",
+   "dataset": "snake",
+   "role": "prefair_like",
+   "file": "mst_snake_prefair_like_eps1",
+   "protected": [
+    "citistat",
+    "female",
+    "wbhaom"
+   ],
+   "admissible": [
+    "cow1",
+    "ftptstat",
+    "gradeatn",
+    "hoursut",
+    "mind16",
+    "mocc10"
+   ],
+   "outcome": [
+    "high_income"
+   ],
+   "seeds": 5,
+   "epsilon": 1.0,
+   "changes": {
+    "none": {
+     "dropped": [],
+     "added": []
+    },
+    "ftu": {
+     "dropped": [],
+     "added": []
+    },
+    "cf": {
+     "dropped": [],
+     "added": []
+    },
+    "dp": {
+     "dropped": [
+      "gradeatn – high_income"
+     ],
+     "added": []
+    }
+   }
+  },
+  {
+   "method": "mst",
+   "dataset": "snake",
+   "role": "sex_only_broad_adm",
+   "file": "mst_snake_sex_only_broad_adm_eps1",
+   "protected": [
+    "female"
+   ],
+   "admissible": [
+    "ftptstat",
+    "gradeatn",
+    "hoursut",
+    "mocc10"
+   ],
+   "outcome": [
+    "high_income"
+   ],
+   "seeds": 5,
+   "epsilon": 1.0,
+   "changes": {
+    "none": {
+     "dropped": [],
+     "added": []
+    },
+    "ftu": {
+     "dropped": [],
+     "added": []
+    },
+    "cf": {
+     "dropped": [],
+     "added": []
+    },
+    "dp": {
+     "dropped": [
+      "gradeatn – high_income"
+     ],
+     "added": []
+    }
+   }
+  },
+  {
+   "method": "mst",
+   "dataset": "snake",
+   "role": "sex_race_narrow_adm",
+   "file": "mst_snake_sex_race_narrow_adm_eps1",
+   "protected": [
+    "female",
+    "wbhaom"
+   ],
+   "admissible": [
+    "gradeatn",
+    "hoursut"
+   ],
+   "outcome": [
+    "high_income"
+   ],
+   "seeds": 5,
+   "epsilon": 1.0,
+   "changes": {
+    "none": {
+     "dropped": [],
+     "added": []
+    },
+    "ftu": {
+     "dropped": [],
+     "added": []
+    },
+    "cf": {
+     "dropped": [],
+     "added": []
+    },
+    "dp": {
+     "dropped": [
+      "gradeatn – high_income"
+     ],
+     "added": []
+    }
+   }
+  },
+  {
+   "method": "mst",
+   "dataset": "sbo",
+   "role": "owner_demographics",
+   "file": "mst_sbo_owner_demographics_eps1",
+   "protected": [
+    "BORNUS1",
+    "ETH1",
+    "RACE1",
+    "SEX1",
+    "VET1"
+   ],
+   "admissible": [
+    "AGE1",
+    "EDUC1",
+    "ESTABLISHED",
+    "HOURS1",
+    "NUMOWNERS",
+    "PRMINC1",
+    "SECTOR",
+    "SELFEMP1"
+   ],
+   "outcome": [
+    "high_receipts"
+   ],
+   "seeds": 5,
+   "epsilon": 1.0,
+   "changes": {
+    "none": {
+     "dropped": [],
+     "added": []
+    },
+    "ftu": {
+     "dropped": [],
+     "added": []
+    },
+    "cf": {
+     "dropped": [],
+     "added": []
+    },
+    "dp": {
+     "dropped": [
+      "NUMOWNERS – PAYROLL_NOISY"
+     ],
+     "added": [
+      "ETH1 – FIPST",
+      "HOMEBASED – PAYROLL_NOISY"
+     ]
+    }
+   }
+  },
+  {
+   "method": "mst",
+   "dataset": "sbo",
+   "role": "sex_race_broad_adm",
+   "file": "mst_sbo_sex_race_broad_adm_eps1",
+   "protected": [
+    "RACE1",
+    "SEX1"
+   ],
+   "admissible": [
+    "EDUC1",
+    "EMPLOYMENT_NOISY",
+    "ESTABLISHED",
+    "HOURS1",
+    "NUMOWNERS",
+    "SECTOR"
+   ],
+   "outcome": [
+    "high_receipts"
+   ],
+   "seeds": 5,
+   "epsilon": 1.0,
+   "changes": {
+    "none": {
+     "dropped": [],
+     "added": []
+    },
+    "ftu": {
+     "dropped": [],
+     "added": []
+    },
+    "cf": {
+     "dropped": [],
+     "added": []
+    },
+    "dp": {
+     "dropped": [
+      "BORNUS1 – RACE1",
+      "SECTOR – SEX1",
+      "SEX1 – VET1"
+     ],
+     "added": [
+      "ETH1 – FIPST",
+      "RACE1 – SEX1"
+     ]
+    }
+   }
+  },
+  {
+   "method": "mst",
+   "dataset": "sbo",
+   "role": "sex_race_no_sector",
+   "file": "mst_sbo_sex_race_no_sector_eps1",
+   "protected": [
+    "ETH1",
+    "RACE1",
+    "SEX1"
+   ],
+   "admissible": [
+    "EDUC1",
+    "ESTABLISHED",
+    "HOURS1"
+   ],
+   "outcome": [
+    "high_receipts"
+   ],
+   "seeds": 5,
+   "epsilon": 1.0,
+   "changes": {
+    "none": {
+     "dropped": [],
+     "added": []
+    },
+    "ftu": {
+     "dropped": [],
+     "added": []
+    },
+    "cf": {
+     "dropped": [],
+     "added": []
+    },
+    "dp": {
+     "dropped": [
+      "BORNUS1 – ETH1",
+      "BORNUS1 – RACE1",
+      "SECTOR – SEX1",
+      "SEX1 – VET1"
+     ],
+     "added": [
+      "ETH1 – RACE1",
+      "ETH1 – SEX1",
+      "RACE1 – SEX1"
+     ]
+    }
+   }
+  },
+  {
+   "method": "mst",
+   "dataset": "acspubcov_ca",
+   "role": "eligibility_adm",
+   "file": "mst_acspubcov_ca_eligibility_adm_eps1",
+   "protected": [
+    "HISP",
+    "NATIVITY",
+    "RAC1P",
+    "SEX"
+   ],
+   "admissible": [
+    "AGEP",
+    "DIS",
+    "ESR",
+    "FER",
+    "PINCP"
+   ],
+   "outcome": [
+    "public_coverage"
+   ],
+   "seeds": 5,
+   "epsilon": 1.0,
+   "changes": {
+    "none": {
+     "dropped": [],
+     "added": []
+    },
+    "ftu": {
+     "dropped": [],
+     "added": []
+    },
+    "cf": {
+     "dropped": [],
+     "added": []
+    },
+    "dp": {
+     "dropped": [
+      "ESR – public_coverage"
+     ],
+     "added": []
+    }
+   }
+  },
+  {
+   "method": "mst",
+   "dataset": "acspubcov_ca",
+   "role": "race_only_broad_adm",
+   "file": "mst_acspubcov_ca_race_only_broad_adm_eps1",
+   "protected": [
+    "HISP",
+    "RAC1P"
+   ],
+   "admissible": [
+    "AGEP",
+    "CIT",
+    "DIS",
+    "ESR",
+    "FER",
+    "MAR",
+    "PINCP",
+    "SCHL"
+   ],
+   "outcome": [
+    "public_coverage"
+   ],
+   "seeds": 5,
+   "epsilon": 1.0,
+   "changes": {
+    "none": {
+     "dropped": [],
+     "added": []
+    },
+    "ftu": {
+     "dropped": [],
+     "added": []
+    },
+    "cf": {
+     "dropped": [],
+     "added": []
+    },
+    "dp": {
+     "dropped": [
+      "ESR – public_coverage"
+     ],
+     "added": []
+    }
+   }
+  },
+  {
+   "method": "mst",
+   "dataset": "acspubcov_ca",
+   "role": "disability_protected_narrow_adm",
+   "file": "mst_acspubcov_ca_disability_protected_narrow_adm_eps1",
+   "protected": [
+    "DIS",
+    "HISP",
+    "RAC1P",
+    "SEX"
+   ],
+   "admissible": [
+    "AGEP",
+    "PINCP"
+   ],
+   "outcome": [
+    "public_coverage"
+   ],
+   "seeds": 5,
+   "epsilon": 1.0,
+   "changes": {
+    "none": {
+     "dropped": [],
+     "added": []
+    },
+    "ftu": {
+     "dropped": [
+      "DIS – public_coverage"
+     ],
+     "added": [
+      "DIS – ESR"
+     ]
+    },
+    "cf": {
+     "dropped": [
+      "DIS – public_coverage"
+     ],
+     "added": [
+      "AGEP – DIS"
+     ]
+    },
+    "dp": {
+     "dropped": [
+      "DIS – public_coverage",
+      "ESR – public_coverage"
+     ],
+     "added": [
+      "DIS – ESR"
+     ]
+    }
+   }
+  },
+  {
+   "method": "mst",
+   "dataset": "acspubcov_tx",
+   "role": "eligibility_adm",
+   "file": "mst_acspubcov_tx_eligibility_adm_eps1",
+   "protected": [
+    "HISP",
+    "NATIVITY",
+    "RAC1P",
+    "SEX"
+   ],
+   "admissible": [
+    "AGEP",
+    "DIS",
+    "ESR",
+    "FER",
+    "PINCP"
+   ],
+   "outcome": [
+    "public_coverage"
+   ],
+   "seeds": 5,
+   "epsilon": 1.0,
+   "changes": {
+    "none": {
+     "dropped": [],
+     "added": []
+    },
+    "ftu": {
+     "dropped": [],
+     "added": []
+    },
+    "cf": {
+     "dropped": [],
+     "added": []
+    },
+    "dp": {
+     "dropped": [
+      "ESR – public_coverage"
+     ],
+     "added": []
+    }
+   }
+  },
+  {
+   "method": "mst",
+   "dataset": "acspubcov_tx",
+   "role": "race_only_broad_adm",
+   "file": "mst_acspubcov_tx_race_only_broad_adm_eps1",
+   "protected": [
+    "HISP",
+    "RAC1P"
+   ],
+   "admissible": [
+    "AGEP",
+    "CIT",
+    "DIS",
+    "ESR",
+    "FER",
+    "MAR",
+    "PINCP",
+    "SCHL"
+   ],
+   "outcome": [
+    "public_coverage"
+   ],
+   "seeds": 5,
+   "epsilon": 1.0,
+   "changes": {
+    "none": {
+     "dropped": [],
+     "added": []
+    },
+    "ftu": {
+     "dropped": [],
+     "added": []
+    },
+    "cf": {
+     "dropped": [],
+     "added": []
+    },
+    "dp": {
+     "dropped": [
+      "ESR – public_coverage"
+     ],
+     "added": []
+    }
+   }
+  },
+  {
+   "method": "mst",
+   "dataset": "acspubcov_tx",
+   "role": "disability_protected_narrow_adm",
+   "file": "mst_acspubcov_tx_disability_protected_narrow_adm_eps1",
+   "protected": [
+    "DIS",
+    "HISP",
+    "RAC1P",
+    "SEX"
+   ],
+   "admissible": [
+    "AGEP",
+    "PINCP"
+   ],
+   "outcome": [
+    "public_coverage"
+   ],
+   "seeds": 5,
+   "epsilon": 1.0,
+   "changes": {
+    "none": {
+     "dropped": [],
+     "added": []
+    },
+    "ftu": {
+     "dropped": [
+      "DIS – public_coverage"
+     ],
+     "added": [
+      "DIS – ESR"
+     ]
+    },
+    "cf": {
+     "dropped": [
+      "DIS – public_coverage"
+     ],
+     "added": [
+      "AGEP – DIS"
+     ]
+    },
+    "dp": {
+     "dropped": [
+      "DIS – public_coverage",
+      "ESR – public_coverage"
+     ],
+     "added": [
+      "DIS – ESR"
+     ]
+    }
+   }
+  },
+  {
+   "method": "mst",
+   "dataset": "cdc_diabetes",
+   "role": "ses_clinical_adm",
+   "file": "mst_cdc_diabetes_ses_clinical_adm_eps1",
+   "protected": [
+    "Education",
+    "Income",
+    "Sex"
+   ],
+   "admissible": [
+    "Age",
+    "BMI",
+    "HeartDiseaseorAttack",
+    "HighBP",
+    "HighChol",
+    "Stroke"
+   ],
+   "outcome": [
+    "Diabetes_binary"
+   ],
+   "seeds": 5,
+   "epsilon": 1.0,
+   "changes": {
+    "none": {
+     "dropped": [],
+     "added": []
+    },
+    "ftu": {
+     "dropped": [],
+     "added": []
+    },
+    "cf": {
+     "dropped": [],
+     "added": []
+    },
+    "dp": {
+     "dropped": [
+      "Age – HeartDiseaseorAttack",
+      "Diabetes_binary – HighBP"
+     ],
+     "added": [
+      "Age – AnyHealthcare",
+      "DiffWalk – Stroke"
+     ]
+    }
+   }
+  },
+  {
+   "method": "mst",
+   "dataset": "cdc_diabetes",
+   "role": "sex_only_broad_adm",
+   "file": "mst_cdc_diabetes_sex_only_broad_adm_eps1",
+   "protected": [
+    "Sex"
+   ],
+   "admissible": [
+    "Age",
+    "BMI",
+    "DiffWalk",
+    "Fruits",
+    "GenHlth",
+    "HeartDiseaseorAttack",
+    "HighBP",
+    "HighChol",
+    "HvyAlcoholConsump",
+    "PhysActivity",
+    "Smoker",
+    "Stroke",
+    "Veggies"
+   ],
+   "outcome": [
+    "Diabetes_binary"
+   ],
+   "seeds": 5,
+   "epsilon": 1.0,
+   "changes": {
+    "none": {
+     "dropped": [],
+     "added": []
+    },
+    "ftu": {
+     "dropped": [],
+     "added": []
+    },
+    "cf": {
+     "dropped": [],
+     "added": []
+    },
+    "dp": {
+     "dropped": [
+      "Age – HeartDiseaseorAttack",
+      "BMI – Sex"
+     ],
+     "added": [
+      "Age – AnyHealthcare",
+      "DiffWalk – Stroke"
+     ]
+    }
+   }
+  },
+  {
+   "method": "mst",
+   "dataset": "cdc_diabetes",
+   "role": "ses_narrow_adm",
+   "file": "mst_cdc_diabetes_ses_narrow_adm_eps1",
+   "protected": [
+    "Education",
+    "Income",
+    "Sex"
+   ],
+   "admissible": [
+    "Age",
+    "BMI"
+   ],
+   "outcome": [
+    "Diabetes_binary"
+   ],
+   "seeds": 5,
+   "epsilon": 1.0,
+   "changes": {
+    "none": {
+     "dropped": [],
+     "added": []
+    },
+    "ftu": {
+     "dropped": [],
+     "added": []
+    },
+    "cf": {
+     "dropped": [
+      "Diabetes_binary – HighBP"
+     ],
+     "added": [
+      "BMI – Diabetes_binary"
+     ]
+    },
+    "dp": {
+     "dropped": [
+      "Age – HeartDiseaseorAttack",
+      "Diabetes_binary – HighBP"
+     ],
+     "added": [
+      "Age – AnyHealthcare",
+      "DiffWalk – Stroke"
+     ]
+    }
+   }
+  }
+ ]
+}

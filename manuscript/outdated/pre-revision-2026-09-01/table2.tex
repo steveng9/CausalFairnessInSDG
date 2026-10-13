@@ -1,0 +1,37 @@
+\begin{table}[t]
+\centering\footnotesize
+\caption{\textbf{Where to intervene, on identical data.} MST synthetic
+training data, real held-out test set, XGBoost, 5 seeds, all inside the
+benchmark code of \citet{angelozzi2026where}. Entries are $|$parity
+gap$|$\,/\,accuracy; \textbf{bold} marks the best value in each column at
+the displayed precision (lower gap, higher accuracy; ties bolded together).
+The eight comparison mitigators act on the released table or on the model
+trained from it; our three (\textbf{in-gen (ours)}) act inside the
+generator. Majority-class accuracy is $0.758$ (Adult) and $0.533$ (COMPAS),
+so learned fair representations buy their low gap by falling to it.}
+\label{tab:baselines}
+\begin{tabular}{llcccc}
+\toprule
+ & & \multicolumn{2}{c}{Adult} & \multicolumn{2}{c}{COMPAS} \\
+\cmidrule(lr){3-4}\cmidrule(lr){5-6}
+stage & intervention & $\varepsilon{=}1$ & $\varepsilon{=}10$ & $\varepsilon{=}1$ & $\varepsilon{=}10$ \\
+\midrule
+ & no mitigation        & 0.068 / 0.74 & 0.073 / 0.74 & 0.109 / \textbf{0.61} & 0.190 / 0.61 \\
+\addlinespace[2pt]
+pre  & Reweighing         & 0.087 / \textbf{0.75} & 0.085 / \textbf{0.75} & 0.132 / \textbf{0.61} & 0.093 / 0.61 \\
+pre  & Disp.\ impact rem. & 0.078 / 0.74 & 0.105 / 0.72 & 0.119 / \textbf{0.61} & 0.205 / \textbf{0.62} \\
+pre  & Learned fair repr. & 0.018 / 0.72 & 0.031 / 0.70 & 0.037 / 0.50 & 0.028 / 0.51 \\
+\addlinespace[2pt]
+in   & Exp.\ gradient     & 0.047 / 0.74 & 0.058 / 0.74 & 0.115 / \textbf{0.61} & 0.053 / 0.60 \\
+in   & Grid search        & 0.068 / 0.74 & 0.073 / 0.74 & 0.109 / \textbf{0.61} & 0.190 / 0.61 \\
+\addlinespace[2pt]
+post & Reject option      & 0.045 / 0.60 & 0.046 / 0.61 & 0.045 / 0.56 & 0.046 / 0.54 \\
+post & Equalised odds     & \textbf{0.009} / 0.71 & 0.015 / 0.72 & \textbf{0.024} / 0.58 & \textbf{0.023} / 0.59 \\
+post & Calib.\ eq.\ odds  & 0.049 / \textbf{0.75} & 0.040 / \textbf{0.75} & 0.485 / 0.56 & 0.415 / 0.57 \\
+\addlinespace[2pt]
+\textbf{in-gen (ours)} & FTU    & 0.073 / 0.74 & 0.062 / 0.74 & 0.087 / 0.53 & 0.155 / 0.61 \\
+\textbf{in-gen (ours)} & DemPar & 0.010 / \textbf{0.75} & \textbf{0.006} / \textbf{0.75} & 0.067 / 0.53 & 0.148 / \textbf{0.62} \\
+\textbf{in-gen (ours)} & CF     & 0.015 / \textbf{0.75} & 0.029 / 0.74 & 0.111 / 0.59 & 0.155 / 0.61 \\
+\bottomrule
+\end{tabular}
+\end{table}

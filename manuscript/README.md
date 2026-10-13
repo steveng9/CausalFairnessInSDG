@@ -1,64 +1,51 @@
 # Manuscript
 
-Two NeurIPS 2026 workshop submissions from one source tree.
+One paper, two workshop submissions. 4 pages, NeurIPS 2026 workshop template.
 
-| file | what it is |
+## Files
+
+| File | What it is |
 |---|---|
-| `main.tex` | master document; everything shared between the two submissions |
-| `workshop-ai4good.tex` | AI4Good title / venue / abstract / intro / discussion |
-| `workshop-privacy.tex` | PriLOM title / venue / abstract / intro / discussion |
-| `table1.tex` | Table 1, matched-pairs effects by family x mechanism |
-| `refs.bib` | 22 entries, each verified against the primary source |
-| `make_figs.py` | regenerates `figs/results.pdf` from `../report/data/all_runs.csv` |
+| `main.tex` | **The master.** Everything shared between both submissions. |
+| `workshop-ai4good.tex` | AI4Good variant: title, venue, abstract, intro, discussion. |
+| `workshop-privacy.tex` | "Privacy in the Era of Large Opaque Models" variant, same five macros. |
+| `table1.tex` | Table 1 (matched-pairs fairness results). Shared. |
+| `refs.bib` | Bibliography. Every entry checked against the primary source 2026-08-22. |
+| `figs/*.pdf` | Figures, produced by `make_figs.py`. |
+| `make_figs.py` | Regenerates every figure from `../report/data/all_runs.csv`. |
 
-## Switching submissions
+## Switching workshops
 
-One line at the top of `main.tex`:
+Top of `main.tex`, comment/uncomment one line:
 
 ```latex
 \newcommand{\WKFILE}{workshop-ai4good}
 %\newcommand{\WKFILE}{workshop-privacy}
 ```
 
-Each workshop file defines exactly five macros (`\wkTitle`, `\wkVenue`,
-`\wkAbstract`, `\wkIntro`, `\wkDiscussion`) and nothing else.
+Each workshop file defines exactly five macros — `\wkTitle`, `\wkVenue`,
+`\wkAbstract`, `\wkIntro`, `\wkDiscussion` — and nothing else. To retune a
+submission, edit only that file.
 
-## Anonymity
-
-Handled by the package option, so the real author block can stay in the source
-permanently. `dblblindworkshop` prints "Anonymous Author(s)" and ignores
-`\author` entirely; swap to `sglblindworkshop` for a single-blind venue or the
-camera-ready.
-
-AI4Good is confirmed **double-blind**, 2-9 pages excluding references,
-non-archival. PriLOM's limit was not published at the time of writing --
-check before submitting.
+Both are set up as `[dblblindworkshop]`. If either turns out to be single-blind,
+swap the package option in `main.tex` and fill in the `\author` block.
 
 ## Building
 
-No system LaTeX on this box. A self-contained `tectonic` binary works (download the static musl release from
-the tectonic GitHub releases page):
-
-```bash
-tectonic -X compile main.tex --outdir build
+```
+pdflatex main && bibtex main && pdflatex main && pdflatex main
 ```
 
-Current lengths (body, i.e. excluding references): AI4Good ~4.9 pages,
-PriLOM ~5.9 pages.
+(There is no TeX installation on this machine — the .tex has not been compiled.)
 
 ## Figures
 
-`figs/results.pdf` is generated: `python make_figs.py`. Three panels, one float:
-(a) 2-way TVD, (b) accuracy over the majority-class baseline, (c) CF effect
-against epsilon. Colour means generator family in all three panels.
+```
+python make_figs.py     # writes figs/fidelity.pdf and figs/fairness.pdf
+```
 
-**Figure 1 is a placeholder** awaiting the author's causal-pruning schematic
-(`main.tex`, the `\fbox{\parbox...}` block). Target <= 0.85in tall. Note the
-demographic-parity mechanism is called **DemPar** throughout, not DP; DP means
-differential privacy only.
+Reads `../report/data/all_runs.csv`, filters `superseded == False` (2,520 active
+runs), and prints the Table 1 numbers to stdout so the table can be re-checked
+against the data.
 
-## Naming conventions used throughout
-
-- **DP** = differential privacy. **DemPar** = demographic parity (DECAF's "DP").
-- **marginals-based** (plural), never "marginal-based".
-- No em dashes anywhere in the body text.
+Figure 1 is a **placeholder** — the causal-pruning schematic goes there.

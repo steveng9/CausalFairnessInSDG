@@ -184,8 +184,8 @@ NCOL={'S':'#f6d9cc','A':'#d6ead9','Z':'#eceae4','Y':'#d3e2f7'}
 NEC={'S':ORANGE,'A':AQUA,'Z':MUT,'Y':BLUE}
 RED='#cf2f2f'
 fig,axes=plt.subplots(1,3,figsize=(5.5,1.42))
-for ax,mech in zip(axes,['FTU','DemPar','CF']):
-    ax.set_xlim(-0.02,1.16); ax.set_ylim(-0.10,1.10); ax.axis('off')
+for ax,mech in zip(axes,['FTU','CF','DemPar']):
+    ax.set_xlim(-0.20,1.16); ax.set_ylim(-0.10,1.10); ax.axis('off')
     for u,v in EDGES:
         cut=(u,v) in CUTS[mech]
         x0,y0=NODES[u]; x1,y1=NODES[v]
@@ -203,6 +203,6 @@ for ax,mech in zip(axes,['FTU','DemPar','CF']):
                                 lw=0.8,zorder=3))
         ax.text(x,y,n,ha='center',va='center',fontsize=7.0,color=INK,zorder=4)
     ax.set_title(f'\\textbf{{{mech}}}' if False else mech,fontsize=7.6,color=INK,pad=1.5)
-    ax.text(0.5,-0.085,SUB[mech],ha='center',fontsize=6.2,color=INK2)
+    ax.text(0.48,-0.085,SUB[mech],ha='center',fontsize=6.2,color=INK2)
 fig.savefig(f'{OUT}/pruning.pdf'); plt.close(fig)
 print('wrote figs/pruning.pdf')

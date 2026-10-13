@@ -1,0 +1,126 @@
+% =====================================================================
+%  AI4Good workshop variant.
+%  Defines everything main.tex pulls in: title, venue string, abstract,
+%  introduction, discussion. Nothing else in the paper changes.
+% =====================================================================
+
+\newcommand{\wkTitle}{Portable Causal Fairness Across \\
+Synthetic Data Generator Families}
+
+\newcommand{\wkVenue}{AI for Good}
+
+% ---------------------------------------------------------------- abstract
+\newcommand{\wkAbstract}{%
+Institutions that release synthetic data in place of sensitive records, such as
+a hospital, a lending regulator or a statistical agency, choose the process
+that generates the table, and can shape that process so unfair pathways are
+absent. DECAF made this concrete for one GAN: factor the generator along a
+causal graph, sever the edges from a protected attribute to an outcome, and
+three fairness definitions become three sets of edge cuts. But DECAF is a
+single GAN, carrying no privacy guarantee and no competitive data-quality
+story, and the mechanism has never been shown to work in any other
+architecture. We ask whether it belongs to DECAF or to causal factorisation
+itself, porting all three definitions to nine generators from three unrelated
+families (marginals-based, GAN-based and diffusion-based, each with
+differentially private variants) across 2{,}520 matched-pair runs on the Adult
+and COMPAS datasets. The definitions transfer everywhere: cutting edges
+reduces downstream disparity in every family, dataset and privacy level. The
+utility cost is small (under two accuracy points for the cuts worth making in
+five of six family--dataset cells), and the privacy cost is nil in the
+marginals family, because a severed edge is never measured under the privacy
+budget. In this setting privacy and fairness turn out to behave close to
+independently rather than adversarially. Causal fairness is now available
+inside a modern differentially private synthesizer and inside a diffusion
+backbone, not only inside one GAN.%
+}
+
+% ------------------------------------------------------------------- intro
+\newcommand{\wkIntro}{%
+Institutions holding sensitive records increasingly publish a synthetic
+substitute rather than the records themselves: a hospital, a lending regulator
+or a statistical agency fits a generative model and releases a table drawn from
+it \martine{Include some citations to give this statement more credibility, e.g., the U.S.-U.K.~PETs Prize Challenge and the V-CHAMPS challenge \cite{vos2024,V-CHAMPS}),...}. That substitution is usually justified on privacy grounds, but it carries a
+second, less-exploited consequence. Whoever generates the data chooses the
+generating process, and a process can be edited. A disparity that exists in the
+world because of a pathway running from a protected attribute, such as national
+origin, to an outcome, such as whether a loan is approved, need not exist in
+the released table.
+
+The cleanest existing realisation of that lever is
+DECAF~\citep{vanbreugel2021decaf}, which factors a generator along a causal
+graph so that severing an edge at sampling time makes the generator
+structurally unable to use the pathway it named. But DECAF is a single
+non-private WGAN-GP~\citep{gulrajani2017wgangp}, whose released tables trail
+modern differentially private marginals-based synthesizers and modern
+diffusion models on the fidelity and utility benchmarks that decide what
+institutions actually deploy \textcolor{red}{(Sec.~\ref{sec:results})}. Whether the fairness mechanism is confined to
+that one architecture, or is a property of causal factorisation itself, is
+therefore a practical question and not \textcolor{red}{merely} an academic one: it decides whether an
+institution deploying synthetic data has the intervention available at all.
+
+We ask two questions of that mechanism. Is edge surgery a property of DECAF,
+or of the causal factorisation any such generator uses? And can it be attached
+to a generator whose graph is not a supplied causal DAG but the undirected
+marginal-dependency graph a differentially private synthesizer builds from
+noisy counts? The stakes are practical: if the mechanism that would make a
+released table fair is confined to a generator no institution would actually
+deploy, it might as well not exist.%
+}
+
+% -------------------------------------------------------------- discussion
+\newcommand{\wkDiscussion}{%
+
+\martine{Do you have a good sense of what method you would use to generate synthetic data? Is my impression correct that the fairness mechanism that you investigated destroys utility, so there is not much point in releasing synthetic data that was generated with it?} \s{this was not my impression of what the fairness mechanism does to utility in our experiments. It's not currently clear, and needs to be made clearer in the wording throughout, if it does not greatly hurt utility; i.e. is it worth it? Which generator would be use based on these? A marginals-based one? A diffusion-based? What gives us the best trade-off for privacy and what for utility? These are the strong conclusions that will help a reader at the AI4Good workshop see out impact. I think many of the following conclusions are too contingent and complex for much impact / holding the reader's attention.}
+
+\textbf{Edge surgery belongs to causal factorisation, not to DECAF.} DECAF
+conjectured that its mechanism would extend beyond its own GAN but tested no
+other generator. It extends: across nine generators from three unrelated
+families, both datasets and every privacy budget, severing edges reduces
+downstream disparity, and FTU, DemPar and CF compile to the same edge cuts on
+a diffusion backbone and on a differentially private marginals synthesizer as
+they do on the original GAN. An institution can now choose a synthesizer for
+its fidelity, privacy or maturity and keep the fairness lever, instead of being
+pushed onto a non-private GAN to get it.
+
+\textbf{Privacy and fairness barely interact here, and in the marginals family
+the fairness cut costs no privacy at all.} \hl{The textbook expectation is a
+trade-off,} \martine{if by ``textbook'' you mean Eugene's paper, then carefully reconsider whether that textbook explanation actually applies to your fairness definition} with tighter privacy blunting any attempt to close the parity gap.
+We see the opposite: the cut removes at least as much disparity under the tight
+$\varepsilon{=}1$ budget as under a permissive one. And in a marginals-based
+synthesizer the cut is free in the privacy accounting, because an edge the
+definition forbids is simply never measured under the budget, a property
+DECAF's GAN cannot offer since it pays for every column it draws. For an
+institution already publishing under a privacy guarantee, fairness here is
+close to a free addition rather than a competing demand.
+
+\textbf{How much the cut removes is set by the graph, not the generator.} The
+definition is identical everywhere; its effect size is not, for a simple
+reason. A hand-supplied causal DAG routes a protected attribute to the outcome
+through many edges, leaving a large disparity to sever; a private marginals
+graph is sparse by construction and often carries that dependence faintly or
+not at all. On Adult, FTU on MST is a literal no-op in all $45$ matched pairs,
+because the private structure search never buys the direct
+\texttt{sex}$\rightarrow$\texttt{income} edge in the first place: the
+constraint is satisfied before it is imposed. So the question an auditor should
+ask of a release is not which generator produced it, but which graph it was
+sampled along and which attributes were nominated admissible.
+
+\textbf{Only the in-generator cut ships with the table.} Where a private
+structure encodes little to sever, as on COMPAS, downstream mitigators remain
+the stronger tool. But a public table is used by consumers its publisher will
+never meet, and of the four places to intervene the in-generator cut is the
+only one that travels with the release and cannot be dropped by whoever trains
+the next model on it. The two are complements: the publisher should apply the
+cut wherever the graph gives it something to sever.
+
+\textbf{Conclusion.} Synthetic data is increasingly the vehicle through which
+institutions share what they know for the public good, as when a hospital, a
+regulator or a statistical agency releases a table so that others can build on
+it. Our results show that the fairness of such a release need not be left to
+whoever eventually trains a model on it, nor traded against the privacy and
+fidelity these institutions rightly demand: a single causal edit, portable
+across the synthesizers they actually deploy, can remove an unfair pathway
+before the data ever leaves the building. Making that lever available wherever
+data is generated is a small but concrete step toward synthetic releases that
+are fair by construction.%
+}

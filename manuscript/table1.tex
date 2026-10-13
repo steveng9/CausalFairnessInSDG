@@ -1,33 +1,39 @@
 \begin{table}[t]
-  \caption{Matched-pairs change in the worst-case demographic-parity gap from
-  applying each mechanism, pooled within generator family. \emph{end} is the
-  gap that remains after the mechanism; $\Delta$\,gap is the mean paired
-  change with a 95\% CI (negative = gap shrunk); $\Delta$\,acc is the paired
-  MLP-accuracy change. Base (no-mechanism) gaps are in the family headers.}
+  \caption{Matched-pairs effect of each mechanism on the worst-case
+  demographic-parity gap, pooled within generator family, restricted to trials
+  where the no-mechanism release lets a downstream random forest reach
+  $\mathrm{AUC}>0.6$ (so that ``fairness'' is not a trivial artefact of
+  collapsed learning). \emph{gap} and \emph{AUC} are what remains after the
+  mechanism, both measured on real held-out people; the parenthesised value
+  beside each is the mean \emph{paired} change against the identical run with
+  no mechanism (negative $=$ the gap shrank), with a $95\%$ CI on the gap.
+  Each family header gives its no-mechanism gap and AUC on
+  Adult\,/\,COMPAS. $\dagger$ marks a generator carrying a differential-privacy
+  guarantee; those run at $\varepsilon{=}10$.}
   \label{tab:fairness}
   \centering
   \footnotesize
-  \setlength{\tabcolsep}{5pt}
-  \begin{tabular}{l ccc c ccc}
+  \setlength{\tabcolsep}{4pt}
+  \begin{tabular}{l cc c cc}
     \toprule
-    & \multicolumn{3}{c}{\textbf{Adult}} & & \multicolumn{3}{c}{\textbf{COMPAS}} \\
-    \cmidrule(lr){2-4} \cmidrule(lr){6-8}
-    Mech. & end & $\Delta$\,gap & $\Delta$\,acc & & end & $\Delta$\,gap & $\Delta$\,acc \\
+    & \multicolumn{2}{c}{\textbf{Adult}} & & \multicolumn{2}{c}{\textbf{COMPAS}} \\
+    \cmidrule(lr){2-3} \cmidrule(lr){5-6}
+    Mech. & gap ($\Delta$) & AUC ($\Delta$) & & gap ($\Delta$) & AUC ($\Delta$) \\
     \midrule
-    \multicolumn{8}{l}{\textit{Marginals-based} (MST, PrivBayes, PrivSyn), base gap 0.143 / 0.331, $n=135$} \\
-    FTU & 0.121 & $-0.022 \pm 0.020$ & $+0.002$ & & 0.254 & $-0.076 \pm 0.027$ & $+0.003$ \\
-    CF  & 0.087 & $-0.056 \pm 0.020$ & $-0.005$ & & 0.225 & $-0.106 \pm 0.027$ & $-0.011$ \\
-    DemPar & 0.071 & $-0.073 \pm 0.021$ & $-0.032$ & & 0.230 & $-0.101 \pm 0.029$ & $-0.033$ \\
+    \multicolumn{6}{l}{\textit{Marginals-based} (MST$^\dagger$, PrivBayes$^\dagger$, PrivSyn$^\dagger$); none: gap 0.210 / 0.234, AUC 0.794 / 0.662} \\
+    FTU    & 0.192 ($-0.019 \pm 0.022$) & 0.795 ($+0.002$) & & 0.192 ($-0.042 \pm 0.026$) & 0.666 ($+0.004$) \\
+    CF     & 0.125 ($-0.086 \pm 0.024$) & 0.737 ($-0.057$) & & 0.178 ($-0.056 \pm 0.033$) & 0.644 ($-0.018$) \\
+    DemPar & 0.103 ($-0.108 \pm 0.027$) & 0.640 ($-0.154$) & & 0.168 ($-0.066 \pm 0.034$) & 0.626 ($-0.036$) \\
     \addlinespace[2pt]
-    \multicolumn{8}{l}{\textit{Causal GAN} (DECAF, +CTGAN, +DP-GAN, +DP-CTGAN), base gap 0.074 / 0.238, $n=102/96$} \\
-    FTU & 0.072 & $-0.003 \pm 0.006$ & $-0.000$ & & 0.156 & $-0.081 \pm 0.028$ & $-0.002$ \\
-    CF  & 0.019 & $-0.055 \pm 0.019$ & $-0.001$ & & 0.134 & $-0.103 \pm 0.031$ & $-0.017$ \\
-    DemPar & 0.007 & $-0.068 \pm 0.021$ & $-0.003$ & & 0.094 & $-0.145 \pm 0.039$ & $-0.049$ \\
+    \multicolumn{6}{l}{\textit{Causal GAN} (DECAF, $+$CTGAN, $+$DP-GAN$^\dagger$, $+$DP-CTGAN$^\dagger$); none: gap 0.164 / 0.254, AUC 0.770 / 0.653} \\
+    FTU    & 0.144 ($-0.020 \pm 0.034$) & 0.762 ($-0.008$) & & 0.216 ($-0.039 \pm 0.032$) & 0.649 ($-0.004$) \\
+    CF     & 0.036 ($-0.128 \pm 0.033$) & 0.612 ($-0.158$) & & 0.219 ($-0.035 \pm 0.038$) & 0.620 ($-0.033$) \\
+    DemPar & 0.018 ($-0.147 \pm 0.032$) & 0.535 ($-0.235$) & & 0.160 ($-0.094 \pm 0.048$) & 0.554 ($-0.099$) \\
     \addlinespace[2pt]
-    \multicolumn{8}{l}{\textit{Causal diffusion} (DECAF+Diffusion, +DP-Diffusion), base gap 0.069 / 0.294, $n=60$} \\
-    FTU & 0.059 & $-0.010 \pm 0.014$ & $-0.004$ & & 0.193 & $-0.101 \pm 0.029$ & $-0.013$ \\
-    CF  & 0.015 & $-0.055 \pm 0.017$ & $-0.015$ & & 0.160 & $-0.134 \pm 0.034$ & $-0.033$ \\
-    DemPar & 0.003 & $-0.066 \pm 0.016$ & $-0.007$ & & 0.126 & $-0.167 \pm 0.034$ & $-0.088$ \\
+    \multicolumn{6}{l}{\textit{Causal diffusion} ($+$Diffusion, $+$DP-Diffusion$^\dagger$); none: gap 0.159 / 0.218, AUC 0.805 / 0.647} \\
+    FTU    & 0.159 ($-0.001 \pm 0.009$) & 0.805 ($+0.000$) & & 0.156 ($-0.063 \pm 0.036$) & 0.633 ($-0.014$) \\
+    CF     & 0.039 ($-0.121 \pm 0.010$) & 0.622 ($-0.183$) & & 0.159 ($-0.060 \pm 0.036$) & 0.601 ($-0.045$) \\
+    DemPar & 0.025 ($-0.135 \pm 0.011$) & 0.493 ($-0.312$) & & 0.137 ($-0.081 \pm 0.043$) & 0.515 ($-0.132$) \\
     \bottomrule
   \end{tabular}
 \end{table}

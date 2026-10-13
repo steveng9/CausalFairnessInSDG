@@ -1,0 +1,129 @@
+% =====================================================================
+%  "Privacy in the Era of Large Opaque Models" workshop variant.
+%  Defines everything main.tex pulls in: title, venue string, abstract,
+%  introduction, discussion. Nothing else in the paper changes.
+% =====================================================================
+
+\newcommand{\wkTitle}{Privacy and Causal Fairness Are Nearly Orthogonal:
+Graph Surgery Across Three Generator Families}
+
+\newcommand{\wkVenue}{Privacy in the Era of Large Opaque Models}
+
+% ---------------------------------------------------------------- abstract
+\newcommand{\wkAbstract}{%
+A differentially private synthetic release is published so that nobody has to look
+at the real records again, which makes the release the only thing anyone can
+inspect, and makes what it fails to report a problem of its own. We study a
+fairness intervention inside that setting. DECAF achieves fair synthetic data by
+factoring a GAN's generator along a causal graph and severing the edges that carry
+disparity from a protected attribute to an outcome; it has no privacy mechanism,
+and the technique has never been shown to work anywhere but in DECAF. We port all three of its fairness definitions to nine generators across three
+families (marginals-based, GAN-based and diffusion-based, each with differentially
+private variants) over 2{,}520 matched-pair runs at $\varepsilon \in
+\{1,10,1000\}$. Three results. The definitions transfer to every family, though the
+potency does not: the cut removes $89\%$ of a causal diffusion backbone's disparity
+and $29\%$ of a marginals synthesizer's, because a private synthesizer has no
+supplied DAG to cut and must bind a structure that noise chose. Privacy and fairness
+behave as near-independent knobs: the parity-gap reduction at
+$\varepsilon{=}1$ is at least as large as at $\varepsilon{=}1000$ in eight of
+eleven generator-dataset cells, and in marginals-based methods the cut costs no
+privacy budget at all, because a severed edge is never measured. And DECAF's own argument that privacy follows for free by
+post-processing turns out to be sound accounting attached to an unusable output:
+the drop-in private discriminator leaves the released table with no signal at all
+(lift over the majority class $\le 0.001$) in $49\%$ of runs, a failure two
+unrelated changes each repair completely.%
+}
+
+% ------------------------------------------------------------------- intro
+\newcommand{\wkIntro}{%
+A differentially private synthetic release is an opaque object by construction.
+The point of publishing it is that the underlying records stay unseen, so every
+downstream question, including whether the data is useful and whether a model
+trained on it is biased, must be answered against the release itself or not at
+all. Two properties of that object therefore matter: what the privacy budget
+costs, and whether the release tells the truth about itself.
+
+Fairness sits awkwardly inside this picture. The standard intuition is a
+trade-off: DP noise falls hardest on the smallest groups, so tightening
+$\varepsilon$ should widen disparities and blunt any attempt to correct them.
+Meanwhile the most attractive fairness mechanism for generated data has no privacy
+story at all. DECAF \citep{vanbreugel2021decaf} factors a GAN's generator along a
+causal DAG, so severing an edge at sampling time makes the generator structurally
+unable to use it, and three fairness definitions become three sets of cuts. It is
+a single GAN with no privacy guarantee, and nothing about the mechanism has been
+demonstrated outside it.
+
+If causal fairness is available only from a generator that cannot offer
+differential privacy, the two goals are not merely in tension but architecturally
+incompatible. PreFair \citep{pujol2023prefair} shows the incompatibility is not
+fundamental, embedding one coarse fairness condition into the private structure
+search of one synthesizer, but stops there: one definition, one algorithm, no
+evaluation on any other.
+
+We ask whether DECAF's edge surgery is a property of DECAF or of causal
+factorisation, and what a privacy budget does to it, attaching all three
+definitions to nine generators from three unrelated families. That includes
+marginals-based synthesizers, where a severed edge is never privately measured in
+the first place.%
+}
+
+% -------------------------------------------------------------- discussion
+\newcommand{\wkDiscussion}{%
+\textbf{Post-processing is an accounting argument, not a guarantee that anything
+comes out.} DECAF states that it ``can be directly used for generating private
+synthetic data by replacing the standard discriminator by a differentially private
+discriminator,'' citing the post-processing theorem. The privacy claim is
+correct and we do not dispute it. What our runs show is that the sentence is
+nonetheless the wrong advice: done literally, it produces a table carrying no
+downstream signal in $49\%$ of runs across the two DP-GAN backbones, rising to
+$80\%$ for the DP-CTGAN backbone on COMPAS at $\varepsilon{=}1$. The failure
+is narrow and locatable. Keeping adversarial training but changing the data
+representation fixes it, and keeping the representation but dropping adversarial
+training for diffusion fixes it; two unrelated repairs of one symptom put the
+cause in DP-SGD applied to a weight-clipped critic. The general lesson is worth
+stating plainly, because this style of argument is common: post-processing
+composes privacy budgets, and says nothing whatever about whether the composed
+system still generates data. Papers that reach for it owe an experiment.
+
+\textbf{The fairness constraint is free in the accounting, but not in fidelity.}
+In the marginals-based family a severed edge is excluded from candidacy before the
+private structure search runs, so no $\varepsilon$ is ever spent measuring it; in
+the DECAF-style families the cut happens after training and is itself
+post-processing. Both are free in the privacy accounting, for different reasons,
+and against the standard picture in which fairness is a tax paid out of the privacy
+budget that is a strong negative result. It is worth being precise about what the
+freed budget does \emph{not} do, though: it does not buy a better-fitting release.
+Across the marginals-based generators, matched-pair 2-way TVD is slightly worse
+under the cut, by $0.008$ for DemPar, $0.003$ for CF and $0.001$ for FTU --- ordered
+by how much structure each removes.
+The reason is structural rather than accounting: MST fixes its per-round
+$\varepsilon$ from the number of edges a spanning tree needs, before selection
+begins, so excluding candidates leaves no extra budget for the edges that remain
+and merely shrinks the pool each round draws from. Prune hard enough and a round
+has no admissible candidate at all, so the model ends as a spanning forest rather
+than a tree --- less structure for the same $\varepsilon$. Fairness costs no
+privacy here; it still costs a little fidelity.
+
+\textbf{Opacity has a measurable direction, and it flatters.} DECAF's Definition 4
+warns that a distribution can look fair scored against itself and still yield
+disparate impact under the distribution the model is deployed into. We can put a
+number on it. Every fairness result above is measured against real held-out
+people; an analyst holding only the release must score the model against the
+synthetic data instead. Under DemPar on Adult, the release reports a parity gap of
+$0.010$ while the same models sit at $0.035$ against real people, a $3.5\times$
+understatement. The direction is the uncomfortable part: the distortion is
+\emph{largest} for the mechanism that most reduces the true gap, because the
+intervention acts on the generative process and so is fully realised in the
+synthetic distribution, while the deployed model meets a world still containing
+every proxy the generator suppressed. A private release used as its own audit
+substrate will certify models it should not, and the better the fairness
+mechanism, the more confidently it will do so. Reporting both references costs one
+extra evaluation on data the publisher already holds.
+
+\textbf{A tight privacy budget manufactures fairness that is not there.} On Adult
+at $\varepsilon{=}10$, both private GAN backbones report a parity gap of $0.000$
+before any mechanism is applied, with lift at or below $0.001$ over the majority
+class. A table that teaches a classifier nothing contains no disparity to find.
+Any privacy-fairness benchmark that reports gaps without utility beside them is
+unfalsifiable in exactly the regime it exists to study.%
+}
