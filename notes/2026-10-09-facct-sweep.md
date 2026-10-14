@@ -443,3 +443,93 @@ role splits. First step: fill the epsilon grid for MST, PrivBayes and PrivSyn.
   on the graph decision in §13, and AIM.
 - Analysis to do afterwards (plan §1e): separate DP noise shrinking the baseline gap
   from the mechanism's own effect at each epsilon.
+
+## 15. Queued, 2026-10-13/14 — downstream baseline, MAMA-MIA, hand-graph torch, DP causal
+
+Steven, 2026-10-13: four additions. Nothing new was started while the CPU share
+(cores 32-47, 14 workers) was full; everything below sits in one queue,
+`sweeps/chain-cpu-2026-10-14.sh`, which starts when `facct-eps-a` ends.
+
+**State of the graph sources before this (the question behind item 3).** Nothing was
+replaced. The discovered-graph batch is a separate batch; the hand-graph sweep
+`facct-2026-10-09` simply never contained the torch families (they were held for the
+graph decision, §13).
+
+| Family | Hand-drawn graphs (`facct-2026-10-09`) | Discovered graphs (`facct-fges-2026-10-13`) |
+|---|---|---|
+| TabPFN causal | done, 660 runs | queued on GPU 1 behind the partial-cut batches |
+| GAN (`decaf`), CTGAN, Diffusion | **not run until now** (pilots only) | done, 1,977 of 1,980 |
+| DP GAN / CTGAN / Diffusion | not run until now | not planned (non-private graph voids the guarantee) |
+| MST, PrivBayes, PrivSyn | not applicable: they select their own graph | same |
+
+**1. Angelozzi & Arcolezi's eight mitigators on the FAccT datasets** (`baselines/`).
+- `facct_bench.py export` writes our splits and a manifest; `facct_bench.py cell`
+  lays one arm's saved synthetic tables out in their format, calls their unmodified
+  `benchmark()` through `run_bench_facct.py` (env `dpfair`), and deletes the copies;
+  `launch_facct_grid.sh` fans cells out; `facct_bench.py collect` writes
+  `report/data/facct/angelozzi_mitigators.csv`.
+- One benchmark dataset per (dataset, protected attribute), 43 in all, attribute
+  binarised majority-versus-rest, privileged = the group with the higher real rate of
+  outcome 1. Arms: `<generator>-none` (their mitigators on our no-mechanism release:
+  the downstream baseline) and `<generator>-<mechanism>@<role split>` (our mechanism
+  scored by their protocol). XGBoost, their pairing for MST. Seeds 0-4, the sweep's
+  splits; their loader halves our holdout into calibration and test.
+- Grid: 1,192 cells from the four generators now in the main sweep (172 no-mechanism,
+  1,020 mechanism). A cell is 20 passes of 9 models (5 seeds x real + 3 epsilons) and
+  the trial cell took 19 minutes under full contention, far more than on their Adult
+  file (86 s for 11 passes), so the no-mechanism arms run first, MST's mechanism arms
+  next, and the remaining mechanism arms last of all.
+- Trial cell (`acsincome_ca__SEX`, `mst-none`): real-data parity gap 0.132 at accuracy
+  0.817; on the epsilon-1 release 0.079 unmitigated, 0.025 after calibrated equalised
+  odds, 0.039 after reject-option, at accuracy 0.75-0.76 against 0.764. As on their
+  Adult file, grid-search reduction changes nothing and LFR collapses to one class;
+  here XGBoost then refuses to fit and their harness logs the LFR row as an error.
+- The upstream clone had disappeared from `baselines/`; re-cloned (MIT licence,
+  git-ignored, 2.3 GB). `facct_data/` and `facct_output/` are git-ignored.
+- Differences from the Adult/COMPAS comparison: their own `mst`/`aim` releases do not
+  exist for these datasets, so the baseline arm is our generator's no-mechanism table;
+  no half-epsilon control.
+
+**2. MAMA-MIA on every saved table** (`scripts/mama_mia.py`).
+- Both flavours from `~/SyntheticData_MIA/conduct_attacks.py`, reimplemented against
+  our tables: `mst` (weighted marginal ratios) and `privbayes` (conditional ratios).
+- Focal points come from each run's recorded graph. For the causal families that is
+  the DAG minus the edges the mechanism cut. For the conditional flavour MST's forest
+  is oriented from its first column; PrivSyn's graph has cycles, so only the marginal
+  flavour runs there.
+- Shadow modelling without new runs: the other seeds of the same cell are the same
+  algorithm on other 70% samples of the same population, so their recorded graphs give
+  the focal-point frequencies (4 shadows; thresholds as in the paper). An `oracle` row
+  (the run's own graph) is recorded beside every `shadow` row.
+- Threat model: auxiliary data = the whole dataset (overlapping, the paper's main
+  setting); targets = all holdout rows plus as many training rows.
+- Output `sweeps/<batch>/mama_mia/<shard>.csv`: AUC, TPR at 10% / 1% / 0.1% FPR,
+  membership advantage. About 0.15 s a run.
+- Trial on five shards (seed 0): ACSIncome CA, MST, marginal flavour AUC 0.513 /
+  0.535 / 0.538 at epsilon 1 / 10 / 1000; PrivBayes, conditional flavour 0.51 / 0.58 /
+  0.63 (shadow), 0.52 / 0.59 / 0.66 (oracle); TabPFN causal 0.506 (marginal), 0.517
+  (conditional). The mechanisms move these by under 0.01 on that dataset.
+
+**3 and 4. Torch causal families on the hand-drawn graphs, and their DP variants.**
+- Added to `facct-2026-10-09`: `decaf`, `decaf_ctgan`, `decaf_diffusion` (1,980 runs,
+  about 6 hours) and `decaf_dpgan`, `decaf_dpctgan`, `decaf_dpdiffusion` at epsilon 1,
+  10, 1000 (5,940 runs; rough estimate 15 hours from the September Adult timings).
+- The DP variants run on the hand graphs only: a fixed, data-independent graph keeps
+  the guarantee. Their epochs for the ACS, CDC and HMDA datasets are SNAKE's, untuned.
+
+**Queue order** (`sweeps/chain-cpu-2026-10-14.sh`): Angelozzi no-mechanism arms;
+MAMA-MIA; hand-graph torch; Angelozzi MST mechanism arms; DP causal; the three SNAKE
+PrivBayes shards of `facct-eps-a` that were killed (signal 9, 63 runs); Angelozzi
+no-mechanism arms for the new families; MAMA-MIA again; `facct-eps-b`; remaining
+Angelozzi mechanism arms. `facct-eps-b` (epsilon 0.3, 3, 30, 300, the "if time permits"
+half) was moved to the back with a `hold` key in its `sweep.json`, a new option of
+`sweep.py run`; at the observed rate it needs well over a day, not the 10 hours
+estimated in §14.
+
+```
+tail sweeps/chain-cpu-2026-10-14.log baselines/logs/facct_grid.log sweeps/mama_mia.log
+python scripts/sweep.py status --batch facct-2026-10-09
+```
+
+Known failures to revisit: `facct-fges` `hmda_tx` / `decaf` / seed 4, DP and CF cuts
+(3 runs, the synthetic outcome has a class with one member).

@@ -38,6 +38,8 @@ experiments.db
 /sweeps/*/locks/
 /sweeps/*/fairpfn_baseline/inputs/
 /sweeps/*/fairpfn_baseline/preds/
+/sweeps/*/preds/
+/sweeps/*/worker-*.log
 /sweeps/*.log
 /sweeps/*/*.out
 manuscript/build/
@@ -58,3 +60,5 @@ logs/
 baselines/dp-fair-intervention-benchmark/
 baselines/output/
 baselines/logs/
+baselines/facct_data/
+baselines/facct_output/

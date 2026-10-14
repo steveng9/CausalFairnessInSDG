@@ -1,0 +1,131 @@
+diff --git a/sweeps/facct-2026-10-09/fairpfn_baseline/run.log b/sweeps/facct-2026-10-09/fairpfn_baseline/run.log
+index 323d9d3..4959d04 100644
+--- a/sweeps/facct-2026-10-09/fairpfn_baseline/run.log
++++ b/sweeps/facct-2026-10-09/fairpfn_baseline/run.log
+@@ -2900,3 +2900,51 @@ snake s4 mst_eps1000 n=10000 female: done auc=0.664 dp@matched=-0.083 2.1s
+ 
+Running inference:   0%|          | 0/1 [00:00<?, ?batch/s]
+Running inference: 100%|██████████| 1/1 [00:01<00:00,  1.62s/batch]
+Running inference: 100%|██████████| 1/1 [00:01<00:00,  1.62s/batch]
+ snake s4 mst_eps1000 n=10000 wbhaom: done auc=0.634 dp@matched=-0.134 2.12s
+ fairpfn baseline complete
++
+Running inference:   0%|          | 0/1 [00:00<?, ?batch/s]Using CUDA, but Triton is not available. Falling back to PyTorch, this will be slower. Install Triton to enable faster training.
++
+Running inference: 100%|██████████| 1/1 [00:02<00:00,  2.05s/batch]
+Running inference: 100%|██████████| 1/1 [00:02<00:00,  2.05s/batch]
++acsincome_ca s0 privbayes_eps1 n=2000 HISP: done auc=0.825 dp@matched=-0.224 6.61s
++
+Running inference:   0%|          | 0/1 [00:00<?, ?batch/s]
+Running inference: 100%|██████████| 1/1 [00:00<00:00,  3.17batch/s]
+Running inference: 100%|██████████| 1/1 [00:00<00:00,  3.17batch/s]
++acsincome_ca s0 privbayes_eps1 n=2000 RAC1P: done auc=0.833 dp@matched=-0.058 0.64s
++
+Running inference:   0%|          | 0/1 [00:00<?, ?batch/s]
+Running inference: 100%|██████████| 1/1 [00:00<00:00,  3.27batch/s]
+Running inference: 100%|██████████| 1/1 [00:00<00:00,  3.27batch/s]
++acsincome_ca s0 privbayes_eps1 n=2000 SEX: done auc=0.844 dp@matched=-0.051 0.6s
++
+Running inference:   0%|          | 0/1 [00:00<?, ?batch/s]
+Running inference: 100%|██████████| 1/1 [00:00<00:00,  3.19batch/s]
+Running inference: 100%|██████████| 1/1 [00:00<00:00,  3.19batch/s]
++acsincome_ca s0 privbayes_eps1 n=2000 WAOB: done auc=0.822 dp@matched=-0.026 0.63s
++
+Running inference:   0%|          | 0/1 [00:00<?, ?batch/s]
+Running inference: 100%|██████████| 1/1 [00:01<00:00,  1.81s/batch]
+Running inference: 100%|██████████| 1/1 [00:01<00:00,  1.81s/batch]
++acsincome_ca s0 privbayes_eps1 n=10000 HISP: done auc=0.827 dp@matched=-0.251 2.59s
++
+Running inference:   0%|          | 0/1 [00:00<?, ?batch/s]
+Running inference: 100%|██████████| 1/1 [00:01<00:00,  1.85s/batch]
+Running inference: 100%|██████████| 1/1 [00:01<00:00,  1.85s/batch]
++acsincome_ca s0 privbayes_eps1 n=10000 RAC1P: done auc=0.834 dp@matched=-0.068 2.6s
++
+Running inference:   0%|          | 0/1 [00:00<?, ?batch/s]
+Running inference: 100%|██████████| 1/1 [00:01<00:00,  1.79s/batch]
+Running inference: 100%|██████████| 1/1 [00:01<00:00,  1.79s/batch]
++acsincome_ca s0 privbayes_eps1 n=10000 SEX: done auc=0.845 dp@matched=-0.060 2.56s
++
+Running inference:   0%|          | 0/1 [00:00<?, ?batch/s]
+Running inference: 100%|██████████| 1/1 [00:01<00:00,  1.80s/batch]
+Running inference: 100%|██████████| 1/1 [00:01<00:00,  1.80s/batch]
++acsincome_ca s0 privbayes_eps1 n=10000 WAOB: done auc=0.825 dp@matched=-0.026 2.57s
++
+Running inference:   0%|          | 0/1 [00:00<?, ?batch/s]
+Running inference: 100%|██████████| 1/1 [00:00<00:00,  3.05batch/s]
+Running inference: 100%|██████████| 1/1 [00:00<00:00,  3.05batch/s]
++acsincome_ca s0 privbayes_eps10 n=2000 HISP: done auc=0.795 dp@matched=-0.142 0.63s
++
+Running inference:   0%|          | 0/1 [00:00<?, ?batch/s]
+Running inference: 100%|██████████| 1/1 [00:00<00:00,  3.27batch/s]
+Running inference: 100%|██████████| 1/1 [00:00<00:00,  3.27batch/s]
++acsincome_ca s0 privbayes_eps10 n=2000 RAC1P: done auc=0.818 dp@matched=-0.014 0.67s
++
+Running inference:   0%|          | 0/1 [00:00<?, ?batch/s]
+Running inference: 100%|██████████| 1/1 [00:00<00:00,  3.24batch/s]
+Running inference: 100%|██████████| 1/1 [00:00<00:00,  3.24batch/s]
++acsincome_ca s0 privbayes_eps10 n=2000 SEX: done auc=0.816 dp@matched=+0.005 0.66s
++
+Running inference:   0%|          | 0/1 [00:00<?, ?batch/s]
+Running inference: 100%|██████████| 1/1 [00:00<00:00,  3.02batch/s]
+Running inference: 100%|██████████| 1/1 [00:00<00:00,  3.02batch/s]
++acsincome_ca s0 privbayes_eps10 n=2000 WAOB: done auc=0.815 dp@matched=-0.014 0.63s
++
+Running inference:   0%|          | 0/1 [00:00<?, ?batch/s]
+Running inference: 100%|██████████| 1/1 [00:01<00:00,  1.87s/batch]
+Running inference: 100%|██████████| 1/1 [00:01<00:00,  1.87s/batch]
++acsincome_ca s0 privbayes_eps10 n=10000 HISP: done auc=0.795 dp@matched=-0.116 2.7s
++
+Running inference:   0%|          | 0/1 [00:00<?, ?batch/s]
+Running inference: 100%|██████████| 1/1 [00:01<00:00,  1.85s/batch]
+Running inference: 100%|██████████| 1/1 [00:01<00:00,  1.85s/batch]
++acsincome_ca s0 privbayes_eps10 n=10000 RAC1P: done auc=0.823 dp@matched=-0.024 2.72s
++
+Running inference:   0%|          | 0/1 [00:00<?, ?batch/s]
+Running inference: 100%|██████████| 1/1 [00:01<00:00,  1.85s/batch]
+Running inference: 100%|██████████| 1/1 [00:01<00:00,  1.85s/batch]
++acsincome_ca s0 privbayes_eps10 n=10000 SEX: done auc=0.820 dp@matched=-0.006 2.75s
++
+Running inference:   0%|          | 0/1 [00:00<?, ?batch/s]
+Running inference: 100%|██████████| 1/1 [00:01<00:00,  1.84s/batch]
+Running inference: 100%|██████████| 1/1 [00:01<00:00,  1.84s/batch]
++acsincome_ca s0 privbayes_eps10 n=10000 WAOB: done auc=0.818 dp@matched=-0.013 2.57s
++
+Running inference:   0%|          | 0/1 [00:00<?, ?batch/s]
+Running inference: 100%|██████████| 1/1 [00:00<00:00,  3.02batch/s]
+Running inference: 100%|██████████| 1/1 [00:00<00:00,  3.02batch/s]
++acsincome_ca s0 privbayes_eps1000 n=2000 HISP: done auc=0.803 dp@matched=-0.119 0.59s
++
+Running inference:   0%|          | 0/1 [00:00<?, ?batch/s]
+Running inference: 100%|██████████| 1/1 [00:00<00:00,  3.08batch/s]
+Running inference: 100%|██████████| 1/1 [00:00<00:00,  3.07batch/s]
++acsincome_ca s0 privbayes_eps1000 n=2000 RAC1P: done auc=0.826 dp@matched=-0.031 0.68s
++
+Running inference:   0%|          | 0/1 [00:00<?, ?batch/s]
+Running inference: 100%|██████████| 1/1 [00:00<00:00,  3.24batch/s]
+Running inference: 100%|██████████| 1/1 [00:00<00:00,  3.23batch/s]
++acsincome_ca s0 privbayes_eps1000 n=2000 SEX: done auc=0.825 dp@matched=-0.006 0.62s
++
+Running inference:   0%|          | 0/1 [00:00<?, ?batch/s]
+Running inference: 100%|██████████| 1/1 [00:00<00:00,  3.09batch/s]
+Running inference: 100%|██████████| 1/1 [00:00<00:00,  3.08batch/s]
++acsincome_ca s0 privbayes_eps1000 n=2000 WAOB: done auc=0.825 dp@matched=-0.013 0.63s
++
+Running inference:   0%|          | 0/1 [00:00<?, ?batch/s]
+Running inference: 100%|██████████| 1/1 [00:01<00:00,  1.79s/batch]
+Running inference: 100%|██████████| 1/1 [00:01<00:00,  1.79s/batch]
++acsincome_ca s0 privbayes_eps1000 n=10000 HISP: done auc=0.795 dp@matched=-0.090 2.56s
++
+Running inference:   0%|          | 0/1 [00:00<?, ?batch/s]
+Running inference: 100%|██████████| 1/1 [00:01<00:00,  1.80s/batch]
+Running inference: 100%|██████████| 1/1 [00:01<00:00,  1.80s/batch]
++acsincome_ca s0 privbayes_eps1000 n=10000 RAC1P: done auc=0.827 dp@matched=-0.031 2.56s
++
+Running inference:   0%|          | 0/1 [00:00<?, ?batch/s]
+Running inference: 100%|██████████| 1/1 [00:01<00:00,  1.80s/batch]
+Running inference: 100%|██████████| 1/1 [00:01<00:00,  1.80s/batch]
++acsincome_ca s0 privbayes_eps1000 n=10000 SEX: done auc=0.822 dp@matched=+0.005 2.51s
++
+Running inference:   0%|          | 0/1 [00:00<?, ?batch/s]
+Running inference: 100%|██████████| 1/1 [00:01<00:00,  1.89s/batch]
+Running inference: 100%|██████████| 1/1 [00:01<00:00,  1.89s/batch]

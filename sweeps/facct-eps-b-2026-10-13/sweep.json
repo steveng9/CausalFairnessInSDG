@@ -33,5 +33,6 @@
     300.0
   ],
   "classifier": "rf",
-  "notes": "Privacy axis for the DP marginal generators, second extension: the half-decade points epsilon 0.3, 3, 30, 300. With facct-2026-10-09 (1, 10, 1000) and facct-eps-a-2026-10-13 (0.1, 100) this gives nine epsilons from 0.1 to 1000 on the same datasets, role splits, mechanisms, seeds and classifier."
+  "notes": "Privacy axis for the DP marginal generators, second extension: the half-decade points epsilon 0.3, 3, 30, 300. With facct-2026-10-09 (1, 10, 1000) and facct-eps-a-2026-10-13 (0.1, 100) this gives nine epsilons from 0.1 to 1000 on the same datasets, role splits, mechanisms, seeds and classifier.",
+  "hold": "2026-10-13: runs after the Angelozzi baseline, hand-graph torch families, MAMA-MIA and DP causal families; started by sweeps/chain-cpu-2026-10-14.sh"
 }

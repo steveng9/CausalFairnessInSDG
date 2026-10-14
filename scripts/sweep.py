@@ -11,7 +11,9 @@ downstream classifier. Everything else follows from that file:
                         `python` maps a method to the interpreter its shards
                         run under, for methods that need their own environment;
                         optional `gpu_only` lists methods a scheduler started
-                        without `--gpu` leaves alone
+                        without `--gpu` leaves alone; optional `hold` (a
+                        reason) makes `run` exit at once unless given
+                        `--even-if-held`, to push a queued sweep back
     db/<shard>.db       one SQLite file per shard -- one writer each, no locks
     synth/<shard>/      every synthetic table, as run_<run_id>.parquet
     logs/<shard>.log    the shard's stdout/stderr
@@ -247,6 +249,10 @@ def cmd_init(args) -> int:
 
 def cmd_run(args) -> int:
     spec = load_spec(args.batch)
+    if spec.get("hold") and not args.even_if_held:
+        print(f"sweep {args.batch} is on hold ({spec['hold']}); not started. "
+              "Pass --even-if-held to run it.", flush=True)
+        return 0
     sweep_dir = _sweep_dir(args.batch)
     for sub in ("db", "synth", "logs", "locks", "results"):
         (sweep_dir / sub).mkdir(parents=True, exist_ok=True)
@@ -376,6 +382,8 @@ def main() -> int:
     run.add_argument("--methods", default=None, help="restrict to these methods")
     run.add_argument("--datasets", default=None, help="restrict to these datasets")
     run.add_argument("--nice", type=int, default=19)
+    run.add_argument("--even-if-held", action="store_true",
+                     help="run a sweep whose sweep.json has a `hold` key")
     run.add_argument("--min-free-gb", type=float, default=24.0,
                      help="do not start another shard below this much available RAM")
     run.add_argument("--max-attempts", type=int, default=2,

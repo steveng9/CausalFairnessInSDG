@@ -1,0 +1,638 @@
+% FAccT 2027 Revision Roadmap
+% Notes for transforming the AI4Good workshop paper into a high-impact full paper
+
+\documentclass[11pt]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage{enumitem}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{xcolor}
+\usepackage{hyperref}
+
+\title{From AI4Good Workshop Paper to FAccT 2027\\
+\large Revision Roadmap for ``Portable Causal Fairness Across Synthetic Data Generator Families''}
+\author{Steven Golob}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+
+\section*{How the Current Paper Differs from the FAccT 2026 Paper}
+
+A central concern is whether the FAccT 2026 paper by Kashyap et al., ``A pipeline for enabling path-specific causal fairness in observational health data,'' makes the present paper insufficiently novel. The short answer is: \textbf{no, but the distinction should be made much more explicit.}
+
+\subsection{Very Short Version}
+
+\begin{quote}
+\textbf{Kashyap et al.:} How can we \emph{measure, diagnose, and mitigate path-specific causal unfairness in models trained on observational health data}, particularly in high dimensions?
+
+\textbf{This paper:} Can causal-fairness interventions be \emph{implemented at the synthetic-data generation layer}, and does the edge-cutting mechanism transfer across fundamentally different generator architectures and privacy mechanisms?
+\end{quote}
+
+The papers overlap in their use of causal/path-specific fairness, but they address different objects and different technical problems.
+
+\subsection{Detailed Comparison}
+
+\begin{center}
+\small
+\begin{tabular}{p{0.22\textwidth}p{0.34\textwidth}p{0.34\textwidth}}
+\toprule
+ & \textbf{Kashyap et al. (FAccT 2026)} & \textbf{This paper} \\
+\midrule
+Primary object &
+ML models trained on observational health data &
+Synthetic-data generators and the released synthetic tables \\[3pt]
+
+Core question &
+How can path-specific causal unfairness be estimated, diagnosed, and mitigated in clinical prediction models? &
+Is causal-fairness edge surgery a DECAF-specific trick, or a more general property of causal synthetic-data factorization? \\[3pt]
+
+Intervention location &
+Primarily the learned predictive model, alongside causal estimation and model-level interventions &
+Inside the synthetic-data generation process, by cutting edges in the generator's factorization \\[3pt]
+
+Technical challenge &
+Robust estimation of path-specific causal effects in high-dimensional observational data; the paper uses doubly robust estimation and dimensionality reduction &
+Translating causal-fairness edge interventions across unrelated synthetic-data generator representations, including generators without an explicit causal DAG \\[3pt]
+
+Empirical scope &
+Four healthcare case studies plus synthetic experiments examining estimator error &
+Nine generators from three families, three levels of formal privacy guarantee, two datasets, and 2,520 matched-pair runs \\[3pt]
+
+Main empirical message &
+There is no universally best fairness intervention; different causal pathways and interventions produce different fairness--accuracy tradeoffs, motivating a pipeline for selecting and evaluating interventions &
+The same basic edge-cutting mechanism transfers across generator families, including DP variants; the mechanism therefore appears to live at the level of causal factorization rather than a particular architecture \\[3pt]
+
+Role of synthetic data &
+Primarily an experimental instrument for studying high-dimensional causal-effect estimation &
+The central object being generated, released, evaluated, and made fair \\[3pt]
+
+Practical implication &
+Provides a pipeline for practitioners working with observational clinical prediction models &
+Provides a way for institutions releasing synthetic data to retain a generation-time causal-fairness control while choosing a generator for privacy, fidelity, or utility reasons \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection{Why the Distinction Matters}
+
+The strongest novelty claim should \emph{not} be:
+
+\begin{quote}
+``We apply causal fairness to synthetic data.''
+\end{quote}
+
+That framing is too narrow and makes the paper vulnerable to adjacent causal-fairness work.
+
+Instead, the novelty is the combination of:
+
+\begin{enumerate}
+    \item \textbf{the location of intervention:} fairness is enforced in the synthetic-data generation mechanism itself;
+    \item \textbf{the portability question:} the intervention is tested across unrelated generator families rather than one causal GAN;
+    \item \textbf{the privacy setting:} the study asks whether this remains possible under formal differential privacy;
+    \item \textbf{the factorization-level claim:} the evidence suggests that edge surgery is a property of an underlying causal factorization rather than of DECAF's particular neural architecture.
+\end{enumerate}
+
+The strongest current result is therefore the portability result:
+
+\[
+\boxed{
+\text{causal GAN}
+\;\rightarrow\;
+\text{causal diffusion}
+\;\rightarrow\;
+\text{marginals-based synthesizers}
+\;\rightarrow\;
+\text{DP variants}
+}
+\]
+
+The paper should make this architectural abstraction, rather than ``porting DECAF,'' the conceptual center of the contribution.
+
+\subsection{Why the FAccT Paper Feels More Mature}
+
+The FAccT paper is a useful model not because it has the same contribution, but because it illustrates a level of completeness worth aiming for.
+
+Kashyap et al. provide a clinically motivated mapping onto the Standard Fairness Model, robust estimation of path-specific effects, a pipeline for choosing and evaluating interventions, multiple clinical case studies, comparisons with causal and non-causal interventions, synthetic experiments examining estimation error, and explicit discussion of generalizability and limitations. This produces a contribution that is simultaneously methodological, empirical, and practical.
+
+The present paper already has unusually broad generator coverage. Its main opportunity is therefore to achieve the same \emph{depth of characterization}: explain why the portability result holds, compare intervention locations, characterize privacy--fairness--fidelity tradeoffs, investigate failure modes, and demonstrate downstream consequences.
+
+\subsection{Bottom-Line Novelty Assessment}
+
+The FAccT paper creates \emph{some conceptual overlap}, but it does not subsume the central contribution of this work.
+
+The important distinction is:
+
+\begin{quote}
+\textbf{They study how causal fairness can be operationalized in models using observational health data. We study whether causal-fairness intervention can become a portable property of the synthetic-data release mechanism itself.}
+\end{quote}
+
+The current paper becomes substantially harder to dismiss as incremental if it develops the latter claim into a systematic account of:
+
+\[
+\boxed{
+\text{portability}
++
+\text{privacy interaction}
++
+\text{intervention-location comparison}
++
+\text{failure modes}
++
+\text{downstream consequences}.
+}
+\]
+
+
+\section*{Overall Assessment}
+
+The current paper already has the seed of a strong FAccT contribution. The core result---that causal-fairness edge surgery transfers across substantially different synthetic-data generator families, including differentially private generators---is interesting and potentially important.
+
+However, the current workshop version reads primarily as a \emph{portability demonstration}:
+
+\begin{quote}
+DECAF demonstrated causal-fairness edge cutting on one GAN; we test whether the mechanism transfers to other synthetic-data generators and find that it does.
+\end{quote}
+
+For a strong FAccT 2027 paper, the goal should be to turn this into a broader scientific study: not merely showing that the intervention works, but characterizing \emph{why, when, and at what cost} causal-fairness intervention works in synthetic-data generation.
+
+This would bring the paper closer to the maturity of strong FAccT work: a clear conceptual contribution, a systematic empirical characterization, meaningful comparisons, practical implications, and explicit failure modes and limitations.
+
+\section*{The Central Narrative Change}
+
+The most important revision is to broaden the central question.
+
+Instead of:
+
+\begin{quote}
+Does DECAF's causal-fairness edge-cutting mechanism generalize across synthetic-data generators?
+\end{quote}
+
+aim for something closer to:
+
+\begin{quote}
+Can causal fairness be treated as a generator-independent intervention on the data-generating mechanism, and what are the consequences of doing so across different generator architectures, privacy mechanisms, and causal structures?
+\end{quote}
+
+A possible central thesis is:
+
+\begin{quote}
+\textbf{Causal fairness can be treated as a generator-independent intervention on the synthetic data-generating mechanism, but its effectiveness depends on the representation, privacy mechanism, and causal structure of the synthesizer. We systematically characterize when this intervention works, what it costs, and what it means for institutions choosing a synthetic-data generator.}
+\end{quote}
+
+This is a substantially bigger scientific claim while remaining grounded in the existing project.
+
+\section*{What the FAccT-Level Paper Should Establish}
+
+The revised paper should answer approximately six questions:
+
+\begin{enumerate}
+    \item \textbf{Can causal fairness be enforced at synthetic-data generation time?}
+    \item \textbf{Does the intervention transfer across fundamentally different generator families?}
+    \item \textbf{How does differential privacy interact with causal fairness?}
+    \item \textbf{What are the fairness--fidelity--privacy tradeoffs?}
+    \item \textbf{When does edge surgery fail or become ineffective?}
+    \item \textbf{Is enforcing fairness inside the generator meaningfully different from imposing fairness after generation?}
+\end{enumerate}
+
+The existing 9-generator experiment is therefore not something to replace. It should become the foundation of a broader systematic study.
+
+\section*{Priority 1: Turn Portability into a Systematic Characterization}
+
+The current generator coverage is already strong. Rather than simply adding many more generators, use the existing diversity to study the phenomenon systematically.
+
+Vary, where feasible:
+
+\begin{itemize}
+    \item generator family;
+    \item causal versus non-causal factorization;
+    \item differential privacy versus non-private generation;
+    \item privacy strength $\epsilon$;
+    \item fairness definition;
+    \item causal graph structure;
+    \item dataset;
+    \item location of intervention.
+\end{itemize}
+
+The resulting research questions become:
+
+\begin{itemize}
+    \item Does the intervention work consistently?
+    \item What properties predict its effectiveness?
+    \item Which generator families preserve the intended causal relationships?
+    \item When does the fairness intervention have a large utility cost?
+    \item When does privacy interfere with the intervention?
+\end{itemize}
+
+The goal is to turn ``we ported DECAF'' into ``we characterize a generator-independent causal-fairness mechanism.''
+
+\section*{Priority 2: Compare Where Fairness Is Enforced}
+
+This is likely the single most important experimental addition.
+
+Compare at least:
+
+\begin{enumerate}
+    \item no fairness intervention;
+    \item in-generator causal edge cutting;
+    \item post-generation fairness intervention;
+    \item downstream fairness intervention on a model trained using the synthetic data.
+\end{enumerate}
+
+Where feasible, include additional fairness-aware synthesis methods as baselines.
+
+Evaluate each intervention on:
+
+\begin{itemize}
+    \item causal fairness;
+    \item statistical/group fairness;
+    \item fidelity to the real data;
+    \item downstream utility;
+    \item privacy;
+    \item stability across runs.
+\end{itemize}
+
+This allows a stronger claim than simply ``synthetic data can be made fair.'' It allows the paper to investigate whether there is a meaningful distinction between fairness enforced \emph{inside the generator} and fairness imposed later.
+
+A particularly important conceptual argument is that a public synthetic dataset will be used by consumers whom the publisher does not control. An in-generator intervention therefore travels with the release, whereas downstream mitigation can be discarded by a consumer.
+
+\section*{Priority 3: Make Privacy--Fairness Interaction a Major Result}
+
+The current observation that formal privacy guarantees do not necessarily make synthetic data less fair is potentially much more important than it currently appears.
+
+Develop this into a systematic study of:
+
+\[
+\epsilon \longrightarrow
+\begin{cases}
+\text{fairness}\\
+\text{fidelity}\\
+\text{subgroup disparities}\\
+\text{effectiveness of edge surgery}\\
+\text{downstream model fairness}
+\end{cases}
+\]
+
+Ask explicitly:
+
+\begin{quote}
+\textbf{Does differential privacy act as a fairness intervention, a fairness antagonist, or neither?}
+\end{quote}
+
+A useful presentation would be a privacy--fidelity--fairness frontier for each generator family.
+
+Rather than seeking one universally optimal generator, the paper could characterize different operating points and explain which choice is appropriate under different institutional priorities.
+
+\section*{Priority 4: Add Deliberate Failure Cases}
+
+A mature FAccT paper should not only demonstrate that the proposed mechanism works.
+
+A skeptical reviewer will naturally ask:
+
+\begin{quote}
+When does it fail?
+\end{quote}
+
+Deliberately construct or identify cases in which:
+
+\begin{itemize}
+    \item the graph contains no relevant edge to cut;
+    \item the sensitive attribute is weakly represented;
+    \item the generator's dependency structure does not preserve the intended causal structure;
+    \item differential privacy obscures or destroys the relevant dependency;
+    \item cutting an edge causes a large fidelity loss;
+    \item fairness intervention has little effect on downstream disparities;
+    \item different fairness definitions produce conflicting interventions.
+\end{itemize}
+
+Even two or three carefully analyzed failure modes could substantially strengthen the paper.
+
+The narrative changes from:
+
+\begin{quote}
+``Our method works.''
+\end{quote}
+
+to:
+
+\begin{quote}
+``Here is an empirical characterization of when this class of interventions works, when it does not, and why.''
+\end{quote}
+
+\section*{Priority 5: Strengthen the Causal/Formal Argument}
+
+The paper's most important conceptual claim is that edge surgery belongs to the causal factorization rather than to DECAF specifically.
+
+Formalize this claim.
+
+A useful theoretical section could:
+
+\begin{enumerate}
+    \item define a synthetic-data generator as implementing a factorization of the joint distribution;
+    \item define an admissible edge intervention;
+    \item establish conditions under which the fairness intervention can be instantiated independently of the particular conditional model or neural architecture;
+    \item distinguish architecture-specific implementations from factorization-level properties.
+\end{enumerate}
+
+The goal is not to turn the paper into a purely theoretical paper. The theory should explain the empirical phenomenon:
+
+\begin{quote}
+\textbf{Why can the same fairness intervention survive such radically different generator architectures?}
+\end{quote}
+
+This would make the portability result substantially more than an empirical observation.
+
+\section*{Priority 6: Expand the Empirical Domains}
+
+Adult and COMPAS are appropriate starting points, but stronger claims about generality would benefit from at least one substantially different domain.
+
+A particularly natural choice would be a healthcare dataset, given the broader motivation and the importance of synthetic data in health applications.
+
+Ideally, also consider:
+
+\begin{itemize}
+    \item a different type of sensitive attribute;
+    \item a non-binary sensitive attribute;
+    \item intersectional fairness.
+\end{itemize}
+
+The goal is not to accumulate datasets for their own sake. Each added dataset should test a meaningful axis of generalization.
+
+\section*{Priority 7: Measure Downstream Consequences}
+
+The paper should distinguish between:
+
+\begin{quote}
+\textbf{fair synthetic data}
+\end{quote}
+
+and
+
+\begin{quote}
+\textbf{fair models trained on synthetic data.}
+\end{quote}
+
+A useful experimental pipeline is:
+
+\[
+\text{real data}
+\rightarrow
+\text{synthetic generator}
+\rightarrow
+\text{synthetic data}
+\rightarrow
+\text{downstream model}.
+\]
+
+Evaluate downstream:
+
+\begin{itemize}
+    \item predictive performance/AUC;
+    \item demographic parity;
+    \item equalized odds;
+    \item subgroup performance;
+    \item calibration;
+    \item where appropriate, causal fairness.
+\end{itemize}
+
+This establishes whether an intervention that looks successful at the dataset level actually changes what matters to downstream users.
+
+\section*{Priority 8: Give Institutions a Generator-Selection Framework}
+
+The current paper already begins to answer an important practical question:
+
+\begin{quote}
+Which synthetic-data generator should an institution use?
+\end{quote}
+
+Make this explicit.
+
+A final decision framework could look like:
+
+\begin{center}
+\begin{tabular}{ll}
+\toprule
+Priority & Preferred generator/intervention \\
+\midrule
+Fidelity & ... \\
+Formal differential privacy & ... \\
+Causal fairness & ... \\
+Fairness + fidelity & ... \\
+Downstream utility & ... \\
+Privacy + fairness + utility & ... \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+The point is not necessarily to identify one universal winner. Instead, explain the tradeoffs and provide guidance for institutions choosing a release mechanism.
+
+This gives the work a concrete accountability and governance implication:
+
+\begin{quote}
+\textbf{Fairness should be considered a property of the synthetic-data release mechanism, not only of downstream models trained from the release.}
+\end{quote}
+
+\section*{What Not to Prioritize}
+
+Do \emph{not} spend most of the revision effort simply adding many more generators.
+
+The current coverage already spans three important families:
+
+\begin{itemize}
+    \item marginals-based;
+    \item GAN;
+    \item diffusion;
+\end{itemize}
+
+with differentially private variants.
+
+The marginal value of generator number 10 is probably substantially lower than the value of understanding:
+
+\begin{itemize}
+    \item why the intervention works;
+    \item when it fails;
+    \item what privacy does to it;
+    \item how it compares with downstream/post-processing interventions;
+    \item what users actually experience when they train models on the resulting data.
+\end{itemize}
+
+Likewise, reduce space devoted to proving that the implementation successfully ``ports DECAF.'' Once that is established, the paper should move rapidly to the broader scientific implications.
+
+\section*{A Possible New Paper Structure}
+
+A stronger full-paper structure could be:
+
+\begin{enumerate}
+    \item \textbf{Introduction}
+    \begin{itemize}
+        \item synthetic data as a public release mechanism;
+        \item why downstream fairness is insufficient;
+        \item causal fairness as a generation-time intervention;
+        \item gap: unclear whether this is architecture-specific;
+        \item research questions and contributions.
+    \end{itemize}
+
+    \item \textbf{Background}
+    \begin{itemize}
+        \item causal fairness;
+        \item edge surgery;
+        \item synthetic data generators;
+        \item differential privacy.
+    \end{itemize}
+
+    \item \textbf{Generator-Independent Formulation}
+    \begin{itemize}
+        \item factorization;
+        \item edge intervention;
+        \item formal conditions for portability.
+    \end{itemize}
+
+    \item \textbf{Experimental Framework}
+    \begin{itemize}
+        \item datasets;
+        \item generators;
+        \item fairness definitions;
+        \item privacy levels;
+        \item fidelity metrics;
+        \item downstream metrics;
+        \item baselines.
+    \end{itemize}
+
+    \item \textbf{Does Causal Fairness Transfer?}
+    \begin{itemize}
+        \item nine-generator results;
+        \item three families;
+        \item robustness across datasets.
+    \end{itemize}
+
+    \item \textbf{Where Should Fairness Be Enforced?}
+    \begin{itemize}
+        \item generator;
+        \item post-processing;
+        \item downstream model;
+        \item comparative tradeoffs.
+    \end{itemize}
+
+    \item \textbf{Privacy--Fairness--Fidelity Tradeoffs}
+    \begin{itemize}
+        \item $\epsilon$ sweeps;
+        \item fairness;
+        \item fidelity;
+        \item downstream consequences.
+    \end{itemize}
+
+    \item \textbf{Failure Modes and Limitations}
+
+    \item \textbf{Implications for Synthetic-Data Release}
+    \begin{itemize}
+        \item generator selection;
+        \item what institutions should do;
+        \item what users can and cannot assume about a fair release.
+    \end{itemize}
+
+    \item \textbf{Discussion and Conclusion}
+\end{enumerate}
+
+\section*{A Possible Contribution Statement}
+
+A strong revised contribution section could eventually make claims along these lines:
+
+\begin{enumerate}
+    \item We show that causal-fairness edge intervention is not specific to the DECAF architecture, but can be expressed at the level of the synthetic-data factorization and instantiated across multiple generator families.
+
+    \item We provide a systematic empirical characterization across marginals-based, GAN, and diffusion synthesizers, including differentially private variants.
+
+    \item We characterize the privacy--fidelity--fairness tradeoffs associated with generation-time causal-fairness intervention.
+
+    \item We compare generation-time intervention with downstream and post-generation alternatives, demonstrating why the location of the fairness intervention matters for public synthetic-data releases.
+
+    \item We identify failure modes and provide practical guidance for institutions selecting synthetic-data generation mechanisms under competing privacy, fidelity, utility, and fairness requirements.
+\end{enumerate}
+
+\section*{Priority Ranking}
+
+\begin{longtable}{p{0.12\textwidth}p{0.78\textwidth}}
+\toprule
+Priority & Revision \\
+\midrule
+\textbf{Essential} &
+Reframe the paper around a broader scientific question rather than ``porting DECAF.'' \\[4pt]
+
+\textbf{Essential} &
+Add comparisons between generation-time, post-generation, and downstream fairness interventions. \\[4pt]
+
+\textbf{Essential} &
+Make the privacy--fairness--fidelity interaction a major empirical result. \\[4pt]
+
+\textbf{Essential} &
+Add deliberate failure cases and explain when/why the mechanism breaks down. \\[4pt]
+
+\textbf{Essential} &
+Strengthen the formal argument that the intervention is a property of causal factorization rather than a DECAF-specific trick. \\[4pt]
+
+\textbf{High value} &
+Add one substantially different empirical domain, ideally healthcare. \\[4pt]
+
+\textbf{High value} &
+Measure downstream ML consequences of fair synthetic-data releases. \\[4pt]
+
+\textbf{High value} &
+Provide an explicit generator-selection/decision framework for institutions. \\[4pt]
+
+\textbf{High value} &
+Study intersectional or non-binary sensitive attributes if feasible. \\[4pt]
+
+\textbf{Lower priority} &
+Add many additional generator architectures without extracting new scientific insight. \\
+\bottomrule
+\end{longtable}
+
+\section*{The Transformation in One Sentence}
+
+The workshop paper says:
+
+\begin{quote}
+\emph{``Causal fairness is portable across synthetic-data generators.''}
+\end{quote}
+
+The target FAccT paper should say something closer to:
+
+\begin{quote}
+\emph{``We establish synthetic-data generation as a distinct locus for causal-fairness intervention, develop a generator-independent formulation of that intervention, and systematically characterize its privacy--fidelity--fairness tradeoffs, failure modes, and downstream consequences across generator families.''}
+\end{quote}
+
+That is a substantially more mature contribution while preserving the core of the existing project.
+
+\section*{Bottom Line}
+
+The project does not need to become a completely different paper. The existing breadth---nine generators, three families, DP variants, two datasets, and 2,520 matched-pair runs---is already a strong experimental foundation.
+
+The main transformation should be:
+
+\[
+\boxed{
+\text{Portability demonstration}
+\quad\longrightarrow\quad
+\text{systematic scientific characterization}
+}
+\]
+
+The highest-value work is therefore not ``more generators.'' It is understanding and demonstrating:
+
+\[
+\boxed{
+\text{why it works}
+\quad+\quad
+\text{when it fails}
+\quad+\quad
+\text{what it costs}
+\quad+\quad
+\text{why intervention location matters}
+}
+\]
+
+That combination would make the paper feel much more like a mature FAccT contribution rather than an extended workshop paper.
+
+\end{document}
