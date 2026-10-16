@@ -2,7 +2,7 @@ from typing import Dict, FrozenSet, List
 
 import networkx as nx
 
-from .base import AttributeRoles, Edge, FairnessMechanism, biased_edges_from_paths
+from .base import AttributeRoles, Edge, FairnessMechanism
 
 
 def path_blocked(graph: nx.Graph, a: str, b: str, admissible: FrozenSet[str]) -> bool:
@@ -52,9 +52,42 @@ class CFFairness(FairnessMechanism):
     def select_biased_edges(
         self, dag: nx.DiGraph, roles: AttributeRoles
     ) -> Dict[str, List[str]]:
-        # A path is blocked (left alone) iff some interior node is admissible.
-        return biased_edges_from_paths(
-            dag,
-            roles,
-            path_is_blocked=lambda interior: any(n in roles.admissible for n in interior),
-        )
+        """DECAF Corollary 1: every non-admissible member of the outcome's
+        Markov boundary must be d-separated from every protected attribute
+        given the admissible set R, in the real-data graph `dag`. Members that
+        are not get the edge joining them to the boundary cut.
+
+        A directed-path rule ("a path through an admissible node is blocked")
+        is not enough on a DAG: conditioning on an admissible *collider*
+        (A -> R <- B -> Y) opens a path, so B carries information about A
+        among people with the same R. Paths are judged by d-separation instead.
+        """
+        protected = [p for p in roles.protected if p in dag]
+        admissible = set(roles.admissible) & set(dag.nodes)
+        biased: Dict[str, set] = {}
+
+        def tied_to_protected(node: str) -> bool:
+            if node in roles.protected:
+                return True
+            given = admissible - {node}
+            return any(not _d_separated(dag, {node}, {p}, given) for p in protected)
+
+        for o in roles.outcome:
+            if o not in dag or not protected:
+                continue
+            for parent in dag.predecessors(o):
+                if parent not in admissible and tied_to_protected(parent):
+                    biased.setdefault(o, set()).add(parent)
+            for child in dag.successors(o):
+                if child not in admissible and tied_to_protected(child):
+                    biased.setdefault(child, set()).add(o)
+                for spouse in dag.predecessors(child):
+                    if spouse != o and spouse not in admissible and tied_to_protected(spouse):
+                        biased.setdefault(child, set()).add(spouse)
+        return {child: sorted(parents) for child, parents in biased.items()}
+
+
+def _d_separated(dag: nx.DiGraph, x: set, y: set, z: set) -> bool:
+    # networkx renamed `d_separated` to `is_d_separator` in 3.3.
+    test = getattr(nx, "is_d_separator", None) or nx.d_separated
+    return test(dag, x, y, z)

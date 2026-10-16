@@ -66,3 +66,16 @@ def test_edges_allowed_reuses_filter_candidates_and_allow_edge():
     roles_dp = AttributeRoles.create(protected={"A"}, admissible=set(), outcome={"Y"})
     assert edges_allowed([("A", "R"), ("A", "Y")], g, roles_dp, DPFairness()) is False
     assert edges_allowed([("A", "R")], g, roles_dp, DPFairness()) is True
+
+
+def test_cf_cuts_a_feature_tied_to_protected_through_an_admissible_collider():
+    # A -> R <- C -> Y (COMPAS: sex -> priors_count <- age_cat -> outcome).
+    # No directed path runs from A through C, but among people with the same R,
+    # C carries information about A, so CF (DECAF Corollary 1) must cut C -> Y.
+    g = nx.DiGraph([("A", "R"), ("C", "R"), ("R", "Y"), ("C", "Y")])
+    assert CFFairness().select_biased_edges(g, ROLES) == {"Y": ["C"]}
+
+
+def test_cf_keeps_a_feature_independent_of_protected_given_r():
+    g = nx.DiGraph([("A", "R"), ("R", "Y"), ("C", "Y")])
+    assert CFFairness().select_biased_edges(g, ROLES) == {}
