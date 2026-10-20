@@ -1,0 +1,31 @@
+{
+  "batch": "facct-tune-dpdiff-e30-2026-10-18",
+  "created": "2026-10-18T17:24:08",
+  "datasets": [
+    "compas",
+    "adult",
+    "acsincome_tx",
+    "acspubcov_ca",
+    "acspubcov_tx",
+    "cdc_diabetes",
+    "hmda_ca",
+    "hmda_tx"
+  ],
+  "methods": [
+    "decaf_dpdiffusion"
+  ],
+  "seeds": [
+    0,
+    1,
+    2
+  ],
+  "epsilons": [
+    1000.0
+  ],
+  "classifier": "rf",
+  "notes": "Epoch check for decaf_dpdiffusion on the datasets that borrowed SNAKE's untuned settings (and compas/adult, also untuned). Same protocol as facct-tune-e30-2026-10-09 (epsilon 1000, no mechanism, seeds 0-2), which covered acsincome_ca, snake, sbo. Compare against the 100-epoch epsilon-1000 'none' rows of facct-2026-10-09. A check on the setting in use, not a re-tune: changing epochs would invalidate the existing epsilon 1/10/1000 rows.",
+  "only": "/none",
+  "settings": {
+    "max_epochs": 30
+  }
+}

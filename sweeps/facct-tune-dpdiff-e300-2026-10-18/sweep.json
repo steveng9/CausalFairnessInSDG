@@ -1,0 +1,27 @@
+{
+  "batch": "facct-tune-dpdiff-e300-2026-10-18",
+  "created": "2026-10-18T17:24:08",
+  "datasets": [
+    "adult",
+    "snake",
+    "acsincome_ca",
+    "hmda_ca"
+  ],
+  "methods": [
+    "decaf_dpdiffusion"
+  ],
+  "seeds": [
+    0,
+    1,
+    2
+  ],
+  "epsilons": [
+    1000.0
+  ],
+  "classifier": "rf",
+  "notes": "Does decaf_dpdiffusion keep improving past 100 epochs? Pilots so far only compared 30 vs 100 (100 at least as good nearly everywhere). Epsilon 1000, no mechanism, seeds 0-2, four datasets spanning size. Compare against the 100-epoch epsilon-1000 'none' rows of facct-2026-10-09. A check, not a re-tune.",
+  "only": "/none",
+  "settings": {
+    "max_epochs": 300
+  }
+}

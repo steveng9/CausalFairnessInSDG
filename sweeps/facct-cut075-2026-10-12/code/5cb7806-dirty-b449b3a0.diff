@@ -1,0 +1,89 @@
+diff --git a/scripts/run_experiments.py b/scripts/run_experiments.py
+index 3f663dc..38b7997 100644
+--- a/scripts/run_experiments.py
++++ b/scripts/run_experiments.py
+@@ -66,10 +66,15 @@ DIFFUSION_BACKBONE_METHODS = ["decaf_diffusion", "decaf_dpdiffusion"]
+ #: Nothing to train or tune; needs the `sdg_tabpfn` environment (see
+ #: `sdg/decaf_tabpfn.py`).
+ FOUNDATION_BACKBONE_METHODS = ["decaf_tabpfn"]
++#: Fair-GAN comparison arm with no causal graph (`sdg/tabfairgan.py`). Not a
++#: DECAF backbone, but trained and cached the same way, and its settings and
++#: device go through the same `overrides`.
++FAIR_GAN_METHODS = ["tabfairgan"]
+ #: Every DECAF backbone swap: one fitted model per (data, seed, epsilon),
+ #: settings and device carried on the method object.
+ BACKBONE_METHODS = [
+     *GAN_BACKBONE_METHODS, *DIFFUSION_BACKBONE_METHODS, *FOUNDATION_BACKBONE_METHODS,
++    *FAIR_GAN_METHODS,
+ ]
+ 
+ MECHANISMS = ["none", "ftu", "dp", "cf"]
+@@ -308,6 +313,13 @@ ROLE_CONFIGS: Dict[str, List[RoleConfig]] = {
+ }
+ 
+ 
++def _mechanisms_of(method: str) -> List[str]:
++    """MECHANISMS, less any the method does not implement (TabFairGAN has
++    only `none` and its own demographic-parity loss)."""
++    own = getattr(SDG_METHODS.get(method), "mechanisms", None)
++    return [m for m in MECHANISMS if own is None or m in own]
++
++
+ def _is_gan(method: str) -> bool:
+     """Torch-trained methods cache one trained model per (data, seed, epsilon).
+ 
+@@ -443,7 +455,7 @@ def build_configs(
+             )
+             for epsilon in epsilons:
+                 for method in marginal:
+-                    for mechanism in MECHANISMS:
++                    for mechanism in _mechanisms_of(method):
+                         for seed in seeds:
+                             configs.append(
+                                 RunConfig(
+@@ -474,7 +486,7 @@ def build_configs(
+             for seed in seeds:
+                 for epsilon in gan_epsilons:
+                     for role_name, protected, admissible in roles_for_dataset:
+-                        for mechanism in MECHANISMS:
++                        for mechanism in _mechanisms_of(method):
+                             configs.append(
+                                 RunConfig(
+                                     dataset=dataset,
+diff --git a/src/causal_fairness_sdg/experiments/runner.py b/src/causal_fairness_sdg/experiments/runner.py
+index a216a20..0b3ae45 100644
+--- a/src/causal_fairness_sdg/experiments/runner.py
++++ b/src/causal_fairness_sdg/experiments/runner.py
+@@ -25,6 +25,7 @@ from ..sdg.base import SDGMethod
+ from ..sdg.mst import MST
+ from ..sdg.privbayes import PrivBayes
+ from ..sdg.privsyn import PrivSyn
++from ..sdg.tabfairgan import TabFairGANMethod
+ from . import db
+ 
+ try:
+@@ -72,6 +73,9 @@ if DECAFTabPFNMethod is not None:
+     # installed, so every environment agrees on what the grid contains; it
+     # raises at fit time (and `run_experiments.py` refuses up front) without it.
+     SDG_METHODS["decaf_tabpfn"] = DECAFTabPFNMethod()
++# Fair-GAN baseline with no causal graph (published `tabfairgan` package,
++# imported at fit time). Not private; `none` and `dp` only.
++SDG_METHODS["tabfairgan"] = TabFairGANMethod()
+ 
+ 
+ #: `eval_reference` value meaning "compute fairness metrics against *both*
+diff --git a/src/causal_fairness_sdg/sdg/base.py b/src/causal_fairness_sdg/sdg/base.py
+index 711c958..f000abf 100644
+--- a/src/causal_fairness_sdg/sdg/base.py
++++ b/src/causal_fairness_sdg/sdg/base.py
+@@ -52,6 +52,10 @@ class SDGMethod(ABC):
+     #: never implies a privacy guarantee that wasn't provided.
+     is_private: bool = True
+ 
++    #: The fairness mechanisms this method implements, or None for all of
++    #: them. The grid gives a method only these (`run_experiments.build_configs`).
++    mechanisms: Optional[Tuple[str, ...]] = None
++
+     @abstractmethod
+     def fit_generate(
+         self,

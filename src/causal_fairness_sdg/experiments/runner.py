@@ -25,6 +25,7 @@ from ..sdg.base import SDGMethod
 from ..sdg.mst import MST
 from ..sdg.privbayes import PrivBayes
 from ..sdg.privsyn import PrivSyn
+from ..sdg.tabfairgan import TabFairGANMethod
 from . import db
 
 try:
@@ -72,6 +73,9 @@ if DECAFTabPFNMethod is not None:
     # installed, so every environment agrees on what the grid contains; it
     # raises at fit time (and `run_experiments.py` refuses up front) without it.
     SDG_METHODS["decaf_tabpfn"] = DECAFTabPFNMethod()
+# Fair-GAN baseline with no causal graph (published `tabfairgan` package,
+# imported at fit time). Not private; `none` and `dp` only.
+SDG_METHODS["tabfairgan"] = TabFairGANMethod()
 
 
 #: `eval_reference` value meaning "compute fairness metrics against *both*

@@ -66,10 +66,15 @@ DIFFUSION_BACKBONE_METHODS = ["decaf_diffusion", "decaf_dpdiffusion"]
 #: Nothing to train or tune; needs the `sdg_tabpfn` environment (see
 #: `sdg/decaf_tabpfn.py`).
 FOUNDATION_BACKBONE_METHODS = ["decaf_tabpfn"]
+#: Fair-GAN comparison arm with no causal graph (`sdg/tabfairgan.py`). Not a
+#: DECAF backbone, but trained and cached the same way, and its settings and
+#: device go through the same `overrides`.
+FAIR_GAN_METHODS = ["tabfairgan"]
 #: Every DECAF backbone swap: one fitted model per (data, seed, epsilon),
 #: settings and device carried on the method object.
 BACKBONE_METHODS = [
     *GAN_BACKBONE_METHODS, *DIFFUSION_BACKBONE_METHODS, *FOUNDATION_BACKBONE_METHODS,
+    *FAIR_GAN_METHODS,
 ]
 
 MECHANISMS = ["none", "ftu", "dp", "cf"]
@@ -308,6 +313,13 @@ ROLE_CONFIGS: Dict[str, List[RoleConfig]] = {
 }
 
 
+def _mechanisms_of(method: str) -> List[str]:
+    """MECHANISMS, less any the method does not implement (TabFairGAN has
+    only `none` and its own demographic-parity loss)."""
+    own = getattr(SDG_METHODS.get(method), "mechanisms", None)
+    return [m for m in MECHANISMS if own is None or m in own]
+
+
 def _is_gan(method: str) -> bool:
     """Torch-trained methods cache one trained model per (data, seed, epsilon).
 
@@ -443,7 +455,7 @@ def build_configs(
             )
             for epsilon in epsilons:
                 for method in marginal:
-                    for mechanism in MECHANISMS:
+                    for mechanism in _mechanisms_of(method):
                         for seed in seeds:
                             configs.append(
                                 RunConfig(
@@ -474,7 +486,7 @@ def build_configs(
             for seed in seeds:
                 for epsilon in gan_epsilons:
                     for role_name, protected, admissible in roles_for_dataset:
-                        for mechanism in MECHANISMS:
+                        for mechanism in _mechanisms_of(method):
                             configs.append(
                                 RunConfig(
                                     dataset=dataset,

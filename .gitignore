@@ -36,6 +36,9 @@ experiments.db
 /sweeps/*/db/
 /sweeps/*/synth/
 /sweeps/*/locks/
+/sweeps/*/invalid-*/
+# 280 MB, rebuilt by `baselines/facct_bench.py collect`
+/report/data/facct/angelozzi_mitigators.csv
 /sweeps/*/fairpfn_baseline/inputs/
 /sweeps/*/fairpfn_baseline/preds/
 /sweeps/*/preds/

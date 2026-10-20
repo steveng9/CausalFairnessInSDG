@@ -52,6 +52,10 @@ class SDGMethod(ABC):
     #: never implies a privacy guarantee that wasn't provided.
     is_private: bool = True
 
+    #: The fairness mechanisms this method implements, or None for all of
+    #: them. The grid gives a method only these (`run_experiments.build_configs`).
+    mechanisms: Optional[Tuple[str, ...]] = None
+
     @abstractmethod
     def fit_generate(
         self,

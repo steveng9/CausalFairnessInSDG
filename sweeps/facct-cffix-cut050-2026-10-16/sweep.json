@@ -1,0 +1,38 @@
+{
+  "batch": "facct-cffix-cut050-2026-10-16",
+  "created": "2026-10-16T21:10:00",
+  "datasets": [
+    "snake",
+    "acsincome_ca",
+    "acsincome_tx",
+    "acspubcov_ca",
+    "acspubcov_tx",
+    "hmda_ca",
+    "hmda_tx"
+  ],
+  "methods": [
+    "decaf_tabpfn"
+  ],
+  "seeds": [
+    0,
+    1,
+    2,
+    3,
+    4
+  ],
+  "epsilons": [
+    1000.0
+  ],
+  "classifier": "rf",
+  "notes": "CF re-run after commit 2379bb9 (CF edges chosen by DECAF Corollary 1, d-separation given R, instead of directed paths). Only the CF arm ('only': '/cf'), only datasets where the new rule changes the cut set for some role split. These rows supersede the CF rows of facct-cut050-2026-10-12 for these datasets and methods.",
+  "settings": {
+    "cut_strength": 0.5
+  },
+  "python": {
+    "decaf_tabpfn": "/home/golobs/miniconda3/envs/sdg_tabpfn/bin/python"
+  },
+  "gpu_only": [
+    "decaf_tabpfn"
+  ],
+  "only": "/cf"
+}

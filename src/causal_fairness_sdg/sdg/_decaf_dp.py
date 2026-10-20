@@ -67,8 +67,13 @@ except ImportError as exc:  # pragma: no cover - opacus ships with the decaf ext
 
 # Rényi orders to search over -- the standard Opacus grid. Fine-grained below
 # 12 (where the optimum usually sits for small epsilon) and coarse above.
+# Extended past 127 (2026-10-19): the RDP->(eps, delta) conversion floors
+# epsilon at about log(1/delta) / (max_order - 1), 0.16 at delta=1e-9 with
+# 127, so epsilon=0.1 was unreachable at any noise. Extra orders only tighten
+# the bound; noise multipliers for epsilon >= 0.3 are unchanged (checked).
 _ORDERS: Tuple[float, ...] = tuple(
-    [1 + x / 10.0 for x in range(1, 100)] + list(range(12, 128))
+    [1 + x / 10.0 for x in range(1, 100)] + list(range(12, 256))
+    + list(range(256, 1025, 16))
 )
 
 

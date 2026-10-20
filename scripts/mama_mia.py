@@ -33,6 +33,9 @@ What the focal points are for each generator:
                     fairness mechanism cut (a cut parent is permuted, so the
                     synthetic child no longer depends on it). A partial cut
                     (`cut_strength` < 1) keeps the edge.
+  tabfairgan        no structure to read: every 1- and 2-way marginal, with
+                    every shadow agreeing on all of them. Marginal flavour
+                    only.
 
 Two focal-point sources are scored for every run:
 
@@ -65,6 +68,7 @@ membership advantage. Resumable per shard. Nothing is trained or generated.
 from __future__ import annotations
 
 import argparse
+import itertools
 import json
 import sqlite3
 import sys
@@ -95,6 +99,10 @@ TEST_SIZE = 0.3  # must match `experiments.runner.RunConfig.test_size`
 FP_WEIGHT_THRESHOLDS = {0.01: 0.5, 1: 0.6, 10: 0.7, 100: 0.8, 1000: 0.85}
 DEFAULT_RATIO_VALUE = 1e-10  # `default_val` in the original attack code
 UNDIRECTED_METHODS = ("mst", "privsyn", "aim")
+#: Generators that select no structure (TabFairGAN). Without a graph to read
+#: the attacker falls back to every pair: the marginal flavour over all 1- and
+#: 2-way marginals, and no conditional flavour.
+GRAPH_FREE_METHODS = ("tabfairgan",)
 #: Keys of `extra_params` that describe the machine or the batch, not the
 #: algorithm; everything else must match for two runs to be shadows of each other.
 NOT_ALGORITHM_KEYS = (
@@ -132,6 +140,9 @@ def focal_points(
 ) -> Tuple[List[Marginal], Optional[List[Conditional]]]:
     """(marginal focal points, conditional focal points) of one recorded run."""
     edges = [(a, b) for a, b in edges if a in columns and b in columns]
+    if method in GRAPH_FREE_METHODS:
+        pairs = [frozenset(p) for p in itertools.combinations(columns, 2)]
+        return [frozenset([c]) for c in columns] + pairs, None
     if method in UNDIRECTED_METHODS:
         directed = orient_forest(columns, edges)
     else:

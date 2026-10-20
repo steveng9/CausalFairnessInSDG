@@ -21,6 +21,8 @@ Deviations from the original, deliberate rather than oversights:
     whole run's privacy budget is a clean `epsilon/2` (structure) +
     `epsilon/2` (conditional distributions), rather than +epsilon more spent
     on outputs this project doesn't consume.
+  - `calculate_k` searches k <= 3 downwards instead of root-finding from
+    d/2, which picked k far above 3 at small epsilon (see its docstring).
   - PrivBayes is pure epsilon-DP (Laplace + exponential mechanisms); `delta`
     is accepted by the caller (`sdg/privbayes.py`) for `SDGMethod` interface
     parity but unused here, same as DECAF ignores epsilon/delta entirely.
@@ -29,13 +31,12 @@ Deviations from the original, deliberate rather than oversights:
 from __future__ import annotations
 
 import itertools
-from math import ceil, log
+from math import log
 from typing import Dict, List, Optional, Sequence, Tuple
 
 import networkx as nx
 import numpy as np
 import pandas as pd
-from scipy.optimize import fsolve
 from sklearn.metrics import mutual_info_score
 
 from ..fairness.base import AttributeRoles, Edge, FairnessMechanism, edges_allowed
@@ -93,18 +94,19 @@ def _usefulness_minus_target(k, num_attributes, num_tuples, target_usefulness, e
 
 
 def calculate_k(num_attributes: int, num_tuples: int, target_usefulness: float = 4, epsilon: float = 0.1) -> int:
-    """PrivBayes Lemma 3: maximum parent-set size."""
-    default_k = 3
-    if _usefulness_minus_target(default_k, num_attributes, num_tuples, 0, epsilon) > target_usefulness:
-        return default_k
-    try:
-        k = ceil(fsolve(
-            _usefulness_minus_target, np.array([int(num_attributes / 2)]),
-            args=(num_attributes, num_tuples, target_usefulness, epsilon),
-        )[0])
-    except Exception:
-        return default_k
-    return k if 1 <= k <= num_attributes else default_k
+    """PrivBayes Lemma 3: maximum parent-set size.
+
+    The largest k <= 3 whose theta-usefulness n * eps / ((d - k) 2^(k+3))
+    exceeds the target, and 1 when none does. DataSynthesizer instead
+    root-finds from k = d/2 once k = 3 misses the target. Usefulness falls
+    with k only while d - k stays large, so that search lands on a spurious
+    root near d/2 and *raises* k as epsilon falls (k = 12 of 25 columns on
+    sbo at epsilon 0.1), the opposite of the lemma and exponentially slower.
+    """
+    for k in range(min(3, num_attributes - 1), 0, -1):
+        if _usefulness_minus_target(k, num_attributes, num_tuples, 0, epsilon) > target_usefulness:
+            return k
+    return 1
 
 
 def _pb_exponential_mechanism(

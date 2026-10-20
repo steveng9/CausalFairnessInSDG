@@ -1,0 +1,33 @@
+{
+  "batch": "facct-cffix-dpdiff-2026-10-18",
+  "created": "2026-10-18T17:24:08",
+  "datasets": [
+    "compas",
+    "adult",
+    "snake",
+    "acsincome_ca",
+    "acsincome_tx",
+    "acspubcov_ca",
+    "acspubcov_tx",
+    "hmda_ca",
+    "hmda_tx"
+  ],
+  "methods": [
+    "decaf_dpdiffusion"
+  ],
+  "seeds": [
+    0,
+    1,
+    2,
+    3,
+    4
+  ],
+  "epsilons": [
+    1.0,
+    10.0,
+    1000.0
+  ],
+  "classifier": "rf",
+  "notes": "CF re-run of decaf_dpdiffusion after commit 2379bb9 (CF edges by DECAF Corollary 1), same datasets as facct-cffix-hand-2026-10-16. All 45 shards, including the ~14 whose CF rows in facct-2026-10-09 already ran on 2379bb9, so one rule holds: these rows supersede every decaf_dpdiffusion CF row of facct-2026-10-09. Settings unchanged (100 epochs). GPU 0 only (Steven, 2026-10-18; GPU 1 kept for Daniil). decaf_dpgan / decaf_dpctgan CF rows are not re-run.",
+  "only": "/cf"
+}

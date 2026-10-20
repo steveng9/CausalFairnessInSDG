@@ -533,3 +533,151 @@ python scripts/sweep.py status --batch facct-2026-10-09
 
 Known failures to revisit: `facct-fges` `hmda_tx` / `decaf` / seed 4, DP and CF cuts
 (3 runs, the synthetic outcome has a class with one member).
+
+## 16. Queued, 2026-10-14 — TabFairGAN comparison arm
+
+Why: it is the generator behind Eitan et al. ("fair synthetic data does not necessarily
+lead to fair models"), its own paper already shows the table-versus-people gap (COMPAS:
+discrimination score 0.258 in the real data, 0.009 in its synthetic table, 0.208 for a
+classifier trained on that table and tested on real people; Rajabi & Garibay 2022,
+Table II), and it imposes parity through a training loss with no causal graph. It
+separates "cutting edges" from "any in-table parity constraint".
+
+- `src/causal_fairness_sdg/sdg/tabfairgan.py`, method `tabfairgan`, in
+  `facct-2026-10-09`. It is the published package (`tabfairgan` 0.1.0 from PyPI, MIT
+  licence, installed in the `sdg` env), used unmodified; the module only adapts it.
+- Mechanisms `none` (no fairness phase) and `dp` (its parity loss) only. A method can
+  now declare `mechanisms`, and the grid gives it only those
+  (`run_experiments._mechanisms_of`). 5 seeds x 3 role splits x 2 = 30 runs per
+  dataset, 330 in all, not private (NULL epsilon).
+- One binary S per role split: the first attribute of `PROTECTED_PRIORITY[dataset]`
+  that the split protects. That is sex everywhere, race on COMPAS (as in the paper),
+  RAC1P on ACSPubCov `race_only_broad_adm`, and race on HMDA `race_narrow_adm`. A
+  many-valued S is binarised majority-vs-rest for training. Generated "rest" rows get a
+  value drawn from the training non-majority distribution. Recorded as `tabfairgan_s`
+  and `tabfairgan_s_under` on each row. Y_desire = 1, S_under = the group with the lower
+  real rate of y = 1; its loss is signed, so this pairing closes the gap.
+- Settings are the paper's Table III. COMPAS: 40 + 30 epochs, lambda 2.2. All others:
+  Adult's 170 + 30, lambda 0.5. Batch 256, n_crit 4, Adam 2e-4. All columns are
+  categorical; a constant numeric column is added for training only, because the
+  package fails without one.
+- Cost: 2.3–5 s an epoch on one thread (Adult, SNAKE, ACSIncome, CDC), so 10–17 min a
+  model. About 120 models (the `none` model and each S's `dp` model are reused across
+  role splits), plus scoring: about 30 core-hours. Smoke test on COMPAS and Adult
+  (3 epochs, scratch DB): 12/12 ok.
+- Queued in step 3 of `sweeps/chain-cpu-2026-10-14.sh`, beside the hand-graph torch
+  families. The chain waiter was restarted to pick it up (now PID 2186270, still
+  waiting on the eps chain).
+- Downstream: step 7's re-export gives it a `tabfairgan-none` Angelozzi arm (the eight
+  mitigators on an unconstrained GAN release), and step 10 scores
+  `tabfairgan-dp@<split>`. MAMA-MIA has no graph to read for it, so it gets every
+  1- and 2-way marginal as focal points (marginal flavour only;
+  `mama_mia.GRAPH_FREE_METHODS`).
+- Not done (cheap follow-ups on tables already saved, if wanted): Krchova-style
+  outcome re-drawing, and dropping the protected attribute before training as the FTU
+  comparison.
+
+## 17. Fix, 2026-10-15 — PrivBayes degree k at small epsilon; epsilon-0.1 runs redone
+
+- Symptom: in facct-eps-a every SNAKE and SBO PrivBayes shard was SIGKILLed twice and
+  given up. SBO shards had run 10–14 h without finishing one epsilon-0.1 run (9 min at
+  epsilon 1); SNAKE epsilon-0.1 runs took 51 min. Peak RSS between samples was about
+  1.3 GB, and the kernel log is not readable here, so out-of-memory is likely but not
+  proven.
+- Cause: the vendored `calculate_k` (from DataSynthesizer) root-finds from k = d/2
+  when k = 3 misses the usefulness target. That lands on a spurious root and
+  *raises* k as epsilon falls. At epsilon 0.1 (epsilon/2 for structure) on our training
+  splits the old k was: SBO 12 (of 25 columns), CDC 11, ACSPubCov 10, HMDA 8, SNAKE 7,
+  Adult 7, and 3 for ACSIncome and COMPAS. At epsilon 0.3 it was SBO 12 and COMPAS 2.
+  Every other epsilon gave 3.
+- Fix (`sdg/_privbayes_vendor.py`): the largest k <= 3 whose usefulness exceeds the
+  target, else 1. That is what PrivBayes Lemma 3 asks. New k at epsilon 0.1: 1 or 2
+  everywhere; at epsilon 0.3: SBO 2, COMPAS 1; at epsilon >= 1 unchanged (3), so the
+  main batch, the cut batches and all workshop results are unaffected. No collected
+  result used PrivBayes below epsilon 1.
+- Redone: all 569 PrivBayes epsilon-0.1 rows of facct-eps-a (550 done, 19 pending,
+  all datasets) were deleted. A copy of each shard DB from before the deletion and the
+  549 synthetic tables are in `sweeps/facct-eps-a-2026-10-13/invalid-privbayes-k-2026-10-15/`
+  (git-ignored). The epsilon-100 runs are kept.
+- Queue: the two stuck SBO shards were killed and the eps chain ended. Step 0 of
+  `sweeps/chain-cpu-2026-10-14.sh` now reruns facct-eps-a PrivBayes (14 workers)
+  before the Angelozzi and MAMA-MIA steps, so those never see the old tables.
+  facct-eps-b (still on hold, step 9) runs with the fixed k.
+
+## 18. Extra capacity, 2026-10-15 17:43 UTC
+
+The box was nearly idle (4 busy cores, GPU 1 empty), so `sweeps/extra-2026-10-15.sh`
+started two more schedulers beside the CPU chain (which keeps cores 32-47, 14 workers):
+- GPU 1, 1 worker: the DP causal families of facct-2026-10-09 (chain step 5),
+  log `sweeps/extra-2026-10-15-gpu1.log`. These rows record `device=cuda:0`.
+- Cores 20-31, 10 workers: facct-eps-b (chain step 9, on hold, run with
+  `--even-if-held`), log `sweeps/extra-2026-10-15-cpu.log`.
+Shard locks keep them apart from the chain, whose steps 5 and 9 skip what is finished.
+Cores 0-19 stay free for other users.
+- 2026-10-16 05:47: GPU 1 runs DP causal shards 3-4x faster than a CPU worker
+  (e.g. ACSIncome DP-CTGAN 27 vs 110 min), but one single-threaded worker left it at
+  about 0% utilisation. A second GPU 1 scheduler (`extra-2026-10-15.sh gpu1b`, 2 workers,
+  cores 17-19) brought it to about 60%. Each worker uses under 1.3 GB of GPU memory.
+- 2026-10-17 19:00: every sweep is finished (facct-2026-10-09 at 14849/14850, all
+  facct-cffix-* complete). Only chain step 10 is left (Angelozzi, 3108 cells, ~2300 to
+  go, ~42 cells/h on 14 workers). `sweeps/extra-grid-2026-10-17.sh` adds 14 workers on
+  cores 16-31 walking the grid in reverse (`facct_data/grid_reverse_2026-10-17.txt`);
+  cells skip once `.done` exists, so the two launchers meet in the middle.
+- 2026-10-17 19:04: added facct-cffix-cut075-2026-10-17 (CF arm, 7 datasets, 105 runs, GPU 0 + cores 4-15); cut075 had been missed from the cffix set.
+
+## 19. DP diffusion, 2026-10-18 17:24 UTC — CF re-run, privacy axis, epoch checks
+
+Steven chose to put the spare GPU on the DP-diffusion family (our novel backbone) rather
+than partial cuts for diffusion (which do not bear on its novelty). GPU 0 only; GPU 1
+stays free for Daniil. Launcher `sweeps/dpdiff-2026-10-18.sh`, two lanes sharing GPU 0:
+lane a (6 workers, cores 4-11, log `sweeps/dpdiff-2026-10-18-a.log`) and lane b
+(3 workers, cores 12-15, log `-b.log`). Cores 0-3 stay free.
+- `facct-cffix-dpdiff-2026-10-18` (lane a): CF arm of decaf_dpdiffusion, epsilon 1, 10,
+  1000, the 9 datasets of facct-cffix-hand, all 45 shards (about 14 had already run on
+  2379bb9, re-run anyway so one rule holds). Supersedes every decaf_dpdiffusion CF row of
+  facct-2026-10-09. decaf_dpgan / decaf_dpctgan CF rows are still not re-run.
+- `facct-eps-dpdiff-2026-10-18` (both lanes, after the above): epsilon 0.1, 3, 100, all
+  mechanisms, 11 datasets, 5 seeds (55 shards, 1,980 runs). With facct-2026-10-09 this
+  gives six points 0.1-1000. Settings unchanged (100 epochs, fixed across epsilon).
+- `facct-tune-dpdiff-e30-2026-10-18` (lane b): 30 epochs, epsilon 1000, no mechanism,
+  seeds 0-2, the 8 datasets the 2026-10-09/10 pilots did not compare at 30 epochs.
+- `facct-tune-dpdiff-e300-2026-10-18` (lane b): 300 epochs, same protocol, adult, snake,
+  acsincome_ca, hmda_ca. Both checks compare with the 100-epoch epsilon-1000 'none' rows
+  of facct-2026-10-09. They check the setting in use; changing it would invalidate the
+  existing DP-diffusion rows.
+- Cost from facct-2026-10-09 (CPU workers): DP diffusion took 160-900 CPU-min a shard
+  (COMPAS 11), about 130 CPU-h per epsilon over 11 datasets; GPU runs were 3-4x faster.
+- 2026-10-19: CF re-run, both epoch checks, and epsilon 3 and 100 finished. Epsilon 0.1
+  failed on all 55 shards: the accountant's Renyi orders stopped at 127, which floors
+  epsilon at about log(1/delta)/126 = 0.16 at delta 1e-9. `_decaf_dp._ORDERS` now runs to
+  1024 (also used by decaf_dpgan / decaf_dpctgan); noise multipliers for epsilon >= 0.3
+  are identical to before (checked at three sample-rate/step settings). Epsilon 0.1
+  relaunched 18:12 UTC with the same launcher, logs `sweeps/dpdiff-2026-10-19-eps01-{a,b}.log`.
+  The failed rows stay in the shard DBs with status 'failed'.
+- 2026-10-20, epoch checks read (decaf_dpdiffusion, epsilon 1000, no mechanism, seeds 0-2,
+  mean over role splits; 100 = facct-2026-10-09 rows, 30 on acsincome_ca/snake/sbo from
+  facct-tune-e30-2026-10-09). RF AUC: 100 epochs >= 30 everywhere (by 0.00-0.025), and 300
+  is no better than 100 (within 0.006 on the four datasets run). Two-way TVD is mixed:
+  30 epochs is closer on ACSPubCov, CDC, HMDA (by 0.01-0.03), 100 is closer on Adult (0.134
+  vs 0.177); 300 is equal or worse than 100. Training loss keeps falling to 300. Verdict:
+  100 epochs is a defensible setting (utility saturates there; more epochs buys nothing),
+  with a mild fidelity cost against 30 on some datasets. Not re-tuned.
+
+## 20. CF re-runs carried through, 2026-10-20 16:20 UTC
+
+- `facct-cffix-dpgan-2026-10-20`: CF arm of decaf_dpgan and decaf_dpctgan, epsilon 1, 10,
+  1000, the 9 cffix-hand datasets, all 90 shards (810 runs). GPU 0, 10 workers on cores
+  4-15, `sweeps/cffix-dpgan-2026-10-20.sh`. Supersedes every DP-GAN / DP-CTGAN CF row of
+  facct-2026-10-09. With it every causal family's CF rows on the hand graphs come from a
+  facct-cffix-* batch.
+- Angelozzi mitigators on the new CF tables. `facct_bench.py export` gained `--merge`
+  (update only the exported arms of each manifest; a plain export would have dropped
+  every other arm). The CF arms of decaf_tabpfn, decaf, decaf_ctgan, decaf_diffusion
+  (facct-cffix-hand) and decaf_dpdiffusion (facct-cffix-dpdiff) were re-pointed: 340
+  cells, all `-cf@` arms, none lost (diffed against
+  `facct_data/backup-pre-cffix-2026-10-20/`). Old-rule outputs moved to
+  `facct_output/invalid-cf-oldrule-2026-10-20/` (not collected). Re-scored on cores 16-47,
+  28 jobs, `sweeps/angelozzi-cffix-2026-10-20.sh`, which then runs `collect`.
+- `sweeps/angelozzi-cffix-dpgan-2026-10-20.sh` waits on both PIDs, then does the same for
+  the DP-GAN / DP-CTGAN CF arms (grid `facct_data/grid_cffix_dpgan_2026-10-20.txt`) and
+  collects again. CDC and SBO keep their CF arms: the new rule does not change their cuts.

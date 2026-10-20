@@ -39,6 +39,8 @@ epsilon slot `inf`.
     JOBS=14 CPUS=32-47 baselines/launch_facct_grid.sh
     # 3. one tidy table
     python baselines/facct_bench.py collect
+    # re-run batches that supersede some arms (e.g. facct-cffix-*): export with
+    # --merge, then rerun those cells with `cell ... --force`
 """
 from __future__ import annotations
 
@@ -133,6 +135,10 @@ def cmd_export(args) -> None:
                         / f"run_{run['run_id']}.parquet")
                 tags[tag] = files
                 grid.append((name, tag))
+            if args.merge and (base / "manifest.json").exists():
+                # Replace only the arms exported now (e.g. a CF re-run batch),
+                # keep every other arm of the existing manifest.
+                tags = {**json.loads((base / "manifest.json").read_text())["tags"], **tags}
             manifest = {
                 "dataset": dataset, "attribute": attr, "target": target,
                 "columns": list(data.columns), "majority_value": int(majority),
@@ -227,6 +233,9 @@ def main() -> None:
     export.add_argument("--methods", default=None)
     export.add_argument("--eps", default=None, help="keep only these epsilons (non-private runs always kept)")
     export.add_argument("--classifiers", default="XGB")
+    export.add_argument("--merge", action="store_true",
+                        help="update the arms exported now in each existing manifest, keep the rest "
+                             "(for re-run batches that supersede some arms)")
     export.set_defaults(func=cmd_export)
     cell = sub.add_parser("cell")
     cell.add_argument("name"), cell.add_argument("tag"), cell.add_argument("classifier")

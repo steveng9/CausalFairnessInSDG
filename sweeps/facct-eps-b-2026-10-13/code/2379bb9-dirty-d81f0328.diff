@@ -1,0 +1,358 @@
+diff --git a/.gitignore b/.gitignore
+index b73d008..7897baa 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -36,6 +36,7 @@ experiments.db
+ /sweeps/*/db/
+ /sweeps/*/synth/
+ /sweeps/*/locks/
++/sweeps/*/invalid-*/
+ /sweeps/*/fairpfn_baseline/inputs/
+ /sweeps/*/fairpfn_baseline/preds/
+ /sweeps/*/preds/
+diff --git a/notes/2026-10-09-facct-sweep.md b/notes/2026-10-09-facct-sweep.md
+index d429f62..d48afa3 100644
+--- a/notes/2026-10-09-facct-sweep.md
++++ b/notes/2026-10-09-facct-sweep.md
+@@ -533,3 +533,88 @@ python scripts/sweep.py status --batch facct-2026-10-09
+ 
+ Known failures to revisit: `facct-fges` `hmda_tx` / `decaf` / seed 4, DP and CF cuts
+ (3 runs, the synthetic outcome has a class with one member).
++
++## 16. Queued, 2026-10-14 — TabFairGAN comparison arm
++
++Why: it is the generator behind Eitan et al. ("fair synthetic data does not necessarily
++lead to fair models"), its own paper already shows the table-versus-people gap (COMPAS:
++discrimination score 0.258 in the real data, 0.009 in its synthetic table, 0.208 for a
++classifier trained on that table and tested on real people; Rajabi & Garibay 2022,
++Table II), and it imposes parity through a training loss with no causal graph. It
++separates "cutting edges" from "any in-table parity constraint".
++
++- `src/causal_fairness_sdg/sdg/tabfairgan.py`, method `tabfairgan`, in
++  `facct-2026-10-09`. It is the published package (`tabfairgan` 0.1.0 from PyPI, MIT
++  licence, installed in the `sdg` env), used unmodified; the module only adapts it.
++- Mechanisms `none` (no fairness phase) and `dp` (its parity loss) only. A method can
++  now declare `mechanisms`, and the grid gives it only those
++  (`run_experiments._mechanisms_of`). 5 seeds x 3 role splits x 2 = 30 runs per
++  dataset, 330 in all, not private (NULL epsilon).
++- One binary S per role split: the first attribute of `PROTECTED_PRIORITY[dataset]`
++  that the split protects. That is sex everywhere, race on COMPAS (as in the paper),
++  RAC1P on ACSPubCov `race_only_broad_adm`, and race on HMDA `race_narrow_adm`. A
++  many-valued S is binarised majority-vs-rest for training. Generated "rest" rows get a
++  value drawn from the training non-majority distribution. Recorded as `tabfairgan_s`
++  and `tabfairgan_s_under` on each row. Y_desire = 1, S_under = the group with the lower
++  real rate of y = 1; its loss is signed, so this pairing closes the gap.
++- Settings are the paper's Table III. COMPAS: 40 + 30 epochs, lambda 2.2. All others:
++  Adult's 170 + 30, lambda 0.5. Batch 256, n_crit 4, Adam 2e-4. All columns are
++  categorical; a constant numeric column is added for training only, because the
++  package fails without one.
++- Cost: 2.3–5 s an epoch on one thread (Adult, SNAKE, ACSIncome, CDC), so 10–17 min a
++  model. About 120 models (the `none` model and each S's `dp` model are reused across
++  role splits), plus scoring: about 30 core-hours. Smoke test on COMPAS and Adult
++  (3 epochs, scratch DB): 12/12 ok.
++- Queued in step 3 of `sweeps/chain-cpu-2026-10-14.sh`, beside the hand-graph torch
++  families. The chain waiter was restarted to pick it up (now PID 2186270, still
++  waiting on the eps chain).
++- Downstream: step 7's re-export gives it a `tabfairgan-none` Angelozzi arm (the eight
++  mitigators on an unconstrained GAN release), and step 10 scores
++  `tabfairgan-dp@<split>`. MAMA-MIA has no graph to read for it, so it gets every
++  1- and 2-way marginal as focal points (marginal flavour only;
++  `mama_mia.GRAPH_FREE_METHODS`).
++- Not done (cheap follow-ups on tables already saved, if wanted): Krchova-style
++  outcome re-drawing, and dropping the protected attribute before training as the FTU
++  comparison.
++
++## 17. Fix, 2026-10-15 — PrivBayes degree k at small epsilon; epsilon-0.1 runs redone
++
++- Symptom: in facct-eps-a every SNAKE and SBO PrivBayes shard was SIGKILLed twice and
++  given up. SBO shards had run 10–14 h without finishing one epsilon-0.1 run (9 min at
++  epsilon 1); SNAKE epsilon-0.1 runs took 51 min. Peak RSS between samples was about
++  1.3 GB, and the kernel log is not readable here, so out-of-memory is likely but not
++  proven.
++- Cause: the vendored `calculate_k` (from DataSynthesizer) root-finds from k = d/2
++  when k = 3 misses the usefulness target. That lands on a spurious root and
++  *raises* k as epsilon falls. At epsilon 0.1 (epsilon/2 for structure) on our training
++  splits the old k was: SBO 12 (of 25 columns), CDC 11, ACSPubCov 10, HMDA 8, SNAKE 7,
++  Adult 7, and 3 for ACSIncome and COMPAS. At epsilon 0.3 it was SBO 12 and COMPAS 2.
++  Every other epsilon gave 3.
++- Fix (`sdg/_privbayes_vendor.py`): the largest k <= 3 whose usefulness exceeds the
++  target, else 1. That is what PrivBayes Lemma 3 asks. New k at epsilon 0.1: 1 or 2
++  everywhere; at epsilon 0.3: SBO 2, COMPAS 1; at epsilon >= 1 unchanged (3), so the
++  main batch, the cut batches and all workshop results are unaffected. No collected
++  result used PrivBayes below epsilon 1.
++- Redone: all 569 PrivBayes epsilon-0.1 rows of facct-eps-a (550 done, 19 pending,
++  all datasets) were deleted. A copy of each shard DB from before the deletion and the
++  549 synthetic tables are in `sweeps/facct-eps-a-2026-10-13/invalid-privbayes-k-2026-10-15/`
++  (git-ignored). The epsilon-100 runs are kept.
++- Queue: the two stuck SBO shards were killed and the eps chain ended. Step 0 of
++  `sweeps/chain-cpu-2026-10-14.sh` now reruns facct-eps-a PrivBayes (14 workers)
++  before the Angelozzi and MAMA-MIA steps, so those never see the old tables.
++  facct-eps-b (still on hold, step 9) runs with the fixed k.
++
++## 18. Extra capacity, 2026-10-15 17:43 UTC
++
++The box was nearly idle (4 busy cores, GPU 1 empty), so `sweeps/extra-2026-10-15.sh`
++started two more schedulers beside the CPU chain (which keeps cores 32-47, 14 workers):
++- GPU 1, 1 worker: the DP causal families of facct-2026-10-09 (chain step 5),
++  log `sweeps/extra-2026-10-15-gpu1.log`. These rows record `device=cuda:0`.
++- Cores 20-31, 10 workers: facct-eps-b (chain step 9, on hold, run with
++  `--even-if-held`), log `sweeps/extra-2026-10-15-cpu.log`.
++Shard locks keep them apart from the chain, whose steps 5 and 9 skip what is finished.
++Cores 0-19 stay free for other users.
++- 2026-10-16 05:47: GPU 1 runs DP causal shards 3-4x faster than a CPU worker
++  (e.g. ACSIncome DP-CTGAN 27 vs 110 min), but one single-threaded worker left it at
++  about 0% utilisation. A second GPU 1 scheduler (`extra-2026-10-15.sh gpu1b`, 2 workers,
++  cores 17-19) brought it to about 60%. Each worker uses under 1.3 GB of GPU memory.
+diff --git a/scripts/mama_mia.py b/scripts/mama_mia.py
+index bd39032..6edba39 100644
+--- a/scripts/mama_mia.py
++++ b/scripts/mama_mia.py
+@@ -33,6 +33,9 @@ What the focal points are for each generator:
+                     fairness mechanism cut (a cut parent is permuted, so the
+                     synthetic child no longer depends on it). A partial cut
+                     (`cut_strength` < 1) keeps the edge.
++  tabfairgan        no structure to read: every 1- and 2-way marginal, with
++                    every shadow agreeing on all of them. Marginal flavour
++                    only.
+ 
+ Two focal-point sources are scored for every run:
+ 
+@@ -65,6 +68,7 @@ membership advantage. Resumable per shard. Nothing is trained or generated.
+ from __future__ import annotations
+ 
+ import argparse
++import itertools
+ import json
+ import sqlite3
+ import sys
+@@ -95,6 +99,10 @@ TEST_SIZE = 0.3  # must match `experiments.runner.RunConfig.test_size`
+ FP_WEIGHT_THRESHOLDS = {0.01: 0.5, 1: 0.6, 10: 0.7, 100: 0.8, 1000: 0.85}
+ DEFAULT_RATIO_VALUE = 1e-10  # `default_val` in the original attack code
+ UNDIRECTED_METHODS = ("mst", "privsyn", "aim")
++#: Generators that select no structure (TabFairGAN). Without a graph to read
++#: the attacker falls back to every pair: the marginal flavour over all 1- and
++#: 2-way marginals, and no conditional flavour.
++GRAPH_FREE_METHODS = ("tabfairgan",)
+ #: Keys of `extra_params` that describe the machine or the batch, not the
+ #: algorithm; everything else must match for two runs to be shadows of each other.
+ NOT_ALGORITHM_KEYS = (
+@@ -132,6 +140,9 @@ def focal_points(
+ ) -> Tuple[List[Marginal], Optional[List[Conditional]]]:
+     """(marginal focal points, conditional focal points) of one recorded run."""
+     edges = [(a, b) for a, b in edges if a in columns and b in columns]
++    if method in GRAPH_FREE_METHODS:
++        pairs = [frozenset(p) for p in itertools.combinations(columns, 2)]
++        return [frozenset([c]) for c in columns] + pairs, None
+     if method in UNDIRECTED_METHODS:
+         directed = orient_forest(columns, edges)
+     else:
+diff --git a/scripts/run_experiments.py b/scripts/run_experiments.py
+index 3f663dc..38b7997 100644
+--- a/scripts/run_experiments.py
++++ b/scripts/run_experiments.py
+@@ -66,10 +66,15 @@ DIFFUSION_BACKBONE_METHODS = ["decaf_diffusion", "decaf_dpdiffusion"]
+ #: Nothing to train or tune; needs the `sdg_tabpfn` environment (see
+ #: `sdg/decaf_tabpfn.py`).
+ FOUNDATION_BACKBONE_METHODS = ["decaf_tabpfn"]
++#: Fair-GAN comparison arm with no causal graph (`sdg/tabfairgan.py`). Not a
++#: DECAF backbone, but trained and cached the same way, and its settings and
++#: device go through the same `overrides`.
++FAIR_GAN_METHODS = ["tabfairgan"]
+ #: Every DECAF backbone swap: one fitted model per (data, seed, epsilon),
+ #: settings and device carried on the method object.
+ BACKBONE_METHODS = [
+     *GAN_BACKBONE_METHODS, *DIFFUSION_BACKBONE_METHODS, *FOUNDATION_BACKBONE_METHODS,
++    *FAIR_GAN_METHODS,
+ ]
+ 
+ MECHANISMS = ["none", "ftu", "dp", "cf"]
+@@ -308,6 +313,13 @@ ROLE_CONFIGS: Dict[str, List[RoleConfig]] = {
+ }
+ 
+ 
++def _mechanisms_of(method: str) -> List[str]:
++    """MECHANISMS, less any the method does not implement (TabFairGAN has
++    only `none` and its own demographic-parity loss)."""
++    own = getattr(SDG_METHODS.get(method), "mechanisms", None)
++    return [m for m in MECHANISMS if own is None or m in own]
++
++
+ def _is_gan(method: str) -> bool:
+     """Torch-trained methods cache one trained model per (data, seed, epsilon).
+ 
+@@ -443,7 +455,7 @@ def build_configs(
+             )
+             for epsilon in epsilons:
+                 for method in marginal:
+-                    for mechanism in MECHANISMS:
++                    for mechanism in _mechanisms_of(method):
+                         for seed in seeds:
+                             configs.append(
+                                 RunConfig(
+@@ -474,7 +486,7 @@ def build_configs(
+             for seed in seeds:
+                 for epsilon in gan_epsilons:
+                     for role_name, protected, admissible in roles_for_dataset:
+-                        for mechanism in MECHANISMS:
++                        for mechanism in _mechanisms_of(method):
+                             configs.append(
+                                 RunConfig(
+                                     dataset=dataset,
+diff --git a/src/causal_fairness_sdg/experiments/runner.py b/src/causal_fairness_sdg/experiments/runner.py
+index a216a20..0b3ae45 100644
+--- a/src/causal_fairness_sdg/experiments/runner.py
++++ b/src/causal_fairness_sdg/experiments/runner.py
+@@ -25,6 +25,7 @@ from ..sdg.base import SDGMethod
+ from ..sdg.mst import MST
+ from ..sdg.privbayes import PrivBayes
+ from ..sdg.privsyn import PrivSyn
++from ..sdg.tabfairgan import TabFairGANMethod
+ from . import db
+ 
+ try:
+@@ -72,6 +73,9 @@ if DECAFTabPFNMethod is not None:
+     # installed, so every environment agrees on what the grid contains; it
+     # raises at fit time (and `run_experiments.py` refuses up front) without it.
+     SDG_METHODS["decaf_tabpfn"] = DECAFTabPFNMethod()
++# Fair-GAN baseline with no causal graph (published `tabfairgan` package,
++# imported at fit time). Not private; `none` and `dp` only.
++SDG_METHODS["tabfairgan"] = TabFairGANMethod()
+ 
+ 
+ #: `eval_reference` value meaning "compute fairness metrics against *both*
+diff --git a/src/causal_fairness_sdg/sdg/_privbayes_vendor.py b/src/causal_fairness_sdg/sdg/_privbayes_vendor.py
+index 1a8baaa..289295d 100644
+--- a/src/causal_fairness_sdg/sdg/_privbayes_vendor.py
++++ b/src/causal_fairness_sdg/sdg/_privbayes_vendor.py
+@@ -21,6 +21,8 @@ Deviations from the original, deliberate rather than oversights:
+     whole run's privacy budget is a clean `epsilon/2` (structure) +
+     `epsilon/2` (conditional distributions), rather than +epsilon more spent
+     on outputs this project doesn't consume.
++  - `calculate_k` searches k <= 3 downwards instead of root-finding from
++    d/2, which picked k far above 3 at small epsilon (see its docstring).
+   - PrivBayes is pure epsilon-DP (Laplace + exponential mechanisms); `delta`
+     is accepted by the caller (`sdg/privbayes.py`) for `SDGMethod` interface
+     parity but unused here, same as DECAF ignores epsilon/delta entirely.
+@@ -29,13 +31,12 @@ Deviations from the original, deliberate rather than oversights:
+ from __future__ import annotations
+ 
+ import itertools
+-from math import ceil, log
++from math import log
+ from typing import Dict, List, Optional, Sequence, Tuple
+ 
+ import networkx as nx
+ import numpy as np
+ import pandas as pd
+-from scipy.optimize import fsolve
+ from sklearn.metrics import mutual_info_score
+ 
+ from ..fairness.base import AttributeRoles, Edge, FairnessMechanism, edges_allowed
+@@ -93,18 +94,19 @@ def _usefulness_minus_target(k, num_attributes, num_tuples, target_usefulness, e
+ 
+ 
+ def calculate_k(num_attributes: int, num_tuples: int, target_usefulness: float = 4, epsilon: float = 0.1) -> int:
+-    """PrivBayes Lemma 3: maximum parent-set size."""
+-    default_k = 3
+-    if _usefulness_minus_target(default_k, num_attributes, num_tuples, 0, epsilon) > target_usefulness:
+-        return default_k
+-    try:
+-        k = ceil(fsolve(
+-            _usefulness_minus_target, np.array([int(num_attributes / 2)]),
+-            args=(num_attributes, num_tuples, target_usefulness, epsilon),
+-        )[0])
+-    except Exception:
+-        return default_k
+-    return k if 1 <= k <= num_attributes else default_k
++    """PrivBayes Lemma 3: maximum parent-set size.
++
++    The largest k <= 3 whose theta-usefulness n * eps / ((d - k) 2^(k+3))
++    exceeds the target, and 1 when none does. DataSynthesizer instead
++    root-finds from k = d/2 once k = 3 misses the target. Usefulness falls
++    with k only while d - k stays large, so that search lands on a spurious
++    root near d/2 and *raises* k as epsilon falls (k = 12 of 25 columns on
++    sbo at epsilon 0.1), the opposite of the lemma and exponentially slower.
++    """
++    for k in range(min(3, num_attributes - 1), 0, -1):
++        if _usefulness_minus_target(k, num_attributes, num_tuples, 0, epsilon) > target_usefulness:
++            return k
++    return 1
+ 
+ 
+ def _pb_exponential_mechanism(
+diff --git a/src/causal_fairness_sdg/sdg/base.py b/src/causal_fairness_sdg/sdg/base.py
+index 711c958..f000abf 100644
+--- a/src/causal_fairness_sdg/sdg/base.py
++++ b/src/causal_fairness_sdg/sdg/base.py
+@@ -52,6 +52,10 @@ class SDGMethod(ABC):
+     #: never implies a privacy guarantee that wasn't provided.
+     is_private: bool = True
+ 
++    #: The fairness mechanisms this method implements, or None for all of
++    #: them. The grid gives a method only these (`run_experiments.build_configs`).
++    mechanisms: Optional[Tuple[str, ...]] = None
++
+     @abstractmethod
+     def fit_generate(
+         self,
+diff --git a/sweeps/chain-cpu-2026-10-14.sh b/sweeps/chain-cpu-2026-10-14.sh
+index 63d6af8..c0fb3a2 100755
+--- a/sweeps/chain-cpu-2026-10-14.sh
++++ b/sweeps/chain-cpu-2026-10-14.sh
+@@ -2,13 +2,19 @@
+ # CPU queue started 2026-10-13/14, cores 32-47, at most 14 processes, in this
+ # order, once the earlier CPU chain whose PID is given as $1 has exited
+ # (facct-eps-a; facct-eps-b is on hold in its sweep.json and returns at once):
++#   0. facct-eps-a PrivBayes: the SNAKE and SBO shards, and every epsilon-0.1
++#      run again (added 2026-10-15). The vendored `calculate_k` picked k up to
++#      12 at epsilon 0.1, so those runs were wrong or never finished; the
++#      fixed k is 1-2 and they take minutes. The old runs are archived in
++#      sweeps/facct-eps-a-2026-10-13/invalid-privbayes-k-2026-10-15/.
+ #   1. Angelozzi & Arcolezi mitigators on the no-mechanism releases (the
+ #      downstream baseline) of every generator in facct-2026-10-09
+ #   2. MAMA-MIA on every saved table so far
+-#   3. torch causal families on the hand-drawn graphs (facct-2026-10-09)
++#   3. torch causal families on the hand-drawn graphs, and TabFairGAN
++#      (added 2026-10-14; no graph, about 30 core-hours) (facct-2026-10-09)
+ #   4. Angelozzi harness on MST's mechanism arms
+ #   5. DP causal families (DP-SGD GAN / CTGAN / diffusion), hand-drawn graphs
+-#   6. the three SNAKE PrivBayes shards of facct-eps-a that were killed (4 workers)
++#   6. anything of facct-eps-a still missing (normally nothing after step 0)
+ #   7. Angelozzi harness: export again to pick up the new families, then their
+ #      no-mechanism arms
+ #   8. MAMA-MIA on what was added
+@@ -31,9 +37,10 @@ mia() { OMP_NUM_THREADS=1 $PIN $SDG scripts/mama_mia.py --batches "$1" --workers
+ 
+ step "waiting for pid $WAIT_PID"
+ while kill -0 "$WAIT_PID" 2>/dev/null; do sleep 60; done
++step "0 facct-eps-a PrivBayes, epsilon 0.1 again"; sweep facct-eps-a-2026-10-13 14 --methods privbayes
+ step "1 Angelozzi, no-mechanism arms";            grid ' [a-z_]+-none '; collect
+ step "2 MAMA-MIA";                                mia "$BATCHES"
+-step "3 torch families, hand graphs";             sweep $MAIN 14 --methods decaf,decaf_ctgan,decaf_diffusion
++step "3 torch families (hand graphs), TabFairGAN"; sweep $MAIN 14 --methods decaf,decaf_ctgan,decaf_diffusion,tabfairgan
+ step "4 Angelozzi, MST mechanism arms";           grid ' mst-'; collect
+ step "5 DP causal families";                      sweep $MAIN 14 --methods decaf_dpgan,decaf_dpctgan,decaf_dpdiffusion
+ step "6 facct-eps-a leftovers";                   sweep facct-eps-a-2026-10-13 4
+diff --git a/sweeps/facct-2026-10-09/sweep.json b/sweeps/facct-2026-10-09/sweep.json
+index 7c5c257..f0ba5bf 100644
+--- a/sweeps/facct-2026-10-09/sweep.json
++++ b/sweeps/facct-2026-10-09/sweep.json
+@@ -24,7 +24,8 @@
+     "decaf_diffusion",
+     "decaf_dpgan",
+     "decaf_dpctgan",
+-    "decaf_dpdiffusion"
++    "decaf_dpdiffusion",
++    "tabfairgan"
+   ],
+   "seeds": [
+     0,
+@@ -39,7 +40,7 @@
+     1000.0
+   ],
+   "classifier": "rf",
+-  "notes": "FAccT unified sweep. Marginal generators only for now; torch backbones (decaf, decaf_ctgan, decaf_dpgan, decaf_dpctgan, decaf_diffusion, decaf_dpdiffusion) are added to 'methods' once their per-dataset epochs are tuned. 2026-10-10: added acspubcov_ca, acspubcov_tx, cdc_diabetes (marginal generators). 2026-10-10: added decaf_tabpfn (DECAF's causal generator with TabPFN-3.5 in context as every attribute's conditional; not private, so one run per cell with NULL epsilon; hand-drawn DAGs, same as the GAN/diffusion families). Its shards run under the sdg_tabpfn environment ('python') and only from a scheduler given --gpu ('gpu_only'). Settings are on every row's extra_params; held-out log-loss of its conditionals is in tabpfn_conditionals.csv. 2026-10-12: added hmda_ca, hmda_tx (HMDA 2018 mortgage applications, data/hmda.py; marginal generators and decaf_tabpfn) and adult, compas (appendix continuity; previously only in rf-2026-09-01 at eps=10). 2026-10-13: added the torch causal families on the hand-drawn DAGs (decaf, decaf_ctgan, decaf_diffusion; not private, one run per cell) so that every causal family has the hand graph, and their DP-SGD variants (decaf_dpgan, decaf_dpctgan, decaf_dpdiffusion; epsilon 1, 10, 1000). The hand graph is fixed and data-independent, so the DP variants' guarantee holds here; it would not on the discovered graphs of facct-fges-2026-10-13. Epochs: DECAF_SETTINGS / each method's SETTINGS, the ACS, CDC and HMDA datasets borrowing SNAKE's (untuned for the DP variants).",
++  "notes": "FAccT unified sweep. Marginal generators only for now; torch backbones (decaf, decaf_ctgan, decaf_dpgan, decaf_dpctgan, decaf_diffusion, decaf_dpdiffusion) are added to 'methods' once their per-dataset epochs are tuned. 2026-10-10: added acspubcov_ca, acspubcov_tx, cdc_diabetes (marginal generators). 2026-10-10: added decaf_tabpfn (DECAF's causal generator with TabPFN-3.5 in context as every attribute's conditional; not private, so one run per cell with NULL epsilon; hand-drawn DAGs, same as the GAN/diffusion families). Its shards run under the sdg_tabpfn environment ('python') and only from a scheduler given --gpu ('gpu_only'). Settings are on every row's extra_params; held-out log-loss of its conditionals is in tabpfn_conditionals.csv. 2026-10-12: added hmda_ca, hmda_tx (HMDA 2018 mortgage applications, data/hmda.py; marginal generators and decaf_tabpfn) and adult, compas (appendix continuity; previously only in rf-2026-09-01 at eps=10). 2026-10-13: added the torch causal families on the hand-drawn DAGs (decaf, decaf_ctgan, decaf_diffusion; not private, one run per cell) so that every causal family has the hand graph, and their DP-SGD variants (decaf_dpgan, decaf_dpctgan, decaf_dpdiffusion; epsilon 1, 10, 1000). The hand graph is fixed and data-independent, so the DP variants' guarantee holds here; it would not on the discovered graphs of facct-fges-2026-10-13. Epochs: DECAF_SETTINGS / each method's SETTINGS, the ACS, CDC and HMDA datasets borrowing SNAKE's (untuned for the DP variants). 2026-10-14: added tabfairgan (Rajabi & Garibay 2022, the published package unmodified; sdg/tabfairgan.py): WGAN-GP with a demographic-parity loss, no causal graph. Mechanisms none (no fairness phase) and dp (its parity loss) only; one binary S per role split (PROTECTED_PRIORITY), paper's Table III settings (COMPAS 40+30 epochs, lambda 2.2; everything else Adult's 170+30, lambda 0.5). Not private, one run per cell.",
+   "python": {
+     "decaf_tabpfn": "/home/golobs/miniconda3/envs/sdg_tabpfn/bin/python"
+   },
