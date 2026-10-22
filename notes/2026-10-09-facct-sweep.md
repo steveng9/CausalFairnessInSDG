@@ -943,3 +943,9 @@ family (every causal family has 660 runs on each graph source).
   CSVs, notes and the staged deletion of the old FAccT zip; no file under `src/`.
   So the generator code is commit 4d04cba. They stay local (git-ignored), as does
   `sweeps/arms-2026-10-22/` (2.2 GB of rows, predictions and re-sampled tables).
+- **Angelozzi re-score at the chosen lambda, done 12:54 UTC.** All 63 cells passed;
+  grid back at 3,087 of 3,108 cells; `angelozzi_mitigators.csv` 798,388 rows (was
+  798,473). The -85 rows are two CDC Education paper-lambda cells that were malformed:
+  `tabfairgan-dp@ses_narrow_adm` had half of seed 2 (153 rows) and
+  `@ses_clinical_adm` had seeds 2-4 twice (272); both now have the regular 5 seeds x 34
+  = 170. The chained MAMA-MIA run found the lambda batches up to date.
