@@ -43,7 +43,12 @@ Settings, from the paper's Table III (batch 256, n_crit 4, Adam 2e-4 and the
 WGAN-GP weight 10 are fixed in the package): COMPAS 40 + 30 epochs, lambda
 2.2; Adult 170 + 30, lambda 0.5. Every other dataset takes Adult's, the
 paper's setting for the larger census-style table. Their COMPAS is a
-different extract (risk decile, 16k rows) from ours.
+different extract (risk decile, 16k rows) from ours (6,172 rows, 17 batches
+an epoch), and at 70 epochs our COMPAS release carries no signal (RF AUC 0.50
+on the real holdout, 2026-10-22). COMPAS therefore trains 970 + 30 epochs,
+about the generator steps Adult gets from 200 (as DECAF's COMPAS epochs are
+scaled in `run_experiments.py`): AUC 0.66 at 200, 0.68 at 500, 0.69 at 1000
+(seed 0, unmitigated). Lambda stays the paper's 2.2.
 
 **Not private.** `epsilon`/`delta` are accepted for interface parity and
 logged as NULL.
@@ -79,7 +84,7 @@ PROTECTED_PRIORITY: Dict[str, List[str]] = {
 
 PAPER_ADULT = {"epochs": 200, "fair_epochs": 30, "lamda": 0.5, "batch_size": 256}
 SETTINGS: Dict[str, Dict[str, Any]] = {
-    "compas": {"epochs": 70, "fair_epochs": 30, "lamda": 2.2, "batch_size": 256},
+    "compas": {"epochs": 1000, "fair_epochs": 30, "lamda": 2.2, "batch_size": 256},
 }
 
 CONST_COL = "_tabfairgan_const"

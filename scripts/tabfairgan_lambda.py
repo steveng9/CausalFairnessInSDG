@@ -11,6 +11,8 @@ table. No real holdout is used for the choice.
 
 Reads the dp runs of facct-2026-10-09 (lambda 0.5, COMPAS 2.2) and of the
 facct-tfg-lam* batches, and writes
+(COMPAS comes only from the facct-tfg-compas* batches, re-run at 1000 epochs
+because 70 left its release without signal; sweep notes section 21.2)
 
   report/data/facct/tabfairgan_lambda.csv          one row per run: lambda,
       S, label gap on S and on every attribute the split protects, and the
@@ -42,6 +44,7 @@ from causal_fairness_sdg.data.datasets import DATASETS  # noqa: E402
 SWEEPS = REPO / "sweeps"
 OUT = REPO / "report" / "data" / "facct"
 MAIN = "facct-2026-10-09"
+COMPAS_REDO = "facct-tfg-compas"  # batch prefix; replaces COMPAS in every other batch
 TEST_SIZE = 0.3  # the runner's holdout share; the training rows give S's majority
 TIE = 0.01  # 1 pp of label gap
 
@@ -69,7 +72,9 @@ def runs_of(batch: str) -> pd.DataFrame:
 
 def main() -> int:
     batches = [MAIN] + sorted(Path(p).name for p in glob.glob(str(SWEEPS / "facct-tfg-lam*")))
+    batches += sorted(Path(p).name for p in glob.glob(str(SWEEPS / f"{COMPAS_REDO}*")))
     runs = pd.concat([runs_of(b) for b in batches], ignore_index=True)
+    runs = runs[(runs.dataset != "compas") | runs.batch.str.startswith(COMPAS_REDO)]
     extra = runs.extra_params.map(lambda e: json.loads(e or "{}"))
     runs["role_config"] = extra.map(lambda e: e.get("role_config"))
     runs["S"] = extra.map(lambda e: e.get("tabfairgan_s"))

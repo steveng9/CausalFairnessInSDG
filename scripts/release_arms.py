@@ -29,6 +29,15 @@ Arms
               (epsilon none or 1000): replace a share `frac` of outcomes with
               draws at the table's base rate, retrain, score. All recipient
               models see the same scrambled table at each `frac`.
+  placebo_split
+              the same scrambled tables and models as `placebo`, scored once
+              per role split of the shard (its protected and admissible
+              attributes), so the placebo has conditional gaps and matches
+              each edit's split exactly.
+  unaware_recipients, resample_recipients
+              `unaware` and `resample` with `lr_ohe` and `hgb` in place of the
+              forest (the re-sampled tables are regenerated, identical to the
+              saved ones, so lam 0 is there too).
 
 Output (resumable; finished keys are skipped):
   sweeps/arms-2026-10-22/<arm>/rows/<batch>/<shard>.jsonl   one row per key
@@ -50,6 +59,7 @@ import sqlite3
 import sys
 import time
 from concurrent.futures import ProcessPoolExecutor, as_completed
+from functools import partial
 from pathlib import Path
 from typing import Dict, List, Sequence
 
@@ -212,14 +222,17 @@ def base_row(batch: str, shard: str, run) -> Dict:
 # Arms. Each yields (key, row, proba-or-None) for one run.
 
 
-def arm_unaware(batch, shard, run, synth, holdout, protected, admissible, outcome, majority):
-    model = make_model("rf")
+def arm_unaware(batch, shard, run, synth, holdout, protected, admissible, outcome, majority,
+                models=("rf",)):
     features = [c for c in synth.columns if c != outcome and c not in set(protected)]
-    model.fit(synth[features], synth[outcome])
-    m = score(model, features, synth, holdout, protected, admissible, outcome, majority)
-    proba = m.pop("_proba")
-    yield f"{run.run_id}", {**base_row(batch, shard, run), "arm": "unaware",
-                            "dropped": json.dumps(sorted(protected)), **m}, proba
+    for name in models:
+        model = make_model(name)
+        model.fit(synth[features], synth[outcome])
+        m = score(model, features, synth, holdout, protected, admissible, outcome, majority)
+        proba = m.pop("_proba")
+        key = f"{run.run_id}" if name == "rf" else f"{run.run_id}_{name}"
+        yield key, {**base_row(batch, shard, run), "arm": "unaware", "recipient": name,
+                    "dropped": json.dumps(sorted(protected)), **m}, proba
 
 
 def oof_scores(synth: pd.DataFrame, outcome: str, seed: int) -> np.ndarray:
@@ -277,7 +290,8 @@ def table_label_gaps(table, outcome, protected, majority, prefix):
     return out
 
 
-def arm_resample(batch, shard, run, synth, holdout, protected, admissible, outcome, majority):
+def arm_resample(batch, shard, run, synth, holdout, protected, admissible, outcome, majority,
+                 models=("rf",), save=True):
     scores = oof_scores(synth, outcome, int(run.seed))
     before = table_label_gaps(synth, outcome, protected, majority, "orig_")
     for lam in LAMS:
@@ -285,18 +299,21 @@ def arm_resample(batch, shard, run, synth, holdout, protected, admissible, outco
         edited, diag = resample_outcome(synth, outcome, protected, majority, scores, lam, rng)
         if edited[outcome].nunique() < 2:
             continue
-        if lam > 0:
+        if lam > 0 and save:
             d = OUT / "resample" / "synth" / batch / shard
             d.mkdir(parents=True, exist_ok=True)
             edited.to_parquet(d / f"run_{run.run_id}_lam{lam:g}.parquet", index=False)
-        model = make_model("rf")
         features = [c for c in edited.columns if c != outcome]
-        model.fit(edited[features], edited[outcome])
-        m = score(model, features, edited, holdout, protected, admissible, outcome, majority)
-        proba = m.pop("_proba")
-        yield f"{run.run_id}_lam{lam:g}", {
-            **base_row(batch, shard, run), "arm": "resample", "lam": lam, **diag, **before,
-            **table_label_gaps(edited, outcome, protected, majority, "edited_"), **m}, proba
+        for name in models:
+            model = make_model(name)
+            model.fit(edited[features], edited[outcome])
+            m = score(model, features, edited, holdout, protected, admissible, outcome, majority)
+            proba = m.pop("_proba")
+            key = f"{run.run_id}_lam{lam:g}" if name == "rf" else f"{run.run_id}_lam{lam:g}_{name}"
+            yield key, {
+                **base_row(batch, shard, run), "arm": "resample", "recipient": name, "lam": lam,
+                **diag, **before, **table_label_gaps(edited, outcome, protected, majority, "edited_"),
+                **m}, proba
 
 
 def arm_recipients(batch, shard, run, synth, holdout, protected, admissible, outcome, majority):
@@ -310,17 +327,22 @@ def arm_recipients(batch, shard, run, synth, holdout, protected, admissible, out
                                        "recipient": name, **m}, None
 
 
-def arm_placebo(batch, shard, run, synth, holdout, protected, admissible, outcome, majority):
-    features = [c for c in synth.columns if c != outcome]
+def scrambled_tables(synth, outcome, seed):
+    """The placebo's tables: a share `frac` of outcomes redrawn at the base rate."""
     base_rate = float(synth[outcome].mean())
     for frac in FRACS:
-        rng = np.random.default_rng([int(run.seed), int(round(frac * 1000))])
+        rng = np.random.default_rng([int(seed), int(round(frac * 1000))])
         scrambled = synth.copy()
         mask = rng.random(len(scrambled)) < frac
         scrambled.loc[mask, outcome] = (rng.random(int(mask.sum())) < base_rate).astype(
             scrambled[outcome].dtype)
-        if scrambled[outcome].nunique() < 2:
-            continue
+        if scrambled[outcome].nunique() >= 2:
+            yield frac, scrambled
+
+
+def arm_placebo(batch, shard, run, synth, holdout, protected, admissible, outcome, majority):
+    features = [c for c in synth.columns if c != outcome]
+    for frac, scrambled in scrambled_tables(synth, outcome, run.seed):
         for name in PLACEBO_MODELS:
             model = make_model(name)
             model.fit(scrambled[features], scrambled[outcome])
@@ -331,14 +353,36 @@ def arm_placebo(batch, shard, run, synth, holdout, protected, admissible, outcom
                 "recipient": name, **m}, None
 
 
+def arm_placebo_split(batch, shard, run, synth, holdout, protected, admissible, outcome,
+                      majority):
+    features = [c for c in synth.columns if c != outcome]
+    for frac, scrambled in scrambled_tables(synth, outcome, run.seed):
+        for name in PLACEBO_MODELS:
+            model = make_model(name)
+            model.fit(scrambled[features], scrambled[outcome])
+            for role_config, split_protected, split_admissible in json.loads(run.splits):
+                split_majority = {p: holdout[p].mode().iloc[0] for p in split_protected}
+                m = score(model, features, scrambled, holdout, split_protected, split_admissible,
+                          outcome, split_majority)
+                m.pop("_proba")
+                yield f"{run.run_id}_{frac:g}_{name}_{role_config}", {
+                    **base_row(batch, shard, run), "role_config": role_config,
+                    "protected_attrs": json.dumps(split_protected),
+                    "admissible_attrs": json.dumps(split_admissible),
+                    "arm": "placebo_split", "frac": frac, "recipient": name, **m}, None
+
+
 ARMS = {"unaware": arm_unaware, "resample": arm_resample,
-        "recipients": arm_recipients, "placebo": arm_placebo}
+        "recipients": arm_recipients, "placebo": arm_placebo,
+        "placebo_split": arm_placebo_split,
+        "unaware_recipients": partial(arm_unaware, models=OTHER_RECIPIENTS),
+        "resample_recipients": partial(arm_resample, models=OTHER_RECIPIENTS, save=False)}
 
 
 def select_runs(arm: str, runs: pd.DataFrame) -> pd.DataFrame:
-    if arm in ("unaware", "resample"):
+    if arm in ("unaware", "resample", "unaware_recipients", "resample_recipients"):
         return runs[runs.fairness_mechanism == "none"]
-    if arm == "placebo":
+    if arm in ("placebo", "placebo_split"):
         none = runs[(runs.fairness_mechanism == "none")
                     & (runs.epsilon.isna() | (runs.epsilon == 1000))]
         return none.sort_values("run_id").head(1)
@@ -360,6 +404,11 @@ def do_shard(arm: str, batch: str, shard: str) -> str:
         union = sorted({a for p in runs.protected_attrs for a in json.loads(p)})
         todo = todo.assign(protected_attrs=json.dumps(union), admissible_attrs="[]",
                            role_config="placebo")
+    if arm == "placebo_split":
+        splits = sorted({(r, p, a) for r, p, a in
+                         zip(runs.role_config, runs.protected_attrs, runs.admissible_attrs)})
+        todo = todo.assign(splits=json.dumps([(r, json.loads(p), json.loads(a))
+                                              for r, p, a in splits]))
     rows_path = OUT / arm / "rows" / batch / f"{shard}.jsonl"
     rows_path.parent.mkdir(parents=True, exist_ok=True)
     done = set()

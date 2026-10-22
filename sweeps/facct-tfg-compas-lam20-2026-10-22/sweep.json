@@ -1,0 +1,26 @@
+{
+  "batch": "facct-tfg-compas-lam20-2026-10-22",
+  "created": "2026-10-22T17:39:29",
+  "datasets": [
+    "compas"
+  ],
+  "methods": [
+    "tabfairgan"
+  ],
+  "seeds": [
+    0,
+    1,
+    2,
+    3,
+    4
+  ],
+  "epsilons": [
+    1000.0
+  ],
+  "classifier": "rf",
+  "notes": "COMPAS TabFairGAN re-run (2026-10-22, sweep notes 21.2): at the paper's COMPAS schedule (40+30 epochs, set for its 16k-row extract) our 6,172-row COMPAS gets ~1,200 generator steps and the release carries no signal (RF AUC 0.50). Now 970+30 epochs, about Adult's step count (AUC 0.69 unmitigated, seed 0). Supersedes every COMPAS tabfairgan row of facct-2026-10-09 and facct-tfg-lam*. dp only, lambda 2.0 (grid as facct-tfg-lam*, plus 0.5).",
+  "only": "/dp",
+  "settings": {
+    "lamda": 2.0
+  }
+}
