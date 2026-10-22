@@ -14,6 +14,11 @@ real holdout the sweep scores against, with its context drawn from
   real              the real training split (fairness fix on real data)
   mst_eps<e>        MST's release with no fairness mechanism, per epsilon
   decaf_tabpfn      the TabPFN generator's release with no fairness mechanism
+  (any generator in --synth-methods, labelled <method>[_eps<e>])
+  <src>_<mech>@<role>  with --stack: an *edited* release (dp or ftu for the
+                    split <role>) as the context, i.e. the publisher and the
+                    recipient both act; scored only on that split's
+                    protected attributes
 
 once per protected attribute named in any of the dataset's role splits. Each
 attribute is binarized exactly as the sweep's fairness metrics binarize it
@@ -147,9 +152,34 @@ def export(args) -> int:
                     )
                     path = cell / f"synth_{label}.parquet"
                 sources[label] = str(path)
+            # Edited releases (--stack "method[:epsilon],..."): one per
+            # mechanism and role split, scored on that split's attributes.
+            stack = dict((s.split(":") + [None])[:2] for s in args.stack.split(",") if s)
+            source_protected = {}
+            edited = mine[(mine.seed == seed)
+                          & mine.mechanism.isin(args.stack_mechanisms.split(","))]
+            for (method, eps, mech, role), g in edited.groupby(
+                    ["method", "epsilon", "mechanism", "role"], dropna=False):
+                if method not in stack:
+                    continue
+                if stack[method] is not None and (pd.isna(eps) or float(eps) != float(stack[method])):
+                    continue
+                r = g.sort_values("run_id").iloc[0]
+                path = batch_dir / "synth" / r.shard / f"run_{r.run_id}.parquet"
+                if not path.exists():
+                    continue
+                label = (method if pd.isna(eps) else f"{method}_eps{eps:g}") + f"_{mech}@{role}"
+                if levels:
+                    coded(pd.read_parquet(path)).to_parquet(
+                        cell / f"synth_{label}.parquet", index=False
+                    )
+                    path = cell / f"synth_{label}.parquet"
+                sources[label] = str(path)
+                source_protected[label] = json.loads(r.protected)
             meta = {
                 "dataset": name, "seed": seed, "outcome": outcome,
                 "protected": protected, "roles": roles,
+                "source_protected": source_protected,
                 "majority_values": {
                     p: int(coded(holdout_df)[p].mode().iloc[0]) for p in protected
                 },
@@ -254,13 +284,15 @@ def run(args) -> int:
     )
     _check_cdp_fast(fm)
     out = _out_dir(args)
-    results_path = out / "results.csv"
+    # Parallel processes each append to their own --results file; every
+    # results*.csv in the folder counts as done.
+    results_path = out / args.results
     preds_dir = out / "preds"
     preds_dir.mkdir(parents=True, exist_ok=True)
     done = set()
-    if results_path.exists():
-        prev = pd.read_csv(results_path)
-        done = set(map(tuple, prev[KEY].astype(str).values))
+    for prev_path in sorted(out.glob("results*.csv")):
+        prev = pd.read_csv(prev_path)
+        done |= set(map(tuple, prev[KEY].astype(str).values))
 
     home = Path(args.fairpfn_home).expanduser().resolve()
     sys.path.insert(0, str(home))
@@ -282,6 +314,8 @@ def run(args) -> int:
             for ctx_size in args.ctx_sizes:
                 ctx = table.sample(n=min(ctx_size, len(table)), random_state=seed)
                 for attr in meta["protected"]:
+                    if attr not in meta.get("source_protected", {}).get(source, [attr]):
+                        continue
                     key = [name, seed, source, ctx_size, attr]
                     todo = [m for m in MODELS
                             if tuple(map(str, key + [m])) not in done]
@@ -354,6 +388,11 @@ def main() -> int:
     parser.add_argument("--synth-methods", default="mst,decaf_tabpfn")
     parser.add_argument("--ctx-sizes", type=lambda s: [int(x) for x in s.split(",")],
                         default=[2000, 10000])
+    parser.add_argument("--stack", default="",
+                        help='edited releases as contexts, "method[:epsilon],..."')
+    parser.add_argument("--stack-mechanisms", default="dp,ftu")
+    parser.add_argument("--results", default="results.csv",
+                        help="file this process appends to (one per parallel process)")
     parser.add_argument("--fairpfn-home", default="~/external/FairPFN")
     parser.add_argument("--device", default="cuda:0")
     parser.add_argument("--n-jobs", type=int, default=4)

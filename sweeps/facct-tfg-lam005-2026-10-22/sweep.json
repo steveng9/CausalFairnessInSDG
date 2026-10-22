@@ -1,0 +1,36 @@
+{
+  "batch": "facct-tfg-lam005-2026-10-22",
+  "created": "2026-10-22T06:31:59",
+  "datasets": [
+    "acsincome_ca",
+    "acsincome_tx",
+    "snake",
+    "sbo",
+    "acspubcov_ca",
+    "acspubcov_tx",
+    "cdc_diabetes",
+    "hmda_ca",
+    "hmda_tx",
+    "adult",
+    "compas"
+  ],
+  "methods": [
+    "tabfairgan"
+  ],
+  "seeds": [
+    0,
+    1,
+    2,
+    3,
+    4
+  ],
+  "epsilons": [
+    1000.0
+  ],
+  "classifier": "rf",
+  "notes": "TabFairGAN lambda grid (2026-10-22). Its parity loss is signed and unbounded (package modules.py FairLossFunc maximises P(y=1|under) - P(y=1|priv)), so at the paper's lambda (0.5; COMPAS 2.2) with 30 fair epochs it reverses the gap in its own table on 9 of 11 datasets (e.g. Adult sex +17.8 -> -28.1 pp, SBO +12.8 -> -50.3 pp). The paper set lambda per dataset; here the publisher picks lambda per dataset x S from this grid (0.02, 0.05, 0.1, 0.2, 1.0, 2.0, plus 0.5 in facct-2026-10-09) by the outcome gap in the synthetic table. Mechanism dp only; the none rows are in facct-2026-10-09. Same datasets, role splits, seeds, epochs (170+30; COMPAS 40+30) and classifier. lamda=0.05 for every dataset.",
+  "only": "/dp",
+  "settings": {
+    "lamda": 0.05
+  }
+}

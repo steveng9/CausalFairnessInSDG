@@ -39,6 +39,19 @@ experiments.db
 /sweeps/*/invalid-*/
 # 280 MB, rebuilt by `baselines/facct_bench.py collect`
 /report/data/facct/angelozzi_mitigators.csv
+# 150 MB, rebuilt by `scripts/mama_mia.py --by-group --collect-to ...`;
+# mama_mia_group_summary.csv (committed) averages it over seeds
+/report/data/facct/mama_mia_group.csv
+# 130 MB, rebuilt by `scripts/release_arms.py collect --arm recipients`;
+# arm_recipients.csv.gz (committed) is the same table
+/report/data/facct/arm_recipients.csv
+# release_arms.py working state (rows, predictions, re-sampled tables; 2 GB),
+# folded into report/data/facct/arm_*.csv by `collect`
+/sweeps/arms-*/
+# The lambda batches' dirty-tree diffs are 53 MB each (report CSVs and staged
+# manuscript deletions); they change no file under src/, so the generator
+# code is commit 4d04cba (sweep notes §21.1)
+/sweeps/facct-tfg-lam*/code/
 /sweeps/*/fairpfn_baseline/inputs/
 /sweeps/*/fairpfn_baseline/preds/
 /sweeps/*/preds/

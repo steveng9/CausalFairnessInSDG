@@ -41,6 +41,8 @@ epsilon slot `inf`.
     python baselines/facct_bench.py collect
     # re-run batches that supersede some arms (e.g. facct-cffix-*): export with
     # --merge, then rerun those cells with `cell ... --force`
+    # TabFairGAN at its per-split lambda: export --merge --methods tabfairgan
+    # --batches facct-2026-10-09,<facct-tfg-lam*> --choose report/data/facct/tabfairgan_lambda_choice.csv
 """
 from __future__ import annotations
 
@@ -94,6 +96,13 @@ def cmd_export(args) -> None:
     if args.eps:
         keep = {float(e) for e in args.eps.split(",")}
         runs = runs[runs["epsilon"].isna() | runs["epsilon"].isin(keep)]
+    if args.choose:
+        # For each (dataset, method, mechanism, split) the file lists, keep only
+        # the runs of the batch it names (e.g. TabFairGAN at its chosen lambda).
+        key = ["dataset", "sdg_method", "fairness_mechanism", "role_config"]
+        pick = pd.read_csv(args.choose)[key + ["batch"]].rename(columns={"batch": "chosen"})
+        chosen = runs.reset_index(drop=True).merge(pick, on=key, how="left")["chosen"]
+        runs = runs[(chosen.isna() | (chosen == runs["batch"].to_numpy())).to_numpy()]
 
     grid = []
     for dataset, ds_runs in runs.groupby("dataset"):
@@ -236,6 +245,9 @@ def main() -> None:
     export.add_argument("--merge", action="store_true",
                         help="update the arms exported now in each existing manifest, keep the rest "
                              "(for re-run batches that supersede some arms)")
+    export.add_argument("--choose", default=None,
+                        help="CSV of dataset, sdg_method, fairness_mechanism, role_config, batch: "
+                             "export those arms from that batch only")
     export.set_defaults(func=cmd_export)
     cell = sub.add_parser("cell")
     cell.add_argument("name"), cell.add_argument("tag"), cell.add_argument("classifier")

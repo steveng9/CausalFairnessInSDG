@@ -61,6 +61,9 @@ number of training rows drawn with the run's seed.
 Output: `sweeps/<batch>/mama_mia/<shard>.csv`, one row per run x flavour x
 focal-point source: AUC, TPR at 10% / 1% / 0.1% FPR and the paper's
 membership advantage. Resumable per shard. Nothing is trained or generated.
+With `--by-group`, `sweeps/<batch>/mama_mia_group/<shard>.csv` instead: the
+same scores ranked within each protected attribute's two groups (one row per
+run x flavour x source x attribute x group), to ask who a release exposes.
 
     python scripts/mama_mia.py --batches facct-2026-10-09 --workers 14
 """
@@ -339,9 +342,9 @@ def run_focal_points(run: pd.Series, edges, columns) -> Tuple[List[Marginal], Op
                         edges, float(extra.get("cut_strength", 1.0)))
 
 
-def attack_shard(batch: str, shard: str) -> str:
+def attack_shard(batch: str, shard: str, by_group: bool = False) -> str:
     sweep_dir = SWEEPS_DIR / batch
-    out_path = sweep_dir / "mama_mia" / f"{shard}.csv"
+    out_path = sweep_dir / ("mama_mia_group" if by_group else "mama_mia") / f"{shard}.csv"
     runs, edges = read_shard(sweep_dir / "db" / f"{shard}.db")
     if runs.empty:
         return f"{shard}: no finished runs"
@@ -407,8 +410,21 @@ def attack_shard(batch: str, shard: str) -> str:
                 if not weights:
                     continue
                 raw = (attack_marginals if flavour == "mst" else attack_conditionals)(tables, weights)
-                rows.append({**base, "attack": flavour, "focal_points": source,
-                             "n_focal_points": len(weights), **score(membership, raw)})
+                head = {**base, "attack": flavour, "focal_points": source,
+                        "n_focal_points": len(weights)}
+                if not by_group:
+                    rows.append({**head, **score(membership, raw)})
+                    continue
+                # By group: the same attack scores, ranked within the targets of
+                # one group (the holdout's modal value = advantaged, the rest =
+                # disadvantaged, as every fairness metric here splits them).
+                for attr in json.loads(run["protected_attrs"]):
+                    dis = targets[attr].to_numpy() != holdout[attr].mode().iloc[0]
+                    for group, mask in (("dis", dis), ("adv", ~dis)):
+                        rows.append({**head, "attr": attr, "group": group,
+                                     "n_members": int(membership[mask].sum()),
+                                     "n_nonmembers": int((1 - membership[mask]).sum()),
+                                     **score(membership[mask], raw[mask])})
     if rows:
         out_path.parent.mkdir(parents=True, exist_ok=True)
         frame = pd.DataFrame(rows)
@@ -421,6 +437,9 @@ def main() -> None:
     parser.add_argument("--batches", required=True, help="comma-separated sweep names")
     parser.add_argument("--shards", default=None, help="comma-separated shard names (default: all)")
     parser.add_argument("--workers", type=int, default=1)
+    parser.add_argument("--by-group", action="store_true",
+                        help="score the attack within each protected group instead "
+                             "(output: sweeps/<batch>/mama_mia_group/)")
     parser.add_argument("--collect-to", default=None,
                         help="afterwards, write every batch's rows here as one CSV")
     args = parser.parse_args()
@@ -433,7 +452,8 @@ def main() -> None:
         jobs += [(batch, name) for name in names]
     print(f"{len(jobs)} shards", flush=True)
     with ProcessPoolExecutor(max_workers=max(args.workers, 1)) as pool:
-        futures = {pool.submit(attack_shard, batch, name): (batch, name) for batch, name in jobs}
+        futures = {pool.submit(attack_shard, batch, name, args.by_group): (batch, name)
+                   for batch, name in jobs}
         for future in as_completed(futures):
             batch, name = futures[future]
             try:
@@ -441,7 +461,8 @@ def main() -> None:
             except Exception as error:  # keep the other shards going
                 print(f"[{batch}] {name}: FAILED {type(error).__name__}: {error}", flush=True)
     if args.collect_to:
-        files = sorted(f for b in {b for b, _ in jobs} for f in (SWEEPS_DIR / b / "mama_mia").glob("*.csv"))
+        sub = "mama_mia_group" if args.by_group else "mama_mia"
+        files = sorted(f for b in {b for b, _ in jobs} for f in (SWEEPS_DIR / b / sub).glob("*.csv"))
         if files:
             frame = pd.concat((pd.read_csv(f) for f in files), ignore_index=True)
             Path(args.collect_to).parent.mkdir(parents=True, exist_ok=True)

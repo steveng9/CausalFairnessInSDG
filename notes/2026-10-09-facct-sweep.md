@@ -681,3 +681,265 @@ lane a (6 workers, cores 4-11, log `sweeps/dpdiff-2026-10-18-a.log`) and lane b
 - `sweeps/angelozzi-cffix-dpgan-2026-10-20.sh` waits on both PIDs, then does the same for
   the DP-GAN / DP-CTGAN CF arms (grid `facct_data/grid_cffix_dpgan_2026-10-20.txt`) and
   collects again. CDC and SBO keep their CF arms: the new rule does not change their cuts.
+- 2026-10-21: Angelozzi grid closed at 3,087 of 3,108 cells (`angelozzi_mitigators.csv`,
+  798,473 rows). Two ACSIncome DP-CTGAN / DP-GAN CF cells had died inside the LFR
+  mitigator at 28 parallel jobs (likely memory) and passed at 6 jobs. The remaining 21
+  cells are all Adult decaf_dpgan arms (none, ftu, dp, cf): their harness needs all 5
+  seeds at one epsilon, and on Adult DP-GAN's synthetic income collapses to one class in
+  some seeds at every epsilon (e.g. dp@prefair keeps seeds 1,4 at eps 1; 0,1,2,4 at 10;
+  1,2,3 at 1000). Decision (Steven): report Adult DP-GAN as not scorable under the
+  Angelozzi protocol and point to the collapse; no per-epsilon seed subsets. The
+  launcher's `exit=` lines said 0 for these failures; trust the `.done` markers.
+
+## 21. Final experiments before writing, 2026-10-22 06:20 UTC
+
+Steven asked for every remaining backlog item that needs compute, so results are ready
+when writing starts. GPU 1 and cores 0-3 stay free for Daniil. Closed without compute:
+the 4 "missing" runs (1 main, 3 FGES) are outcome collapse (one class has a single row,
+the RF cannot be fitted), same as `partial`; hand vs FGES is no longer confounded with
+family (every causal family has 660 runs on each graph source).
+
+- **MAMA-MIA on the unattacked tables.** Every facct-cffix-* batch and
+  facct-eps-dpdiff-2026-10-18: 16,170 rows in `report/data/facct/mama_mia_cffix.csv`
+  (`sweeps/mama-mia-cffix-2026-10-22.sh`). Use these for causal-family CF; the CF rows of
+  those families in `mama_mia.csv` are old-rule tables.
+- **MAMA-MIA by group.** `mama_mia.py --by-group`: the same attack scores ranked within
+  each protected attribute's two groups (holdout modal value = advantaged), one row per
+  run x flavour x focal-point source x attribute x group, with member and non-member
+  counts. All 15 batches with saved tables, cores 8-15
+  (`sweeps/mama-mia-group-2026-10-22.sh`) -> `report/data/facct/mama_mia_group.csv`.
+- **TabFairGAN lambda grid.** Its parity loss (package `modules.py` `FairLossFunc`) is
+  signed and unbounded: it maximises P(y=1|under) - P(y=1|priv). At the paper's lambda
+  (0.5; COMPAS 2.2) with 30 fair epochs it overshoots and reverses the gap in its own
+  table on 9 of 11 datasets. Label gap in the table, majority - rest, mean of seeds,
+  none -> dp: Adult sex +17.8 -> -28.1 pp; SBO +12.8 -> -50.3; SNAKE -0.6 -> -52.3;
+  HMDA -0.1..+4.2 -> -14.6..-18.7; CDC -2.0 -> +15.6; ACSPubCov TX race -3.9 -> +18.2;
+  only ACSIncome narrows (CA +11.4 -> +3.2, TX +15.3 -> +7.8). The paper set lambda per
+  dataset, so the publisher here picks lambda per dataset x S from a grid by the table's
+  label gap: batches `facct-tfg-lam{002,005,01,02,10,20}-2026-10-22` (lambda 0.02, 0.05,
+  0.1, 0.2, 1.0, 2.0; 0.5 is in facct-2026-10-09), dp only (`only: /dp`, `settings:
+  {lamda}`), 165 runs each, cores 24-47 (`sweeps/tfg-lambda-2026-10-22.sh`). About 11
+  core-hours a batch. Follow-ups once done: collect, MAMA-MIA (both modes), choose
+  lambda, re-point the Angelozzi `tabfairgan-dp` arms.
+- **FairPFN extension** (`scripts/fairpfn_baseline.py`, GPU 0, cores 16-23,
+  `sweeps/fairpfn-ext-2026-10-22.sh`). Re-exported with every generator's unmitigated
+  release as a context (adds decaf, decaf_ctgan, decaf_diffusion, decaf_dpgan / dpctgan /
+  dpdiffusion at epsilon 1, 10, 1000, tabfairgan) and, new `--stack`, edited releases as
+  contexts (decaf_tabpfn, decaf_diffusion, MST at epsilon 10; dp and ftu; each role
+  split; scored on that split's protected attributes only). CF is left out of the stack
+  because the causal families' CF tables in facct-2026-10-09 are old-rule. 10,000-row
+  contexts only. New `--results`: three processes append to `results-{a,b,c}.csv`; every
+  `results*.csv` counts as done. Inputs before the re-export:
+  job tmp `fairpfn-inputs-backup/` (13 MB).
+- **Arms on saved releases** (`scripts/release_arms.py`, new; rows in
+  `sweeps/arms-2026-10-22/<arm>/`, collected to `report/data/facct/arm_<arm>.csv`; same
+  metric names as the runs tables, plus per-group selection rate, TPR and accuracy for
+  both groups, `sel_dis__X`, `sel_adv__X`, ...). The sweep's conditional metrics loop
+  over admissible cells in pandas (75 s a release on ACSIncome); `fast_fairness_metrics`
+  is the same computation with bincount, equal to 1e-17 on three checked runs, and an RF
+  refit reproduces a stored sweep row exactly (ACSIncome-CA MST run 19: dp_gap__SEX
+  -0.059024, cdp_gap__SEX 0.016834).
+  - `unaware`: the sweep's RF on every unmitigated release with the role split's
+    protected attributes dropped. Main, FGES, eps-a, eps-b, eps-dpdiff.
+  - `recipients`: one-hot logistic regression (`lr_ohe`) and gradient boosting (`hgb`,
+    sklearn HistGradientBoosting, random_state 0) on every release of main, FGES,
+    cffix-*, eps-*, cut*. (The sweep's own `lr` uses raw integer codes; `lr_ohe` is
+    what a recipient would fit.)
+  - `placebo`: one unmitigated release per shard (epsilon none or 1000), outcome
+    scrambled at frac 0, 0.05, 0.1, 0.2, 0.3, 0.4, 0.5, 0.7, 0.9, 1.0 (replacement draws
+    at the table's base rate; the same scrambled table for rf, lr_ohe and hgb). Scored
+    on the union of the dataset's protected attributes. Durable copy of the RF placebo
+    as well (the analysis session's pl/ and pl2/ live in its job tmp).
+  - `resample` (Krchova et al. 2023, agreed 2026-10-14 notes 10.7): 5-fold out-of-fold
+    gradient-boosting scores on the release; each group (cell of the split's binarised
+    protected attributes, >= 50 rows) other than the reference is mapped onto the
+    reference group's score quantiles, mixed with weight lam, and its outcomes redrawn;
+    reference = highest outcome rate among groups with >= 5% of rows. lam 0 (redraw
+    only, the control), 0.5, 1. Edited tables saved for lam > 0. Scored with the sweep's
+    RF. Main and FGES unmitigated releases. Trial (ACSIncome-CA MST, sex-only split,
+    epsilon 1000, lam 1): table label gap -2.1 -> +0.5 pp, real-people parity gap
+    -6.6 -> -3.1 pp, AUC 0.823 -> 0.823.
+  - Lanes (`sweeps/arms-2026-10-22.sh`): 1 cores 4-7 unaware then recipients; 2 cores
+    8-15 after the by-group MIA: placebo then resample (FGES); 3 cores 24-47 after the
+    lambda grid: resample (main).
+
+### 21.1 Results as they land
+
+- **MAMA-MIA by group, done 07:19 UTC.** 650,976 rows (15 batches, 1,885 shards)
+  in `report/data/facct/mama_mia_group.csv` (150 MB, git-ignored); averaged over
+  seeds in `mama_mia_group_summary.csv` (66,132 rows: `auc_dis`, `auc_adv`,
+  `auc_gap` = dis - adv, TPR at 10% / 1% FPR, group sizes). Groups have 337-14,324
+  members. Findings (AUC, 0.5 = chance):
+  - The minority group is slightly more exposed, and the gap grows with the
+    budget: main batch, unmitigated, MST +0.0024, PrivBayes +0.0039, PrivSyn
+    +0.0021; the deep DP generators ~0. Across epsilon, PrivBayes +0.0067 at
+    epsilon 300 vs -0.0001 at 0.1. Largest cells: Adult native-country +0.016,
+    COMPAS sex +0.009.
+  - The fairness edits do not widen it. Paired with the same shard's unmitigated
+    release, the dis - adv gap moves -0.0005 (dp), -0.0002 (cf), 0.0000 (ftu);
+    95th percentile of the change +0.007 (dp). At epsilon >= 100, PrivBayes dp
+    halves the gap (+0.0078 -> +0.0029). Chang & Shokri's "fairness costs the
+    protected group privacy" is not seen for these edits.
+- **Unawareness arm, done 09:16 UTC.** `report/data/facct/arm_unaware.csv`, 7,737
+  rows from 1,207 shards (two shards had no finished runs; no errors log). First
+  look, main batch (hand graphs), 9,561 run x attribute cells, each unmitigated
+  release matched to the same shard's edited releases (same split, epsilon), real
+  holdout, the sweep's RF. Mean |gap| in pp of selection rate, AUC:
+
+  | recipient model on | parity gap | conditional gap | AUC |
+  |---|---|---|---|
+  | unedited release, all columns | 8.2 | 5.8 | 0.695 |
+  | unedited release, protected columns dropped (unaware) | 6.0 | 3.2 | 0.686 |
+  | publisher's FTU edit | 6.2 | 3.7 | 0.686 |
+  | publisher's CF edit | 5.2 | 2.9 | 0.654 |
+  | publisher's parity (dp) edit | 4.2 | 3.2 | 0.591 |
+
+  Dropping the columns narrows the parity gap in 64% of cells (median -0.4 pp,
+  10th percentile -8.5 pp); the sign flips in 18%. It equals the publisher's FTU
+  edit on every summary, and comes within 0.3 pp of the CF edit's conditional gap
+  at 0.03 more AUC. The parity edit buys a further 1.8 pp of parity gap for 0.10
+  AUC. Script: job tmp `unaware_look.py` (to be moved into the analysis).
+- **FairPFN extension, done 09:26 UTC.** 15,726 rows (264 failed: "context has one
+  outcome class or one group", 183 of them DP-GAN epsilon 1, 60 DP-GAN epsilon 10,
+  15 DECAF). Merged into `sweeps/facct-2026-10-09/fairpfn_baseline/results.csv`
+  (29,916 rows; lane files moved to job tmp), re-summarised with all 11 generators
+  (`summarize_fairpfn_baseline.py --generators ...`), copied to
+  `report/data/facct/fairpfn/`. First look, 10,000-row contexts, mean
+  |dp_gap_matched| in pp and AUC, each model on the same context:
+  - FairPFN narrows the gap on every non-degenerate context: real 12.6 -> 5.9 pp
+    (AUC 0.803 -> 0.747), DECAF-TabPFN 12.2 -> 7.7, TabFairGAN (unedited) 12.3 ->
+    6.7, PrivSyn epsilon 1000 15.3 -> 7.3. The unaware RF on the same contexts sits
+    between (8.3-10.2 pp, AUC within 0.005 of the RF).
+  - On DP-CTGAN (all epsilon) and DP-GAN (epsilon 10, 1000) contexts FairPFN widens
+    it: e.g. DP-CTGAN epsilon 1000 7.6 -> 15.4 pp, DP-GAN epsilon 1000 8.2 -> 14.8.
+    Those contexts have RF AUC 0.51-0.70.
+  - Stacked (publisher edit + FairPFN): on the FTU edit, no change vs FairPFN on the
+    unedited release (7.3-8.4 pp either way). On the parity edit, FairPFN's |gap|
+    rises to 9.9-12.4 pp (unedited 7.3-8.4) and AUC falls to 0.57; the signed gap
+    averages about -1 pp and flips direction in 45% of cells. Two corrections on
+    the same table do not add up; they make the recipient's model erratic.
+  Script: job tmp `fairpfn_look.py`.
+- **Placebo, done 09:12 UTC.** `report/data/facct/arm_placebo.csv`, 24,630 rows from
+  821 shards (main + FGES; one error, an outcome-collapsed Adult DP-GAN release; two
+  shards without finished runs). Columns `frac`, `recipient` (rf, lr_ohe, hgb), gaps
+  over the union of the dataset's protected attributes (no admissible set, so no
+  conditional gaps). Main batch, mean |parity gap| pp / AUC by fraction scrambled:
+
+  | frac | rf | lr_ohe | hgb |
+  |---|---|---|---|
+  | 0 | 9.9 / 0.718 | 11.0 / 0.742 | 10.4 / 0.740 |
+  | 0.3 | 8.1 / 0.694 | 9.1 / 0.741 | 8.9 / 0.734 |
+  | 0.5 | 6.4 / 0.669 | 7.2 / 0.737 | 7.0 / 0.727 |
+  | 0.7 | 4.7 / 0.630 | 4.7 / 0.727 | 4.1 / 0.711 |
+  | 0.9 | 2.9 / 0.562 | 2.0 / 0.671 | 1.8 / 0.650 |
+  | 1.0 | 2.9 / 0.512 | 1.5 / 0.501 | 1.6 / 0.500 |
+
+  Positive rate falls only 0.42 -> 0.36-0.38, so the gap does not shrink by
+  predicting everyone negative. Rough read against the unawareness table above
+  (different attribute sets, so indicative only): the RF parity edit (8.2 -> 4.2
+  pp at AUC 0.695 -> 0.591) sits about on the RF placebo curve (~3.7 pp at AUC
+  0.59 by interpolation). Gradient boosting and one-hot LR lose far less AUC to
+  random label noise than the RF does (0.03 vs 0.09 AUC at frac 0.7), so the
+  placebo frontier depends on the recipient. Script: job tmp `placebo_look.py`.
+- **TabFairGAN lambda grid, done 10:45 UTC.** 6 x 165 runs, all done; collected
+  (`report/data/facct/facct-tfg-lam*_runs.csv`). `scripts/tabfairgan_lambda.py` reads
+  the dp releases at every lambda (grid + facct-2026-10-09 at the paper's), computes the
+  release's own outcome-rate gap on S (majority - rest, majority on the training rows),
+  and picks per dataset x role split the lambda with the smallest mean |label gap|
+  over seeds, keeping the paper's unless the grid beats it by >= 1 pp. Per run:
+  `report/data/facct/tabfairgan_lambda.csv`; choice: `tabfairgan_lambda_choice.csv`.
+  Mean over seeds, |label gap on S| in the release / |real parity gap on S| (sweep RF,
+  real holdout), pp, and AUC, chosen vs paper lambda:
+
+  | dataset (S) | chosen lambda | label gap | real gap | AUC | at paper lambda |
+  |---|---|---|---|---|---|
+  | ACSIncome CA (SEX) | 0.5 (paper) | 5.5 | 6.7 | 0.851 | same |
+  | ACSIncome TX (SEX) | 0.5 (paper) | 7.8 | 11.1 | 0.832 | same |
+  | ACSPubCov CA (SEX / RAC1P) | 0.1 / 0.05 | 0.9 / 0.6 | 0.8 / 1.6 | 0.672 / 0.670 | 4.4 / 3.9, 3.9 / 5.7, 0.67 |
+  | ACSPubCov TX (SEX / RAC1P) | 0.02 / 0.05 | 0.7 / 1.4 | 1.4 / 1.1 | 0.755 / 0.751 | 6.9 / 18.2, 3.7 / 11.6, 0.75 / 0.72 |
+  | Adult (sex) | 0.2 | 4.7 | 5.0 | 0.815 | 28.1, 18.8, 0.737 |
+  | CDC (Sex) | 0.05 | 0.4 | 0.5 | 0.782 | 15.6, 10.2, 0.735 |
+  | COMPAS (race) | 2.2 (paper) | 2.4 | 8.9 | 0.497 | same |
+  | HMDA CA (sex / race) | 0.02 / 0.05 | 0.9 / 0.3 | 0.4 / 0.7 | 0.75 | 18.7 / 17.7, 7.1 / 7.7, 0.71 |
+  | HMDA TX (sex / race) | 0.05 | 0.6 / 0.7 | 0.9 / 1.5 | 0.77 | 14.7 / 14.6, 5.4, 0.73 |
+  | SBO (SEX1) | 0.05 | 1.8 | 8.7 | 0.935 | 50.3, 43.9, 0.874 |
+  | SNAKE (female) | 0.02 | 1.2 | 2.3 | 0.668 | 52.3, 62.4, 0.587 |
+
+  (The label-gap column's mean of |.| over seeds; the choice file's `label_gap_S` is
+  the signed mean. Signs of `real_dp_gap_S` follow the sweep's convention.) The grid
+  is monotone past the minimum everywhere: larger lambda, larger reversal, lower AUC.
+  On 7 of 11 datasets the best lambda is 0.1 or less: SNAKE, HMDA, CDC and ACSPubCov
+  are near parity unedited, so any push overshoots; SBO (+12.8 pp unedited) closes at
+  0.05 and reverses from 0.1.
+  **COMPAS: TabFairGAN's release carries no signal at any lambda (AUC 0.49-0.50 dp,
+  0.52 unedited)**, so its COMPAS row measures nothing; flag in the paper.
+  Angelozzi arms re-pointed: `facct_bench.py export` gained `--choose <csv>` (keep,
+  per dataset x method x mechanism x split listed, only the named batch's runs);
+  `export --merge --methods tabfairgan --batches facct-2026-10-09,<lam batches>
+  --choose report/data/facct/tabfairgan_lambda_choice.csv` changed exactly 63 tags,
+  all `tabfairgan-dp@` (ACSIncome, COMPAS unchanged), no other manifest field
+  (manifests backed up to `facct_data/backup-pre-tfglam-2026-10-22/`). Paper-lambda
+  outputs moved to `facct_output/superseded-tfg-paperlambda-2026-10-22/` (kept, not
+  collected); 63 cells re-scored on cores 16-23, 6 jobs
+  (`sweeps/angelozzi-tfglam-2026-10-22.sh`, then `collect`). Then MAMA-MIA pooled and
+  by group on the six lambda batches (`sweeps/mama-mia-tfglam-2026-10-22.sh`, waits on
+  it) -> `mama_mia_tfglam.csv`, `mama_mia_group_tfglam.csv`.
+- **Re-sampling (Krchova) arm, done 11:21 UTC.** `report/data/facct/arm_resample.csv`,
+  13,085 rows from 822 shards (main + FGES; 3 errors, all outcome-collapsed releases:
+  Adult DP-diffusion s1, Adult DP-GAN s4, CDC DP-GAN s3). Columns: `lam`, `ref_cell`,
+  `n_cells`, `n_eligible`, `share_redrawn`, `share_label_changed`,
+  `base_rate_before/after`, `orig_label_gap__X` / `edited_label_gap__X` (rest -
+  majority, in the release), then the sweep's metrics for the RF trained on the
+  edited release. First look, main batch, 9,092 run x attribute cells matched across
+  every arm below (same shard, split, epsilon), mean |gap| pp on the real holdout:
+
+  | release the recipient's RF trains on | parity gap | conditional gap | AUC |
+  |---|---|---|---|
+  | unedited | 8.2 | 5.7 | 0.692 |
+  | re-sampled, lam 0 (redraw only, control) | 8.1 | 5.6 | 0.688 |
+  | re-sampled, lam 0.5 | 6.0 | 4.0 | 0.685 |
+  | re-sampled, lam 1 | 4.5 | 3.7 | 0.676 |
+  | unedited, protected columns dropped (unaware) | 5.9 | 3.1 | 0.683 |
+  | FTU edit | 6.2 | 3.7 | 0.687 |
+  | CF edit | 5.2 | 2.9 | 0.654 |
+  | parity (dp) edit | 3.8 | 2.9 | 0.584 |
+
+  The release's own label gap goes 5.1 -> 0.5 pp at lam 1 (5.0 at lam 0), yet real
+  people keep 4.5 pp. Re-sampling at lam 1 gets 85% of the parity edit's reduction
+  (3.7 of 4.4 pp) for 15% of its AUC cost (0.016 of 0.108), and sits well off the
+  RF placebo curve (scrambling 20% of labels costs the same 0.015 AUC and keeps 89% of
+  the gap, i.e. ~7.3 pp here). It works for every
+  generator with signal (e.g. DECAF-TabPFN 10.3 -> 4.3 pp, AUC 0.794 -> 0.770; PrivBayes
+  8.1 -> 3.6, 0.744 -> 0.724) and does nothing on DP-GAN / DP-CTGAN (7.7 -> 7.6,
+  3.2 -> 2.9; their releases have AUC 0.53-0.65). By dataset it narrows the gap
+  everywhere but CDC (1.8 -> 1.8, already small); SBO least (10.7 -> 8.7). Script:
+  job tmp `resample_look.py`.
+- **Other recipients (one-hot LR, gradient boosting), done 11:26 UTC.**
+  `report/data/facct/arm_recipients.csv`, 69,352 rows (`recipient` = lr_ohe / hgb)
+  from 1,882 shards of main, FGES, cffix-*, eps-*, cut*; no errors. Then the six
+  lambda batches (`sweeps/arms-2026-10-22-4.log`), which re-collects the file. Main
+  batch, each edited release matched to the same shard's unedited one, mean |gap|
+  pp, unedited -> edited, and AUC:
+
+  | edit | recipient | parity gap | conditional gap | AUC |
+  |---|---|---|---|---|
+  | dp | rf / lr_ohe / hgb | 8.3 -> 4.2 / 9.1 -> 4.1 / 8.5 -> 3.7 | 5.8 -> 3.2 / 6.3 -> 2.8 / 5.7 -> 2.5 | 0.695 -> 0.591 / 0.721 -> 0.604 / 0.717 -> 0.600 |
+  | cf | rf / lr_ohe / hgb | 8.2 -> 5.2 / 9.0 -> 5.3 / 8.4 -> 5.0 | 5.7 -> 2.9 / 6.2 -> 2.6 / 5.7 -> 2.3 | 0.691 -> 0.654 / 0.717 -> 0.679 / 0.713 -> 0.675 |
+  | ftu | rf / lr_ohe / hgb | 8.2 -> 6.2 / 9.0 -> 6.4 / 8.4 -> 6.1 | 5.7 -> 3.7 / 6.2 -> 3.5 / 5.6 -> 3.2 | 0.691 -> 0.686 / 0.716 -> 0.712 / 0.713 -> 0.708 |
+
+  The edits act the same on every recipient; LR and boosting see slightly larger
+  reductions than the RF, in every generator (dp edit, reduction in pp: DECAF 10.8 /
+  13.3 / 11.9, MST 3.2 / 3.9 / 3.8, DP-CTGAN 0.3 / 0.7 / 0.4). The conclusions do not
+  hang on the sweep's RF. Script: job tmp `recipients_look.py`. 131 MB, so the plain
+  CSV is git-ignored and `arm_recipients.csv.gz` is committed.
+- **MAMA-MIA on the lambda grid, done 11:31 UTC** (run early on the freed cores 24-47,
+  `sweeps/mama-mia-tfglam-early-2026-10-22.log`; the chained script finds it done).
+  `mama_mia_tfglam.csv` (1,980 rows), `mama_mia_group_tfglam.csv` (10,200 rows).
+  Marginal flavour, mean AUC 0.503-0.507 at every lambda (unedited 0.506, max 0.518):
+  TabFairGAN exposes no one measurably at any lambda.
+- Provenance of the lambda batches: their `code/*.diff` snapshots (53 MB each, nine
+  fingerprints per batch, because scripts were being edited while they ran) touch
+  only `.gitignore`, `scripts/mama_mia.py`, `scripts/fairpfn_baseline.py`, report
+  CSVs, notes and the staged deletion of the old FAccT zip; no file under `src/`.
+  So the generator code is commit 4d04cba. They stay local (git-ignored), as does
+  `sweeps/arms-2026-10-22/` (2.2 GB of rows, predictions and re-sampled tables).
