@@ -45,6 +45,9 @@ experiments.db
 # 130 MB, rebuilt by `scripts/release_arms.py collect --arm recipients`;
 # arm_recipients.csv.gz (committed) is the same table
 /report/data/facct/arm_recipients.csv
+# 145 MB, rebuilt by `scripts/release_arms.py collect --arm placebo_split`;
+# arm_placebo_split.csv.gz (committed) is the same table
+/report/data/facct/arm_placebo_split.csv
 # release_arms.py working state (rows, predictions, re-sampled tables; 2 GB),
 # folded into report/data/facct/arm_*.csv by `collect`
 /sweeps/arms-*/
@@ -52,6 +55,8 @@ experiments.db
 # manuscript deletions); they change no file under src/, so the generator
 # code is commit 4d04cba (sweep notes §21.1)
 /sweeps/facct-tfg-lam*/code/
+# Same for the COMPAS re-run (up to 78 MB each); the generator code is 49c1bbb
+/sweeps/facct-tfg-compas*/code/
 /sweeps/*/fairpfn_baseline/inputs/
 /sweeps/*/fairpfn_baseline/preds/
 /sweeps/*/preds/

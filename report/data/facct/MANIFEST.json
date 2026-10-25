@@ -1,6 +1,6 @@
 {
-  "collected_utc": "2026-10-22T10:45:54+00:00",
-  "git_head": "4d04cba",
+  "collected_utc": "2026-10-22T19:44:17+00:00",
+  "git_head": "49c1bbb",
   "sweeps": {
     "facct-2026-10-09": {
       "datasets": [
@@ -951,6 +951,236 @@
         "snake/decaf_ctgan": 60,
         "snake/decaf_diffusion": 60,
         "snake/decaf_tabpfn": 60
+      }
+    },
+    "facct-tfg-compas-2026-10-22": {
+      "datasets": [
+        "compas"
+      ],
+      "methods": [
+        "tabfairgan"
+      ],
+      "seeds": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "epsilons": [
+        1000.0
+      ],
+      "settings": {},
+      "only": null,
+      "rows": 30,
+      "status": {
+        "done": 30
+      },
+      "runs_per_dataset_method": {
+        "compas/tabfairgan": 30
+      }
+    },
+    "facct-tfg-compas-lam002-2026-10-22": {
+      "datasets": [
+        "compas"
+      ],
+      "methods": [
+        "tabfairgan"
+      ],
+      "seeds": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "epsilons": [
+        1000.0
+      ],
+      "settings": {
+        "lamda": 0.02
+      },
+      "only": "/dp",
+      "rows": 15,
+      "status": {
+        "done": 15
+      },
+      "runs_per_dataset_method": {
+        "compas/tabfairgan": 15
+      }
+    },
+    "facct-tfg-compas-lam005-2026-10-22": {
+      "datasets": [
+        "compas"
+      ],
+      "methods": [
+        "tabfairgan"
+      ],
+      "seeds": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "epsilons": [
+        1000.0
+      ],
+      "settings": {
+        "lamda": 0.05
+      },
+      "only": "/dp",
+      "rows": 15,
+      "status": {
+        "done": 15
+      },
+      "runs_per_dataset_method": {
+        "compas/tabfairgan": 15
+      }
+    },
+    "facct-tfg-compas-lam01-2026-10-22": {
+      "datasets": [
+        "compas"
+      ],
+      "methods": [
+        "tabfairgan"
+      ],
+      "seeds": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "epsilons": [
+        1000.0
+      ],
+      "settings": {
+        "lamda": 0.1
+      },
+      "only": "/dp",
+      "rows": 15,
+      "status": {
+        "done": 15
+      },
+      "runs_per_dataset_method": {
+        "compas/tabfairgan": 15
+      }
+    },
+    "facct-tfg-compas-lam02-2026-10-22": {
+      "datasets": [
+        "compas"
+      ],
+      "methods": [
+        "tabfairgan"
+      ],
+      "seeds": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "epsilons": [
+        1000.0
+      ],
+      "settings": {
+        "lamda": 0.2
+      },
+      "only": "/dp",
+      "rows": 15,
+      "status": {
+        "done": 15
+      },
+      "runs_per_dataset_method": {
+        "compas/tabfairgan": 15
+      }
+    },
+    "facct-tfg-compas-lam05-2026-10-22": {
+      "datasets": [
+        "compas"
+      ],
+      "methods": [
+        "tabfairgan"
+      ],
+      "seeds": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "epsilons": [
+        1000.0
+      ],
+      "settings": {
+        "lamda": 0.5
+      },
+      "only": "/dp",
+      "rows": 15,
+      "status": {
+        "done": 15
+      },
+      "runs_per_dataset_method": {
+        "compas/tabfairgan": 15
+      }
+    },
+    "facct-tfg-compas-lam10-2026-10-22": {
+      "datasets": [
+        "compas"
+      ],
+      "methods": [
+        "tabfairgan"
+      ],
+      "seeds": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "epsilons": [
+        1000.0
+      ],
+      "settings": {
+        "lamda": 1.0
+      },
+      "only": "/dp",
+      "rows": 15,
+      "status": {
+        "done": 15
+      },
+      "runs_per_dataset_method": {
+        "compas/tabfairgan": 15
+      }
+    },
+    "facct-tfg-compas-lam20-2026-10-22": {
+      "datasets": [
+        "compas"
+      ],
+      "methods": [
+        "tabfairgan"
+      ],
+      "seeds": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "epsilons": [
+        1000.0
+      ],
+      "settings": {
+        "lamda": 2.0
+      },
+      "only": "/dp",
+      "rows": 15,
+      "status": {
+        "done": 15
+      },
+      "runs_per_dataset_method": {
+        "compas/tabfairgan": 15
       }
     },
     "facct-tfg-lam002-2026-10-22": {

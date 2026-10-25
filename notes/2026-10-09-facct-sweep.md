@@ -949,3 +949,163 @@ family (every causal family has 660 runs on each graph source).
   `tabfairgan-dp@ses_narrow_adm` had half of seed 2 (153 rows) and
   `@ses_clinical_adm` had seeds 2-4 twice (272); both now have the regular 5 seeds x 34
   = 170. The chained MAMA-MIA run found the lambda batches up to date.
+
+### 21.2 Last additions, 2026-10-22 17:30 UTC
+
+Steven asked whether anything else should be launched. Three gaps in the controls
+the paper leans on, plus one broken baseline row:
+
+- **Placebo per role split (`placebo_split`).** The 09:12 placebo was scored on
+  the union of protected attributes with no admissible set, so it had no
+  conditional gaps and matched the edits only roughly. `placebo_split` scores
+  the same scrambled tables and models once per role split (that split's
+  protected and admissible attributes). Its parity gaps and AUC equal
+  `placebo`'s exactly (checked on COMPAS MST s0, max difference 0.0); new are
+  `cdp_gap__X`, `ctprb__X`, `ctnrb__X`. Needed to say whether the CF edit
+  beats random label noise on its own target (the conditional gap). Main +
+  FGES, cores 8-23 (`sweeps/arms-2026-10-22b.sh 1`) ->
+  `report/data/facct/arm_placebo_split.csv`.
+- **Re-sampling and unawareness with the other recipients
+  (`resample_recipients`, `unaware_recipients`: lr_ohe, hgb).** The placebo
+  frontier depends on the recipient: boosting and one-hot LR lose about 0.03 AUC
+  to 70% label noise where the RF loses 0.09. So "re-sampling beats the
+  placebo" and "the parity edit sits on the placebo curve" must be checked
+  per recipient; re-sampling and unawareness had only the RF. The re-sampled
+  tables are regenerated (identical to the saved lam 0.5 / 1 tables, checked),
+  so lam 0 is there too. Main + FGES, cores 24-47, after the next item.
+- **Re-sampling across epsilon.** `resample` (RF) on facct-eps-a, eps-b,
+  eps-dpdiff (385 shards), for the privacy axis: does the best-trade edit
+  survive strong privacy? Main already has epsilon 1, 10, 1000.
+  All three collect to `arm_resample*.csv` / `arm_unaware_recipients.csv`.
+- **TabFairGAN on COMPAS re-run at 970 + 30 epochs.** The "no signal at any
+  lambda" result was our schedule, not the method: the paper's COMPAS epochs
+  (40 + 30) were set for its 16k-row extract; ours has 6,172 rows (17 batches an
+  epoch), so 70 epochs is ~1,200 generator steps against Adult's ~16,500.
+  Diagnostic (job tmp `compas_tfg_epochs.py`, unmitigated, sweep RF, real
+  holdout AUC): seed 0: 70 epochs 0.496, 200 0.660, 500 0.683, 1000 0.691;
+  seed 1: 70 0.586, 200 0.696. 1000 is about Adult's step count, the same rule
+  that gives DECAF 1000 epochs on COMPAS (`run_experiments.py`). `SETTINGS["compas"]`
+  in `sdg/tabfairgan.py` is now 1000 epochs (commit 49c1bbb). Eight batches,
+  `facct-tfg-compas-2026-10-22` (none + dp at lambda 2.2) and
+  `facct-tfg-compas-lam{002,005,01,02,05,10,20}-2026-10-22` (dp at 0.02 ... 2.0;
+  0.5 added), GPU 0, cores 4-7 (`sweeps/tfg-compas-2026-10-22.sh`, which then
+  collects, re-chooses lambda, runs MAMA-MIA both modes ->
+  `mama_mia[_group]_tfgcompas.csv`, and every arm on them).
+  **These supersede every COMPAS tabfairgan row in facct-2026-10-09,
+  facct-tfg-lam*, the arms, the MAMA-MIA tables and FairPFN's TabFairGAN COMPAS
+  context.** `tabfairgan_lambda.py` already takes COMPAS only from them. Still
+  to do by hand after: re-point the Angelozzi `tabfairgan*@` COMPAS cells
+  (`facct_bench.py export --merge --choose`) and re-score them.
+
+#### 21.2 results, 19:20 UTC
+
+- **Lane 2 done 19:02 UTC, no errors** (`sweeps/arms-2026-10-22b-2.log`).
+  `arm_resample.csv` now 23,195 rows from 1,207 shards (main, FGES, eps-a, eps-b,
+  eps-dpdiff); `arm_resample_recipients.csv` 26,164 rows and
+  `arm_unaware_recipients.csv` 8,732 rows, each from 822 shards (main + FGES; the
+  3 missing shards have no finished runs, e.g. acspubcov_tx-decaf-s1,
+  FGES compas-decaf-s2). Main batch, 9,092 matched (shard, split, attribute)
+  cells, mean |gap| pp and real-holdout AUC:
+
+  | arm | rf: parity / cond / AUC | lr_ohe | hgb |
+  |---|---|---|---|
+  | unedited | 8.2 / 5.7 / 0.692 | 9.0 / 6.2 / 0.717 | 8.4 / 5.7 / 0.714 |
+  | re-sampled, lam 0.5 | 6.0 / 4.0 / 0.685 | 6.7 / 4.4 / 0.713 | 6.2 / 3.8 / 0.709 |
+  | re-sampled, lam 1 | 4.5 / 3.7 / 0.676 | 4.9 / 3.9 / 0.704 | 4.5 / 3.6 / 0.699 |
+  | unaware | 5.9 / 3.1 / 0.683 | 6.3 / 3.2 / 0.715 | 6.1 / 3.0 / 0.712 |
+  | FTU edit | 6.2 / 3.7 / 0.687 | 6.5 / 3.6 / 0.713 | 6.1 / 3.2 / 0.709 |
+  | CF edit | 5.2 / 2.9 / 0.654 | 5.3 / 2.6 / 0.679 | 5.0 / 2.3 / 0.676 |
+  | parity (dp) edit | 3.8 / 2.9 / 0.584 | 3.6 / 2.5 / 0.597 | 3.3 / 2.1 / 0.593 |
+
+  Re-sampling at lam 1 roughly halves the parity gap for every recipient at
+  0.013-0.016 AUC; unaware ≈ FTU holds for LR and boosting too. Script: job tmp
+  `lane2_look.py`.
+- **Re-sampling across epsilon (RF, eps-a/b/dpdiff, matched cells):**
+
+  | epsilon | cells | parity gap: unedited / lam 0.5 / lam 1 / dp edit (pp) | AUC: same order |
+  |---|---|---|---|
+  | 0.1 | 1,452 | 6.4 / 5.3 / 4.3 / 3.8 | 0.620 / 0.616 / 0.612 / 0.568 |
+  | 0.3 | 1,275 | 7.9 / 6.2 / 4.8 / 4.3 | 0.690 / 0.684 / 0.677 / 0.606 |
+  | 3 | 1,700 | 8.5 / 6.2 / 4.2 / 4.3 | 0.717 / 0.708 / 0.699 / 0.612 |
+  | 30 | 1,275 | 9.1 / 6.3 / 3.9 / 5.1 | 0.729 / 0.720 / 0.709 / 0.654 |
+  | 100 | 1,700 | 8.9 / 6.3 / 4.0 / 4.5 | 0.730 / 0.720 / 0.710 / 0.627 |
+  | 300 | 1,275 | 9.1 / 6.3 / 3.7 / 5.2 | 0.729 / 0.719 / 0.708 / 0.653 |
+
+  The best-trade edit survives privacy: at epsilon >= 3 lam 1 cuts 4.4-5.4 pp for
+  ~0.02 AUC and ends *below* the parity edit's gap, which costs 0.08-0.10 AUC. At
+  epsilon 0.1 the DP noise has already flattened the gap and lam 1 cuts only
+  2.0 pp (0.008 AUC); DP diffusion at 0.1 barely moves (0.3 pp; its outcome
+  collapses in 42% of runs, §19). By generator at epsilon >= 3 the cut is MST
+  3.6-4.0, PrivBayes 4.4-5.4, PrivSyn 5.7-7.2, DP diffusion 3.3-3.6 pp.
+- **Lane 1 done 19:12 UTC, no errors.** `arm_placebo_split.csv`, 73,890 rows from
+  821 shards. Each arm vs label noise at the same AUC loss (job tmp
+  `placebo_match.py`): cut in |gap| from the cell's own unedited release, minus the
+  cut the placebo curve gives at that AUC loss ("beats noise", pp; > 0 = better
+  than noise). The placebo's table is the shard's first none run; for PrivSyn
+  and the DECAF family the other splits' none runs are separate fits (frac 0 ≠
+  unedited in 31% of cells), so the curve is taken as deltas from the placebo's
+  own frac 0. Restricting to the 69% of cells with the identical table changes
+  every number by < 0.4 pp. Main batch, 4,211 cells per recipient:
+
+  | arm | AUC loss rf / lr / hgb | beats noise, parity gap: rf / lr / hgb | beats noise, cond gap: rf / lr / hgb |
+  |---|---|---|---|
+  | re-sampled, lam 1 | 0.021 / 0.016 / 0.019 | +3.1 / -0.7 / +0.6 | +1.5 / -1.4 / -0.4 |
+  | re-sampled, lam 0.5 | 0.009 / 0.005 / 0.007 | +2.1 / -0.2 / +1.3 | +1.9 / +0.1 / +1.3 |
+  | unaware | 0.009 / 0.003 / 0.003 | +2.1 / +0.9 / +2.0 | +2.7 / +1.8 / +2.5 |
+  | FTU edit | 0.007 / 0.005 / 0.006 | +2.1 / -0.2 / +1.5 | +2.2 / +0.7 / +1.9 |
+  | CF edit | 0.051 / 0.048 / 0.050 | +0.5 / -2.7 / -2.2 | +1.4 / -0.6 / -0.3 |
+  | parity (dp) edit | 0.137 / 0.143 / 0.146 | -0.7 / -1.8 / -1.5 | -0.2 / -1.0 / -0.8 |
+
+  FGES (1,688 cells per recipient) agrees in sign except three small entries:
+  unaware-LR (+0.9 -> -0.7), lam 1-boosting (+0.6 -> -0.6), CF-RF (+0.5 -> -0.3). Read: **against the RF, every cheap arm beats noise by 2-3 pp
+  and the parity edit sits on the noise curve (the §21.1 claim stands). Against
+  one-hot LR and boosting, label noise is a much stronger competitor: it cuts
+  parity gaps almost for free (LR: at re-sampling's 0.016 AUC loss, noise cuts
+  5.9 of the 10.4 pp gap), so
+  re-sampling only ties it, and the CF and parity edits do *worse* than noise on
+  parity (-1.5 to -2.7 pp) and roughly tie it on the CF edit's own target, the
+  conditional gap (-0.3 to -0.6 pp).** By generator (RF), re-sampling beats noise
+  most on PrivSyn (+6.3), DECAF-TabPFN (+4.9), DECAF-CTGAN (+4.6), PrivBayes
+  (+4.2), and loses on DP-GAN (-2.9; no signal to re-sample).
+- **But noise and re-sampling close the gap in opposite directions** (job tmp
+  `level_look.py`; main, signed mean selection rate of the disadvantaged /
+  advantaged group, pp, LR; boosting the same within 0.6 pp):
+  unedited 35.8 / 41.5; placebo 70% 30.8 / 33.8 (both groups *down*, -5.0 /
+  -7.7); re-sampled lam 1 44.4 / 47.0 (both *up*, +8.6 / +5.5); parity edit 33.9 /
+  35.4 (-1.9 / -6.0); CF edit 34.8 / 38.9 (-1.0 / -2.6); FTU 35.5 / 40.4; unaware
+  36.0 / 40.4. So at equal AUC the noise "fairness" is levelling down; re-sampling
+  is the only arm that levels up, and the paper's edits level down (the parity
+  edit by cutting the advantaged group's selection 6 pp). This is the levelling
+  point of the must-write checklist (notes 10.18) and the honest way to state the
+  LR/boosting result.
+- **COMPAS TabFairGAN re-run: sweeps done 19:43 UTC, 135 runs, all done.** Lambda
+  grid on race (release label gap / real parity gap / AUC, mean over seeds): 0.02
+  12.7 / -18.0 pp / 0.684; 0.5 8.2 / -12.6 / 0.682; 1.0 4.5 / -10.2 / 0.675; 2.2
+  -0.7 / -5.5 / 0.667. The method now works on COMPAS; the choice stays at the
+  paper's 2.2 (batch facct-tfg-compas-2026-10-22). The "flag COMPAS" caveat of
+  §21.1 is resolved.
+- **Angelozzi re-point:** `export --merge --methods tabfairgan --datasets compas
+  --batches <8 facct-tfg-compas> --choose ...` re-pointed exactly the 9 COMPAS
+  tabfairgan-none / -dp@ tags; nothing else changed (checked). Backup
+  `facct_data/backup-pre-tfgcompas-2026-10-22/`; old outputs in
+  `facct_output/superseded-tfgcompas-70epochs-2026-10-22/`; re-scored
+  (`sweeps/angelozzi-tfgcompas-2026-10-22.sh`, cores 16-23), done 19:49 UTC: all 9
+  cells exit 0; `angelozzi_mitigators.csv` 798,388 rows (unchanged count, 170 rows
+  per cell replaced one for one).
+- **FairPFN TabFairGAN COMPAS context re-run, done 19:46 UTC** (export/run on
+  `--batch facct-tfg-compas-2026-10-22`, ctx 10,000). Its real-context rows
+  match the main file exactly (max AUC difference 0.0). The 45 COMPAS tabfairgan rows
+  in `sweeps/facct-2026-10-09/fairpfn_baseline/results.csv` were replaced (mean
+  AUC fairpfn / rf / rf_unaware 0.528 / 0.525 / 0.531 -> 0.691 / 0.681 / 0.684).
+  Re-summarised and copied to `report/data/facct/fairpfn/`. Old file: job tmp
+  `fairpfn-results-before-tfgcompas.csv`.
+- **Chain done 19:47 UTC, no errors** (`sweeps/tfg-compas-2026-10-22.log`).
+  MAMA-MIA on the 8 COMPAS batches (`mama_mia_tfgcompas.csv`, 270 rows;
+  `mama_mia_group_tfgcompas.csv`, 1,080 rows): mean attack AUC 0.511 unedited,
+  0.511-0.513 at every lambda, so the trained TabFairGAN exposes no one
+  measurably either. Every arm ran on the new batches and all seven `arm_*.csv`
+  were re-collected with them (e.g. placebo_split 74,340 rows from 826 shards,
+  resample 23,240 from 1,212). For COMPAS tabfairgan, read only the
+  facct-tfg-compas* rows (§21.2 above); the old facct-2026-10-09 COMPAS
+  tabfairgan rows are still in the tables. `arm_placebo_split.csv` (145 MB) is
+  git-ignored and committed as `.csv.gz`; `arm_recipients.csv.gz` regenerated.
