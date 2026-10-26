@@ -1,0 +1,482 @@
+{
+ "graphs": {
+  "2827c79dce1a2081dec3139d211ffb85678491d2": {
+   "seed": 0,
+   "n_rows": 35000,
+   "n_directed": 20,
+   "n_undirected": 0,
+   "undirected_in_cpdag": [],
+   "edges": [
+    [
+     "WAOB",
+     "SCHL"
+    ],
+    [
+     "OCCP",
+     "SCHL"
+    ],
+    [
+     "AGEP",
+     "MAR"
+    ],
+    [
+     "SEX",
+     "MAR"
+    ],
+    [
+     "RAC1P",
+     "MAR"
+    ],
+    [
+     "HISP",
+     "MAR"
+    ],
+    [
+     "AGEP",
+     "RELP"
+    ],
+    [
+     "SEX",
+     "RELP"
+    ],
+    [
+     "WAOB",
+     "RELP"
+    ],
+    [
+     "MAR",
+     "RELP"
+    ],
+    [
+     "SEX",
+     "OCCP"
+    ],
+    [
+     "WAOB",
+     "OCCP"
+    ],
+    [
+     "RELP",
+     "OCCP"
+    ],
+    [
+     "OCCP",
+     "COW"
+    ],
+    [
+     "WKHP",
+     "COW"
+    ],
+    [
+     "AGEP",
+     "WKHP"
+    ],
+    [
+     "OCCP",
+     "WKHP"
+    ],
+    [
+     "AGEP",
+     "high_income"
+    ],
+    [
+     "OCCP",
+     "high_income"
+    ],
+    [
+     "WKHP",
+     "high_income"
+    ]
+   ],
+   "seconds": 1.1
+  },
+  "5204e1cd6f2689928aad117d5fdc38b714585557": {
+   "seed": 1,
+   "n_rows": 35000,
+   "n_directed": 21,
+   "n_undirected": 0,
+   "undirected_in_cpdag": [],
+   "edges": [
+    [
+     "HISP",
+     "SCHL"
+    ],
+    [
+     "WAOB",
+     "SCHL"
+    ],
+    [
+     "RELP",
+     "SCHL"
+    ],
+    [
+     "AGEP",
+     "MAR"
+    ],
+    [
+     "SEX",
+     "MAR"
+    ],
+    [
+     "RAC1P",
+     "MAR"
+    ],
+    [
+     "HISP",
+     "MAR"
+    ],
+    [
+     "AGEP",
+     "RELP"
+    ],
+    [
+     "SEX",
+     "RELP"
+    ],
+    [
+     "HISP",
+     "RELP"
+    ],
+    [
+     "MAR",
+     "RELP"
+    ],
+    [
+     "SEX",
+     "OCCP"
+    ],
+    [
+     "HISP",
+     "OCCP"
+    ],
+    [
+     "SCHL",
+     "OCCP"
+    ],
+    [
+     "OCCP",
+     "COW"
+    ],
+    [
+     "WKHP",
+     "COW"
+    ],
+    [
+     "AGEP",
+     "WKHP"
+    ],
+    [
+     "OCCP",
+     "WKHP"
+    ],
+    [
+     "AGEP",
+     "high_income"
+    ],
+    [
+     "OCCP",
+     "high_income"
+    ],
+    [
+     "WKHP",
+     "high_income"
+    ]
+   ],
+   "seconds": 1.1
+  },
+  "4ca105b0e1d7ee56ed2e2337cc325d5a04aa708e": {
+   "seed": 2,
+   "n_rows": 35000,
+   "n_directed": 21,
+   "n_undirected": 0,
+   "undirected_in_cpdag": [],
+   "edges": [
+    [
+     "HISP",
+     "SCHL"
+    ],
+    [
+     "WAOB",
+     "SCHL"
+    ],
+    [
+     "RELP",
+     "SCHL"
+    ],
+    [
+     "AGEP",
+     "MAR"
+    ],
+    [
+     "SEX",
+     "MAR"
+    ],
+    [
+     "RAC1P",
+     "MAR"
+    ],
+    [
+     "HISP",
+     "MAR"
+    ],
+    [
+     "AGEP",
+     "RELP"
+    ],
+    [
+     "SEX",
+     "RELP"
+    ],
+    [
+     "HISP",
+     "RELP"
+    ],
+    [
+     "MAR",
+     "RELP"
+    ],
+    [
+     "SEX",
+     "OCCP"
+    ],
+    [
+     "HISP",
+     "OCCP"
+    ],
+    [
+     "SCHL",
+     "OCCP"
+    ],
+    [
+     "OCCP",
+     "COW"
+    ],
+    [
+     "WKHP",
+     "COW"
+    ],
+    [
+     "AGEP",
+     "WKHP"
+    ],
+    [
+     "OCCP",
+     "WKHP"
+    ],
+    [
+     "AGEP",
+     "high_income"
+    ],
+    [
+     "OCCP",
+     "high_income"
+    ],
+    [
+     "WKHP",
+     "high_income"
+    ]
+   ],
+   "seconds": 1.1
+  },
+  "b298827347c0264a351229ac28b9139fb0efc975": {
+   "seed": 3,
+   "n_rows": 35000,
+   "n_directed": 19,
+   "n_undirected": 0,
+   "undirected_in_cpdag": [],
+   "edges": [
+    [
+     "AGEP",
+     "SCHL"
+    ],
+    [
+     "HISP",
+     "SCHL"
+    ],
+    [
+     "WAOB",
+     "SCHL"
+    ],
+    [
+     "AGEP",
+     "MAR"
+    ],
+    [
+     "SEX",
+     "MAR"
+    ],
+    [
+     "WAOB",
+     "MAR"
+    ],
+    [
+     "RELP",
+     "MAR"
+    ],
+    [
+     "AGEP",
+     "RELP"
+    ],
+    [
+     "SCHL",
+     "RELP"
+    ],
+    [
+     "SEX",
+     "OCCP"
+    ],
+    [
+     "HISP",
+     "OCCP"
+    ],
+    [
+     "SCHL",
+     "OCCP"
+    ],
+    [
+     "OCCP",
+     "COW"
+    ],
+    [
+     "WKHP",
+     "COW"
+    ],
+    [
+     "AGEP",
+     "WKHP"
+    ],
+    [
+     "OCCP",
+     "WKHP"
+    ],
+    [
+     "AGEP",
+     "high_income"
+    ],
+    [
+     "OCCP",
+     "high_income"
+    ],
+    [
+     "WKHP",
+     "high_income"
+    ]
+   ],
+   "seconds": 1.1
+  },
+  "e71a88cbe964425260733f9f68068ead26cc0930": {
+   "seed": 4,
+   "n_rows": 35000,
+   "n_directed": 20,
+   "n_undirected": 0,
+   "undirected_in_cpdag": [],
+   "edges": [
+    [
+     "WAOB",
+     "SCHL"
+    ],
+    [
+     "OCCP",
+     "SCHL"
+    ],
+    [
+     "AGEP",
+     "MAR"
+    ],
+    [
+     "SEX",
+     "MAR"
+    ],
+    [
+     "RAC1P",
+     "MAR"
+    ],
+    [
+     "HISP",
+     "MAR"
+    ],
+    [
+     "AGEP",
+     "RELP"
+    ],
+    [
+     "SEX",
+     "RELP"
+    ],
+    [
+     "HISP",
+     "RELP"
+    ],
+    [
+     "MAR",
+     "RELP"
+    ],
+    [
+     "SEX",
+     "OCCP"
+    ],
+    [
+     "WAOB",
+     "OCCP"
+    ],
+    [
+     "RELP",
+     "OCCP"
+    ],
+    [
+     "OCCP",
+     "COW"
+    ],
+    [
+     "WKHP",
+     "COW"
+    ],
+    [
+     "AGEP",
+     "WKHP"
+    ],
+    [
+     "OCCP",
+     "WKHP"
+    ],
+    [
+     "AGEP",
+     "high_income"
+    ],
+    [
+     "OCCP",
+     "high_income"
+    ],
+    [
+     "WKHP",
+     "high_income"
+    ]
+   ],
+   "seconds": 1.1
+  }
+ },
+ "dataset": "acsincome_tx",
+ "algorithm": "FGES (Tetrad, causal-cmd 1.4.1)",
+ "tetrad_jar_sha1": "887ff1cca0a2379e8f7e4d09768e1181c0b2f9bd",
+ "score": "bdeu-score",
+ "parameters": {
+  "priorEquivalentSampleSize": 1000.0,
+  "structurePrior": 1.0,
+  "maxDegree": 1000,
+  "faithfulnessAssumed": false,
+  "symmetricFirstStep": false,
+  "note": "Tetrad defaults for this build, as printed in its output"
+ },
+ "knowledge": {
+  "roots": [
+   "AGEP",
+   "HISP",
+   "RAC1P",
+   "SEX",
+   "WAOB"
+  ],
+  "sink": "high_income"
+ },
+ "rows": "training split only (test_size=0.3, random_state=seed)",
+ "dag_from_cpdag": "Dor-Tarsi consistent extension, last column first"
+}

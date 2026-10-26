@@ -1,0 +1,605 @@
+{
+ "graphs": {
+  "17bbf77a3cefaf218ab23de78f59cb074e1b84ba": {
+   "seed": 0,
+   "n_rows": 4320,
+   "n_directed": 18,
+   "n_undirected": 5,
+   "undirected_in_cpdag": [
+    [
+     "c_charge_degree",
+     "juv_fel_count"
+    ],
+    [
+     "c_charge_degree",
+     "priors_count"
+    ],
+    [
+     "juv_fel_count",
+     "juv_misd_count"
+    ],
+    [
+     "juv_fel_count",
+     "priors_count"
+    ],
+    [
+     "juv_misd_count",
+     "priors_count"
+    ]
+   ],
+   "edges": [
+    [
+     "sex",
+     "juv_fel_count"
+    ],
+    [
+     "race",
+     "juv_fel_count"
+    ],
+    [
+     "age_cat",
+     "juv_fel_count"
+    ],
+    [
+     "sex",
+     "juv_misd_count"
+    ],
+    [
+     "race",
+     "juv_misd_count"
+    ],
+    [
+     "age_cat",
+     "juv_misd_count"
+    ],
+    [
+     "juv_fel_count",
+     "juv_misd_count"
+    ],
+    [
+     "sex",
+     "priors_count"
+    ],
+    [
+     "race",
+     "priors_count"
+    ],
+    [
+     "age_cat",
+     "priors_count"
+    ],
+    [
+     "juv_fel_count",
+     "priors_count"
+    ],
+    [
+     "juv_misd_count",
+     "priors_count"
+    ],
+    [
+     "sex",
+     "c_charge_degree"
+    ],
+    [
+     "race",
+     "c_charge_degree"
+    ],
+    [
+     "age_cat",
+     "c_charge_degree"
+    ],
+    [
+     "juv_fel_count",
+     "c_charge_degree"
+    ],
+    [
+     "priors_count",
+     "c_charge_degree"
+    ],
+    [
+     "sex",
+     "two_year_recid"
+    ],
+    [
+     "race",
+     "two_year_recid"
+    ],
+    [
+     "age_cat",
+     "two_year_recid"
+    ],
+    [
+     "juv_fel_count",
+     "two_year_recid"
+    ],
+    [
+     "juv_misd_count",
+     "two_year_recid"
+    ],
+    [
+     "priors_count",
+     "two_year_recid"
+    ]
+   ],
+   "seconds": 0.7
+  },
+  "7ada76653d12fc85061955a4f914b369ce04597c": {
+   "seed": 1,
+   "n_rows": 4320,
+   "n_directed": 17,
+   "n_undirected": 5,
+   "undirected_in_cpdag": [
+    [
+     "c_charge_degree",
+     "juv_fel_count"
+    ],
+    [
+     "c_charge_degree",
+     "priors_count"
+    ],
+    [
+     "juv_fel_count",
+     "juv_misd_count"
+    ],
+    [
+     "juv_fel_count",
+     "priors_count"
+    ],
+    [
+     "juv_misd_count",
+     "priors_count"
+    ]
+   ],
+   "edges": [
+    [
+     "sex",
+     "juv_fel_count"
+    ],
+    [
+     "race",
+     "juv_fel_count"
+    ],
+    [
+     "age_cat",
+     "juv_fel_count"
+    ],
+    [
+     "sex",
+     "juv_misd_count"
+    ],
+    [
+     "race",
+     "juv_misd_count"
+    ],
+    [
+     "age_cat",
+     "juv_misd_count"
+    ],
+    [
+     "juv_fel_count",
+     "juv_misd_count"
+    ],
+    [
+     "sex",
+     "priors_count"
+    ],
+    [
+     "race",
+     "priors_count"
+    ],
+    [
+     "age_cat",
+     "priors_count"
+    ],
+    [
+     "juv_fel_count",
+     "priors_count"
+    ],
+    [
+     "juv_misd_count",
+     "priors_count"
+    ],
+    [
+     "sex",
+     "c_charge_degree"
+    ],
+    [
+     "race",
+     "c_charge_degree"
+    ],
+    [
+     "age_cat",
+     "c_charge_degree"
+    ],
+    [
+     "juv_fel_count",
+     "c_charge_degree"
+    ],
+    [
+     "priors_count",
+     "c_charge_degree"
+    ],
+    [
+     "race",
+     "two_year_recid"
+    ],
+    [
+     "age_cat",
+     "two_year_recid"
+    ],
+    [
+     "juv_fel_count",
+     "two_year_recid"
+    ],
+    [
+     "juv_misd_count",
+     "two_year_recid"
+    ],
+    [
+     "priors_count",
+     "two_year_recid"
+    ]
+   ],
+   "seconds": 0.7
+  },
+  "9482375007e17b5c84ba76f0493f63cdfac28817": {
+   "seed": 2,
+   "n_rows": 4320,
+   "n_directed": 20,
+   "n_undirected": 2,
+   "undirected_in_cpdag": [
+    [
+     "c_charge_degree",
+     "juv_fel_count"
+    ],
+    [
+     "juv_fel_count",
+     "juv_misd_count"
+    ]
+   ],
+   "edges": [
+    [
+     "sex",
+     "juv_fel_count"
+    ],
+    [
+     "race",
+     "juv_fel_count"
+    ],
+    [
+     "age_cat",
+     "juv_fel_count"
+    ],
+    [
+     "sex",
+     "juv_misd_count"
+    ],
+    [
+     "race",
+     "juv_misd_count"
+    ],
+    [
+     "age_cat",
+     "juv_misd_count"
+    ],
+    [
+     "juv_fel_count",
+     "juv_misd_count"
+    ],
+    [
+     "sex",
+     "priors_count"
+    ],
+    [
+     "race",
+     "priors_count"
+    ],
+    [
+     "age_cat",
+     "priors_count"
+    ],
+    [
+     "juv_fel_count",
+     "priors_count"
+    ],
+    [
+     "juv_misd_count",
+     "priors_count"
+    ],
+    [
+     "c_charge_degree",
+     "priors_count"
+    ],
+    [
+     "sex",
+     "c_charge_degree"
+    ],
+    [
+     "race",
+     "c_charge_degree"
+    ],
+    [
+     "age_cat",
+     "c_charge_degree"
+    ],
+    [
+     "juv_fel_count",
+     "c_charge_degree"
+    ],
+    [
+     "race",
+     "two_year_recid"
+    ],
+    [
+     "age_cat",
+     "two_year_recid"
+    ],
+    [
+     "juv_fel_count",
+     "two_year_recid"
+    ],
+    [
+     "juv_misd_count",
+     "two_year_recid"
+    ],
+    [
+     "priors_count",
+     "two_year_recid"
+    ]
+   ],
+   "seconds": 0.7
+  },
+  "181b4aace5d11f0c0d2a3dd8a3f8d97f61180ece": {
+   "seed": 3,
+   "n_rows": 4320,
+   "n_directed": 21,
+   "n_undirected": 2,
+   "undirected_in_cpdag": [
+    [
+     "c_charge_degree",
+     "juv_fel_count"
+    ],
+    [
+     "juv_fel_count",
+     "juv_misd_count"
+    ]
+   ],
+   "edges": [
+    [
+     "sex",
+     "juv_fel_count"
+    ],
+    [
+     "race",
+     "juv_fel_count"
+    ],
+    [
+     "age_cat",
+     "juv_fel_count"
+    ],
+    [
+     "sex",
+     "juv_misd_count"
+    ],
+    [
+     "race",
+     "juv_misd_count"
+    ],
+    [
+     "age_cat",
+     "juv_misd_count"
+    ],
+    [
+     "juv_fel_count",
+     "juv_misd_count"
+    ],
+    [
+     "sex",
+     "priors_count"
+    ],
+    [
+     "race",
+     "priors_count"
+    ],
+    [
+     "age_cat",
+     "priors_count"
+    ],
+    [
+     "juv_fel_count",
+     "priors_count"
+    ],
+    [
+     "juv_misd_count",
+     "priors_count"
+    ],
+    [
+     "c_charge_degree",
+     "priors_count"
+    ],
+    [
+     "sex",
+     "c_charge_degree"
+    ],
+    [
+     "race",
+     "c_charge_degree"
+    ],
+    [
+     "age_cat",
+     "c_charge_degree"
+    ],
+    [
+     "juv_fel_count",
+     "c_charge_degree"
+    ],
+    [
+     "sex",
+     "two_year_recid"
+    ],
+    [
+     "race",
+     "two_year_recid"
+    ],
+    [
+     "age_cat",
+     "two_year_recid"
+    ],
+    [
+     "juv_fel_count",
+     "two_year_recid"
+    ],
+    [
+     "juv_misd_count",
+     "two_year_recid"
+    ],
+    [
+     "priors_count",
+     "two_year_recid"
+    ]
+   ],
+   "seconds": 0.7
+  },
+  "359964a3cda22827641e68723635a9637f297850": {
+   "seed": 4,
+   "n_rows": 4320,
+   "n_directed": 17,
+   "n_undirected": 5,
+   "undirected_in_cpdag": [
+    [
+     "c_charge_degree",
+     "juv_fel_count"
+    ],
+    [
+     "c_charge_degree",
+     "priors_count"
+    ],
+    [
+     "juv_fel_count",
+     "juv_misd_count"
+    ],
+    [
+     "juv_fel_count",
+     "priors_count"
+    ],
+    [
+     "juv_misd_count",
+     "priors_count"
+    ]
+   ],
+   "edges": [
+    [
+     "sex",
+     "juv_fel_count"
+    ],
+    [
+     "race",
+     "juv_fel_count"
+    ],
+    [
+     "age_cat",
+     "juv_fel_count"
+    ],
+    [
+     "sex",
+     "juv_misd_count"
+    ],
+    [
+     "race",
+     "juv_misd_count"
+    ],
+    [
+     "age_cat",
+     "juv_misd_count"
+    ],
+    [
+     "juv_fel_count",
+     "juv_misd_count"
+    ],
+    [
+     "sex",
+     "priors_count"
+    ],
+    [
+     "race",
+     "priors_count"
+    ],
+    [
+     "age_cat",
+     "priors_count"
+    ],
+    [
+     "juv_fel_count",
+     "priors_count"
+    ],
+    [
+     "juv_misd_count",
+     "priors_count"
+    ],
+    [
+     "sex",
+     "c_charge_degree"
+    ],
+    [
+     "race",
+     "c_charge_degree"
+    ],
+    [
+     "age_cat",
+     "c_charge_degree"
+    ],
+    [
+     "juv_fel_count",
+     "c_charge_degree"
+    ],
+    [
+     "priors_count",
+     "c_charge_degree"
+    ],
+    [
+     "race",
+     "two_year_recid"
+    ],
+    [
+     "age_cat",
+     "two_year_recid"
+    ],
+    [
+     "juv_fel_count",
+     "two_year_recid"
+    ],
+    [
+     "juv_misd_count",
+     "two_year_recid"
+    ],
+    [
+     "priors_count",
+     "two_year_recid"
+    ]
+   ],
+   "seconds": 0.7
+  }
+ },
+ "dataset": "compas",
+ "algorithm": "FGES (Tetrad, causal-cmd 1.4.1)",
+ "tetrad_jar_sha1": "887ff1cca0a2379e8f7e4d09768e1181c0b2f9bd",
+ "score": "bdeu-score",
+ "parameters": {
+  "priorEquivalentSampleSize": 10000.0,
+  "structurePrior": 1.0,
+  "maxDegree": 1000,
+  "faithfulnessAssumed": false,
+  "symmetricFirstStep": false,
+  "note": "Tetrad defaults for this build, as printed in its output"
+ },
+ "knowledge": {
+  "roots": [
+   "age_cat",
+   "race",
+   "sex"
+  ],
+  "sink": "two_year_recid"
+ },
+ "rows": "training split only (test_size=0.3, random_state=seed)",
+ "dag_from_cpdag": "Dor-Tarsi consistent extension, last column first"
+}

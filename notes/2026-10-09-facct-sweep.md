@@ -1109,3 +1109,137 @@ the paper leans on, plus one broken baseline row:
   facct-tfg-compas* rows (§21.2 above); the old facct-2026-10-09 COMPAS
   tabfairgan rows are still in the tables. `arm_placebo_split.csv` (145 MB) is
   git-ignored and committed as `.csv.gz`; `arm_recipients.csv.gz` regenerated.
+
+## 22. New angles, 2026-10-25 — privacy noise and the graph (first looks)
+
+Steven asked for patterns beyond the outline-v3 story, privacy-centric or about the
+graph. First looks only (RF recipient, hand graphs, means over seeds/splits); the
+analysis session should redo them in its own code. Scripts (private, untracked):
+`FAccT_manuscript/notes/scripts/angles_2026-10-25/`. Run order: the analysis session's
+`core_2026-10-22/noise_test.py .` (writes `noise_test_rows.parquet`), then `oracle.py`,
+`orc2.py`, `dpnoise.py`, `edges.py`, `topo_marg.py`, `topo_marg2.py`, `lottery.py`,
+`ci.py`, `sign.py` in one folder.
+
+**A. Privacy noise is not label noise; it acts through the graph the generator learns.**
+- Unedited releases at each epsilon against their epsilon-1000 twin, read on the
+  label-noise placebo of that twin at the same AUC loss (`dpnoise.py`; cases with a
+  real gap >= 3 pp at epsilon 1000; 95% CI over dataset x attribute cases, `ci.py`).
+  PrivBayes keeps more of the real gap than label noise: -2.3 pp [-3.7, -1.1] at
+  epsilon 0.1, -2.6 pp [-4.9, -0.5] at 0.3 (-0.6 / -0.8 pp, CI over 0, at 1 / 3).
+  PrivSyn closes more than noise: +1.8 pp [0.2, 3.9] at 0.3, +1.75 [0.85, 2.7] at 1.
+  MST -1.7 pp [-5.3, 0.7] at 0.1, else ~0. DP diffusion (fixed hand graph) -0.5 to
+  +1.4 at epsilon 1-100 (CIs over 0); its +3.0 at 0.1 is on the 58% of runs that did
+  not collapse.
+- Mechanism: the structure MST/PrivBayes/PrivSyn learn is logged per run
+  (`graph_edges` in the shard DBs; `edges.py`). Share of releases where a protected
+  attribute is adjacent to the outcome: PrivBayes 9% at epsilon 1000, 26% / 24% at
+  0.3 / 1; PrivSyn 60% at 1000, 40-43% at <= 10; MST 3%, 5% at 0.1. Within a case
+  (dataset x attribute x split fixed effects, plus epsilon fixed effects, clustered SE),
+  adjacency adds to the real gap: PrivBayes +8.0 pp [4.5, 11.5], PrivSyn +5.1 [3.6, 6.7],
+  and lowers the beyond-noise reading by 5.1 / 4.6 pp. PrivBayes releases that *gain*
+  adjacency under DP (303 runs at epsilon < 1000): gap +5.5 pp on average, 89% in the
+  direction it already pointed (+4.7 pp amplification), 36% widen by >= 5 pp.
+- Usable releases are hit too: 8.1% of PrivBayes releases at epsilon <= 3 gained the
+  link and keep AUC >= 0.70. Over all epsilon < 1000, the 143 PrivBayes releases that
+  gained it with AUC >= 0.70 average gap 10.4 -> 13.7 pp at AUC 0.81 -> 0.79. Examples:
+  ACSIncome-TX Hispanic 19.1 -> 28.9 pp (AUC 0.78); ACSIncome-CA sex 5.3 -> 10.2 pp
+  (0.80); PrivSyn SBO sex 8.6 -> 15.6 pp (0.83).
+- MST at epsilon 0.1 attaches the outcome to one attribute, usually the one with the
+  most categories (8 of 11 datasets). COMPAS: race, in all 5 seeds; Adult: native
+  country, all 5. COMPAS race gap (signed, other races minus African-American) at
+  epsilon 0.1: -45, -40, +20, -54, -82 pp by seed, against -14 pp at epsilon 1000.
+  2-way TVD 0.098 rates it better than PrivSyn at 0.1 (0.184, race gap -10 pp).
+- Membership attack by group (MAMA-MIA, shadow): disadvantaged group more exposed by
+  at most 0.014 AUC, only at epsilon >= 30 (PrivBayes 0.592 vs 0.578 at 1000); edits
+  move attack AUC by <= 0.009. Too thin to carry a finding.
+- Reading: fairness edits cut edges on purpose; privacy noise rewires them by
+  accident. A fixed hand graph removes the rewiring (and spends no budget), which
+  backs the hand-graph decision. The learned structure is itself DP output, so a
+  publisher can check it for a protected-outcome link at no extra privacy cost.
+  Novelty not checked: compare Ganev et al. 2022, Cheng et al. 2021, Bullwinkel et
+  al. 2022 [verify]. Not done: per-group selection rates for these releases (needs a
+  re-score of saved tables, ~20 min on 12 cores).
+
+**B. The graph sets what each label can deliver (real-data oracle, `oracle.py`).**
+- Every outcome is a sink in the hand graphs, so its parents are its Markov blanket.
+  Protected attributes are ancestors of 70-100% of those parents (`graphs_summary.csv`
+  n_cut_dp / n_outcome_parents), so DemPar must cut nearly all of them.
+- Oracle: the sweep's RF fit on REAL training rows using only the parents each cut
+  keeps, scored on the real holdout (5 seeds, 11 datasets, 3 splits), plus a real-data
+  label-noise curve. Mean AUC: none 0.802, FTU 0.793, CF 0.742, DemPar 0.586;
+  real gap 10.3 / 8.1 / 5.9 / 1.5 pp. So DemPar's ceiling on hand graphs is AUC 0.59.
+- The oracle predicts the observed cells (`orc2.py`, 255 cells per family): causal
+  families pooled, AUC loss r = 0.89, gap drop r = 0.83, final real gap r = 0.81;
+  marginals (which learn their own graph) AUC loss r = 0.54. The oracle beats noise for
+  DemPar by +2.0 pp but the generators realise ~0-0.5 pp, so synthesis loses the
+  targeted part of the DemPar cut (released AUC 0.54 vs ceiling 0.59, gap 3.2 vs 1.5 pp).
+- Across labels, cuts removing > 70% of the outcome's parents beat noise by 0.24 pp,
+  cuts removing <= 35% by 1.5 pp; within CF the share alone does not order the effect.
+
+## 23. Graph-variant experiment, 2026-10-26 — same data and generator, different graphs
+
+Steven, 2026-10-26: make the graph the paper's explanation (T2: "a cut is only as good
+as the graph it cuts"), keeping the placebo test as the measuring tool; judge graphs on
+real data with per-edge tests (no simulated world); run E1 (graph misses proxies), E2
+(contested edges), E3 (density ladder) and the no-direct-edge graph, on the four non-DP
+causal generators, DP diffusion at epsilon 1 and 10, and a hand-wired DP marginal.
+
+**First look from existing runs (hand vs FGES, same generator; job tmp `graph/hvf.py`).**
+172 dataset x attribute x generator cases, FGES minus hand, 95% bootstrap CI:
+unedited AUC -0.021 [-0.026, -0.015]; unedited real gap -1.5 pp [-2.3, -0.7]; FTU's
+lead over the placebo -1.0 pp [-1.6, -0.5] (FGES rarely draws protected -> outcome,
+so FTU usually cuts nothing); CF -0.4 and DemPar -0.3 pp, CIs over 0. The draft's
+"hand vs FGES is confounded with family" no longer holds: all four non-DP causal
+generators now have both.
+
+**Why "no direct edge" is not FTU.** FTU trains the outcome's conditional on all its
+parents, protected attribute included, then feeds it a shuffled protected attribute
+at generation. A graph without the direct edge trains the conditional without the
+protected attribute, so the direct effect is absorbed by the parents correlated with
+it (the proxies); FTU on that graph then has nothing to cut.
+
+**Code (uncommitted at launch).**
+- `data/causal_graphs.py`: `resolve_graph(dataset, data, source, roles, seed)` takes
+  `"<source>:<variant>"`; `perturb_graph` builds `nodirect`, `noproxy<N>` (N% of
+  protected -> non-protected, non-outcome edges, nested random subset by dataset and
+  seed), `contested` (`CONTESTED_EDGES`: Adult sex -> relationship; ACSIncome SEX -> OCCP;
+  SNAKE female -> mocc10; COMPAS race -> priors / juvenile counts; HMDA race and
+  ethnicity -> tract_minority / tract_income; SBO SEX1 / RACE1 / ETH1 -> SECTOR) and
+  `over` (protected -> every other non-outcome column, every column -> outcome, kept
+  acyclic). No variant reads the data, so DP guarantees are unaffected. Discovered
+  sources `fges-<tag>` are accepted. The DECAF wrapper and the backbone variants pass
+  the run's roles and seed through.
+- `scripts/discover_graphs.py`: `--ess` (BDeu prior equivalent sample size) and
+  `--tag`; fixed the v-structure check, which treated two nodes joined by an undirected
+  CPDAG edge as non-adjacent and so raised on denser graphs (false alarm; the extension
+  was right). New graphs `fges-ess1000_*`, `fges-ess10000_*` (seeds 0-4): 17-115 and
+  22-115 edges against 10-51 at the default; the outcome still has only 2-6 parents.
+- `scripts/run_experiments.py`: `only` accepts `|`-separated alternatives.
+- `sdg/mst.py::MSTHand` (`mst_hand`): MST with the structure fixed to the hand graph,
+  every hand edge measured as a 2-way marginal, the selection third of the budget
+  moved to measurement (two rounds of rho/2), and the cut applied as in the causal
+  families (edges `select_biased_edges` would shuffle are not measured). Junction-tree
+  cliques are at most 5e5 cells on every hand graph, so inference is feasible.
+
+**Batches (all first role split only; seeds 0-4; torch on GPU 0).**
+`facct-graph-<v>-2026-10-26` for v in hand (control, re-run on GPU; also the run-to-run
+noise floor), nodirect, noproxy100, noproxy50, contested (8 datasets), over, fges1000,
+fges10000: decaf, decaf_ctgan, decaf_diffusion, decaf_tabpfn, 880 runs each (640 for
+contested). `facct-graph-dp-<v>-2026-10-26` for v in hand, nodirect, noproxy100, over:
+decaf_dpdiffusion, epsilon 1 and 10, seeds 0-2, 264 runs each.
+Launcher `sweeps/graph-2026-10-26.sh`, lanes started 2026-10-26 22:52 UTC:
+T (decaf_tabpfn, GPU 0, cores 12-14, 3 workers, script PID 1946928) and D
+(dpdiffusion, GPU 0, cores 23-26, 4 workers, PID 1946926); lane T scores the placebo
+(`release_arms.py --arm placebo`) after each batch on cores 35-37. Lane G (decaf,
+ctgan, diffusion on GPU 0, 8 workers) saturated the GPU (99%, 15 processes; TabPFN
+~780 s and diffusion ~600 s per shard, GAN/CTGAN unfinished after 15 min) and was
+stopped at 23:10 (PID 1946927 and children; 2 hand-batch diffusion shards finished on
+GPU and are kept). Replaced by `sweeps/graph-2026-10-26b.sh` (lane C, PID 1951867):
+the same three methods on CPU, 18 workers on cores 27-34,38-47, placebo on 16-22.
+Logs `sweeps/graph-2026-10-26-<lane>.log` (T, D, C).
+
+```
+python scripts/sweep.py status --batch facct-graph-nodirect-2026-10-26
+python scripts/release_arms.py collect --arm placebo
+python scripts/collect_results.py      # every facct-* batch -> report/data/facct/<batch>_runs.csv
+```

@@ -27,6 +27,7 @@ from mbi import Dataset, Domain, FactoredInference
 from scipy import sparse
 from scipy.special import logsumexp
 
+from ..data.causal_graphs import as_digraph, resolve_graph
 from ..fairness.base import AttributeRoles, Edge, FairnessMechanism
 from ._cdp2adp import cdp_rho
 from .base import SDGMethod, SDGResult
@@ -142,6 +143,57 @@ class MST(SDGMethod):
 
         edges = select_fair(dataset, rho / 3.0, log1, roles, fairness_mechanism)
 
+        log2 = measure(dataset, edges, sigma) if edges else []
+        engine = FactoredInference(dataset.domain, iters=1000)
+        est = engine.estimate(log1 + log2)
+        synth = est.synthetic_data(n_synth)
+
+        return SDGResult(synthetic_data=synth.df, graph_edges=edges)
+
+
+class MSTHand(MST):
+    """MST with its structure fixed to the hand-drawn graph instead of chosen
+    privately: every 1-way marginal and every edge of the graph as a 2-way
+    marginal, with the third of the budget MST spends on selection moved to
+    measurement. Separates "the graph is learned under noise" from "the
+    generator is a marginal method".
+
+    The fairness cut is the causal families' (`select_biased_edges` on the
+    graph, DECAF Corollaries 1-3): the edges it would shuffle are not
+    measured, so the outcome's neighbours are its kept parents.
+    """
+
+    name = "mst_hand"
+    graph = "hand"
+
+    def fit_generate(
+        self,
+        data,
+        domain: Dict[str, int],
+        roles: AttributeRoles,
+        fairness_mechanism: FairnessMechanism,
+        epsilon: float,
+        delta: float,
+        n_synth: int,
+        seed: Optional[int] = None,
+        dataset_name: Optional[str] = None,
+    ) -> SDGResult:
+        if seed is not None:
+            np.random.seed(seed)
+
+        dataset = Dataset(data, Domain.fromdict(domain))
+        rho = cdp_rho(epsilon, delta)
+        sigma = np.sqrt(2 / (2 * rho))  # two measurement rounds of rho/2
+
+        dag = as_digraph(resolve_graph(dataset_name, data, self.graph, roles, seed), list(data.columns))
+        cut = {
+            (parent, child)
+            for child, parents in fairness_mechanism.select_biased_edges(dag, roles).items()
+            for parent in parents
+        }
+        edges = [e for e in dag.edges if e not in cut]
+
+        log1 = measure(dataset, [(col,) for col in dataset.domain], sigma)
         log2 = measure(dataset, edges, sigma) if edges else []
         engine = FactoredInference(dataset.domain, iters=1000)
         est = engine.estimate(log1 + log2)

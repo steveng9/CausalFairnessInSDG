@@ -375,12 +375,14 @@ def _parse_overrides(pairs: Sequence[str]) -> Dict[str, object]:
 
 def filter_only(configs: List[RunConfig], only: Optional[str]) -> List[RunConfig]:
     """Keep configs whose '<dataset>/<role_config>/<method>/<mechanism>' label
-    contains `only`."""
+    contains `only`, or any of its '|'-separated alternatives."""
     if not only:
         return configs
+    alternatives = only.split("|")
     return [
         c for c in configs
-        if only in f"{c.dataset}/{c.role_config}/{c.sdg_method}/{c.fairness_mechanism}"
+        if any(a in f"{c.dataset}/{c.role_config}/{c.sdg_method}/{c.fairness_mechanism}"
+               for a in alternatives)
     ]
 
 

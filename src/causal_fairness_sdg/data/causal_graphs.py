@@ -27,7 +27,7 @@ import hashlib
 import json
 from functools import lru_cache
 from pathlib import Path
-from typing import Dict, List, Tuple
+from typing import Dict, List, Optional, Tuple
 
 import networkx as nx
 import numpy as np
@@ -636,8 +636,95 @@ def _discovered(source: str, dataset_name: str) -> Dict[str, List[Edge]]:
     }
 
 
-def resolve_graph(dataset_name: str, data: pd.DataFrame, source: str = "hand") -> List[Edge]:
-    """The edge list a DECAF-style generator should use for `data`."""
+#: Edges whose presence is a value judgment, removed by the "contested"
+#: variant. Each is a link a reasonable graph-drawer might leave out, and
+#: leaving it out decides whether the child counts as a proxy.
+CONTESTED_EDGES: Dict[str, List[Edge]] = {
+    # The household-role codes ("husband", "wife") carry sex.
+    "adult": [("sex", "relationship")],
+    # Occupational segregation: is the occupation mix a channel of the gap?
+    "acsincome_ca": [("SEX", "OCCP")],
+    "acsincome_tx": [("SEX", "OCCP")],
+    "snake": [("female", "mocc10")],
+    # Policing: does race shape the criminal record itself?
+    "compas": [("race", "priors_count"), ("race", "juv_fel_count"), ("race", "juv_misd_count")],
+    # Residential segregation: the tract variables are the redlining channel.
+    "hmda_ca": [(a, t) for a in ("race", "ethnicity") for t in ("tract_minority", "tract_income")],
+    "hmda_tx": [(a, t) for a in ("race", "ethnicity") for t in ("tract_minority", "tract_income")],
+    # Industry mix: do the owner's sex and race steer the firm's sector?
+    "sbo": [("SEX1", "SECTOR"), ("RACE1", "SECTOR"), ("ETH1", "SECTOR")],
+}
+
+
+def perturb_graph(
+    edges: List[Edge], variant: str, dataset_name: str, columns: List[str], roles, seed: Optional[int]
+) -> List[Edge]:
+    """A deliberately different graph over the same data, for testing how much
+    a fairness cut's meaning depends on the graph it cuts. `roles` is the run's
+    `AttributeRoles` (only `protected` and `outcome` are read).
+
+      nodirect     drop every protected -> outcome edge: the drawer believes
+                   there is no direct effect (FTU then has nothing to cut).
+      noproxy<N>   drop N% of the edges from a protected attribute into a
+                   non-protected, non-outcome child, chosen at random by
+                   (dataset, seed) and nested across N; the direct edges stay.
+      contested    drop `CONTESTED_EDGES[dataset_name]`.
+      over         add protected -> every other non-outcome column, and every
+                   column -> outcome, wherever that keeps the graph acyclic.
+
+    None of these reads the data, so a DP generator's guarantee is unaffected.
+    """
+    protected, outcome = set(roles.protected), set(roles.outcome)
+    if variant == "nodirect":
+        return [e for e in edges if not (e[0] in protected and e[1] in outcome)]
+    if variant.startswith("noproxy"):
+        share = int(variant[len("noproxy"):]) / 100
+        proxies = sorted(e for e in edges if e[0] in protected and e[1] not in protected | outcome)
+        salt = int(hashlib.sha1(dataset_name.encode()).hexdigest()[:8], 16)
+        order = np.random.default_rng([0 if seed is None else seed, salt]).permutation(len(proxies))
+        drop = {proxies[i] for i in order[: round(share * len(proxies))]}
+        return [e for e in edges if e not in drop]
+    if variant == "contested":
+        if dataset_name not in CONTESTED_EDGES:
+            raise ValueError(f"no contested edges listed for {dataset_name!r}")
+        drop = set(CONTESTED_EDGES[dataset_name])
+        if drop - set(edges):
+            raise ValueError(f"contested edges not in the graph: {sorted(drop - set(edges))}")
+        return [e for e in edges if e not in drop]
+    if variant == "over":
+        dag = nx.DiGraph()
+        dag.add_nodes_from(columns)
+        dag.add_edges_from(edges)
+        for p in sorted(protected & set(columns)):
+            for x in columns:
+                if x not in protected | outcome and x not in nx.ancestors(dag, p):
+                    dag.add_edge(p, x)
+        for o in sorted(outcome & set(columns)):
+            for x in columns:
+                if x != o and x not in nx.descendants(dag, o):
+                    dag.add_edge(x, o)
+        return list(dag.edges)
+    raise ValueError(f"unknown graph variant {variant!r}")
+
+
+def resolve_graph(
+    dataset_name: str, data: pd.DataFrame, source: str = "hand", roles=None, seed: Optional[int] = None
+) -> List[Edge]:
+    """The edge list a DECAF-style generator should use for `data`.
+
+    `source` is a graph source, optionally followed by a variant
+    (`"hand:noproxy50"`; see `perturb_graph`), which needs the run's `roles`
+    and `seed`."""
+    source, _, variant = source.partition(":")
+    edges = _base_graph(dataset_name, data, source)
+    if not variant:
+        return edges
+    if roles is None:
+        raise ValueError(f"graph variant {variant!r} needs the run's attribute roles")
+    return perturb_graph(edges, variant, dataset_name, list(data.columns), roles, seed)
+
+
+def _base_graph(dataset_name: str, data: pd.DataFrame, source: str) -> List[Edge]:
     if source == "hand":
         if dataset_name not in CAUSAL_GRAPHS:
             raise ValueError(
@@ -645,7 +732,8 @@ def resolve_graph(dataset_name: str, data: pd.DataFrame, source: str = "hand") -
                 f"available: {sorted(CAUSAL_GRAPHS)}"
             )
         return CAUSAL_GRAPHS[dataset_name]
-    if source not in GRAPH_SOURCES:
+    # "fges-<tag>": FGES run with other parameters (`discover_graphs.py --tag`).
+    if source not in GRAPH_SOURCES and not source.startswith("fges-"):
         raise ValueError(f"unknown graph source {source!r}; one of {GRAPH_SOURCES}")
     graphs = _discovered(source, dataset_name)
     key = table_key(data)

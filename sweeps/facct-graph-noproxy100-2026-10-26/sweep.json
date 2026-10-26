@@ -1,0 +1,45 @@
+{
+  "batch": "facct-graph-noproxy100-2026-10-26",
+  "created": "2026-10-26T22:52:05",
+  "datasets": [
+    "acsincome_ca",
+    "acsincome_tx",
+    "snake",
+    "sbo",
+    "acspubcov_ca",
+    "acspubcov_tx",
+    "cdc_diabetes",
+    "hmda_ca",
+    "hmda_tx",
+    "adult",
+    "compas"
+  ],
+  "methods": [
+    "decaf",
+    "decaf_ctgan",
+    "decaf_diffusion",
+    "decaf_tabpfn"
+  ],
+  "seeds": [
+    0,
+    1,
+    2,
+    3,
+    4
+  ],
+  "epsilons": [
+    1000.0
+  ],
+  "classifier": "rf",
+  "notes": "Hand graph minus every edge from a protected attribute into a non-protected, non-outcome child (the graph misses all proxies). First role split of each dataset only. Same datasets, seeds and classifier as facct-2026-10-09; all torch shards on GPU 0. Part of the graph-variant experiment (sweep notes \u00a723).",
+  "only": "/prefair/|/prefair_like/|/eligibility_adm/|/ecoa_underwriting_adm/|/ses_clinical_adm/|/owner_demographics/",
+  "settings": {
+    "graph": "hand:noproxy100"
+  },
+  "python": {
+    "decaf_tabpfn": "/home/golobs/miniconda3/envs/sdg_tabpfn/bin/python"
+  },
+  "gpu_only": [
+    "decaf_tabpfn"
+  ]
+}

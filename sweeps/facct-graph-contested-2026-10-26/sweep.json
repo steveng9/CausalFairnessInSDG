@@ -1,0 +1,42 @@
+{
+  "batch": "facct-graph-contested-2026-10-26",
+  "created": "2026-10-26T22:52:05",
+  "datasets": [
+    "acsincome_ca",
+    "acsincome_tx",
+    "snake",
+    "sbo",
+    "hmda_ca",
+    "hmda_tx",
+    "adult",
+    "compas"
+  ],
+  "methods": [
+    "decaf",
+    "decaf_ctgan",
+    "decaf_diffusion",
+    "decaf_tabpfn"
+  ],
+  "seeds": [
+    0,
+    1,
+    2,
+    3,
+    4
+  ],
+  "epsilons": [
+    1000.0
+  ],
+  "classifier": "rf",
+  "notes": "Hand graph minus one named, value-laden link per dataset (causal_graphs.CONTESTED_EDGES). First role split of each dataset only. Same datasets, seeds and classifier as facct-2026-10-09; all torch shards on GPU 0. Part of the graph-variant experiment (sweep notes \u00a723).",
+  "only": "/prefair/|/prefair_like/|/eligibility_adm/|/ecoa_underwriting_adm/|/ses_clinical_adm/|/owner_demographics/",
+  "settings": {
+    "graph": "hand:contested"
+  },
+  "python": {
+    "decaf_tabpfn": "/home/golobs/miniconda3/envs/sdg_tabpfn/bin/python"
+  },
+  "gpu_only": [
+    "decaf_tabpfn"
+  ]
+}

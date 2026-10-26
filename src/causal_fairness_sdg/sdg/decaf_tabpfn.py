@@ -198,7 +198,7 @@ class DECAFTabPFNMethod(_BaseDECAFVariant):
         dataset_name: Optional[str] = None,
     ) -> SDGResult:
         self._require_backend()
-        columns, col_index, dag, dag_seed = self._dag(data, dataset_name)
+        columns, col_index, dag, dag_seed = self._dag(data, dataset_name, roles, seed)
         cfg = self._trainer_settings(dataset_name)
         cards = np.array([domain[c] for c in columns], dtype=np.int64)
         # Same convention as `_decaf_ctgan.ColumnBlocks.encode`: Adult's

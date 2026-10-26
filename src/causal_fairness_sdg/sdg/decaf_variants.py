@@ -84,11 +84,11 @@ class _BaseDECAFVariant(SDGMethod):
         cfg.pop(self.graph_setting, None)
         return cfg
 
-    def _dag(self, data: pd.DataFrame, dataset_name: Optional[str]):
+    def _dag(self, data: pd.DataFrame, dataset_name: Optional[str], roles=None, seed=None):
         source = self._settings_for(dataset_name).get(self.graph_setting, "hand")
         columns = list(data.columns)
         col_index = {c: i for i, c in enumerate(columns)}
-        dag = as_digraph(resolve_graph(dataset_name, data, source), columns)
+        dag = as_digraph(resolve_graph(dataset_name, data, source, roles, seed), columns)
         dag_seed = [[col_index[p], col_index[c]] for p, c in dag.edges]
         return columns, col_index, dag, dag_seed
 
@@ -198,7 +198,7 @@ class DECAFDPGANMethod(_BaseDECAFVariant):
         dataset_name: Optional[str] = None,
     ) -> SDGResult:
         self._require_backend()
-        columns, col_index, dag, dag_seed = self._dag(data, dataset_name)
+        columns, col_index, dag, dag_seed = self._dag(data, dataset_name, roles, seed)
         cfg = self._trainer_settings(dataset_name)
         values = data.to_numpy(dtype="float32")
 
@@ -309,7 +309,7 @@ class DECAFCTGANMethod(_BaseDECAFVariant):
         dataset_name: Optional[str] = None,
     ) -> SDGResult:
         self._require_backend()
-        columns, col_index, dag, dag_seed = self._dag(data, dataset_name)
+        columns, col_index, dag, dag_seed = self._dag(data, dataset_name, roles, seed)
         cfg = self._trainer_settings(dataset_name)
         codes = data.to_numpy()
         blocks = ColumnBlocks(columns, domain)
@@ -429,7 +429,7 @@ class DECAFDiffusionMethod(_BaseDECAFVariant):
         dataset_name: Optional[str] = None,
     ) -> SDGResult:
         self._require_backend()
-        columns, col_index, dag, dag_seed = self._dag(data, dataset_name)
+        columns, col_index, dag, dag_seed = self._dag(data, dataset_name, roles, seed)
         cfg = self._trainer_settings(dataset_name)
         codes = data.to_numpy()
         blocks = ColumnBlocks(columns, domain)

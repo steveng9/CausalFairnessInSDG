@@ -85,8 +85,10 @@ def knowledge_text(roots: Sequence[str], middle: Sequence[str], outcome: str) ->
     )
 
 
-def run_fges(train, knowledge: str, workdir: Path, cpus: str) -> Tuple[List[Edge], List[Edge], str]:
-    """Returns (directed edges, undirected edges, raw Tetrad output)."""
+def run_fges(train, knowledge: str, workdir: Path, cpus: str,
+             ess: float = 10.0) -> Tuple[List[Edge], List[Edge], str]:
+    """Returns (directed edges, undirected edges, raw Tetrad output). `ess` is
+    BDeu's prior equivalent sample size; larger values give denser graphs."""
     data_path = workdir / "train.tsv"
     know_path = workdir / "knowledge.txt"
     train.to_csv(data_path, sep="\t", index=False)
@@ -103,6 +105,8 @@ def run_fges(train, knowledge: str, workdir: Path, cpus: str) -> Tuple[List[Edge
         "--out", str(workdir),
         "--prefix", "fges",
     ]
+    if ess != 10.0:  # Tetrad's default; left off the command line so the default runs are unchanged
+        cmd += ["--priorEquivalentSampleSize", str(ess)]
     proc = subprocess.run(cmd, capture_output=True, text=True, cwd=workdir)
     out_file = workdir / "fges.txt"
     if proc.returncode != 0 or not out_file.exists():
@@ -180,11 +184,16 @@ def consistent_extension(
     return result
 
 
-def v_structures(nodes: Sequence[str], edges: Sequence[Edge]) -> Set[Tuple[str, str, str]]:
+def v_structures(
+    nodes: Sequence[str], edges: Sequence[Edge], also_adjacent: Sequence[Edge] = ()
+) -> Set[Tuple[str, str, str]]:
+    """Colliders a -> c <- b with a, b non-adjacent. `also_adjacent` are
+    undirected edges: they make their ends adjacent without adding a parent."""
     parents: Dict[str, Set[str]] = {n: set() for n in nodes}
     adj: Dict[str, Set[str]] = {n: set() for n in nodes}
     for a, b in edges:
         parents[b].add(a)
+    for a, b in [*edges, *also_adjacent]:
         adj[a].add(b)
         adj[b].add(a)
     return {
@@ -196,7 +205,7 @@ def v_structures(nodes: Sequence[str], edges: Sequence[Edge]) -> Set[Tuple[str, 
     }
 
 
-def discover(dataset: str, seed: int, cpus: str) -> Dict[str, object]:
+def discover(dataset: str, seed: int, cpus: str, ess: float = 10.0) -> Dict[str, object]:
     data, _domain, roles = DATASETS[dataset]()
     columns = list(data.columns)
     outcome = next(iter(roles.outcome))
@@ -210,7 +219,7 @@ def discover(dataset: str, seed: int, cpus: str) -> Dict[str, object]:
     started = time.time()
     with tempfile.TemporaryDirectory(prefix=f"fges-{dataset}-s{seed}-") as tmp:
         directed, undirected, _raw = run_fges(
-            train, knowledge_text(roots, middle, outcome), Path(tmp), cpus
+            train, knowledge_text(roots, middle, outcome), Path(tmp), cpus, ess
         )
     edges = consistent_extension(columns, directed, undirected)
 
@@ -220,7 +229,7 @@ def discover(dataset: str, seed: int, cpus: str) -> Dict[str, object]:
     assert nx.is_directed_acyclic_graph(dag), "extension is cyclic"
     assert len(edges) == len(directed) + len(undirected)
     # Same equivalence class: no collider created by orienting.
-    assert v_structures(columns, edges) == v_structures(columns, directed), (
+    assert v_structures(columns, edges) == v_structures(columns, directed, undirected), (
         "extension changed the v-structures"
     )
     assert all(dag.in_degree(r) == 0 for r in roots), "a declared root has a parent"
@@ -245,12 +254,17 @@ def main() -> None:
     parser.add_argument("--datasets", nargs="+", default=sorted(DISCOVERY_ROOTS))
     parser.add_argument("--seeds", nargs="+", type=int, default=list(SEEDS))
     parser.add_argument("--cpus", default="32-47")
+    parser.add_argument("--ess", type=float, default=10.0,
+                        help="BDeu prior equivalent sample size (Tetrad default 10)")
+    parser.add_argument("--tag", default=None,
+                        help="write graph source 'fges-<tag>' instead of 'fges'")
     args = parser.parse_args()
+    source = f"fges-{args.tag}" if args.tag else "fges"
 
     jar_sha1 = hashlib.sha1(TETRAD_JAR.read_bytes()).hexdigest()
     DISCOVERED_GRAPH_DIR.mkdir(parents=True, exist_ok=True)
     for dataset in args.datasets:
-        path = DISCOVERED_GRAPH_DIR / f"fges_{dataset}.json"
+        path = DISCOVERED_GRAPH_DIR / f"{source}_{dataset}.json"
         _data, _domain, roles = DATASETS[dataset]()
         record = json.loads(path.read_text()) if path.exists() else {"graphs": {}}
         record.update({
@@ -259,7 +273,7 @@ def main() -> None:
             "tetrad_jar_sha1": jar_sha1,
             "score": "bdeu-score",
             "parameters": {
-                "priorEquivalentSampleSize": 10.0, "structurePrior": 1.0,
+                "priorEquivalentSampleSize": args.ess, "structurePrior": 1.0,
                 "maxDegree": 1000, "faithfulnessAssumed": False,
                 "symmetricFirstStep": False,
                 "note": "Tetrad defaults for this build, as printed in its output",
@@ -272,7 +286,7 @@ def main() -> None:
             "dag_from_cpdag": "Dor-Tarsi consistent extension, last column first",
         })
         for seed in args.seeds:
-            graph = discover(dataset, seed, args.cpus)
+            graph = discover(dataset, seed, args.cpus, args.ess)
             key = graph.pop("key")
             record["graphs"][key] = graph
             path.write_text(json.dumps(record, indent=1) + "\n")

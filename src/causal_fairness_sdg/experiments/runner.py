@@ -22,7 +22,7 @@ from ..eval import fairness_metrics, utility
 from ..fairness import AttributeRoles, EvalReference, get_fairness_mechanism
 from ..sdg.aim import AIM
 from ..sdg.base import SDGMethod
-from ..sdg.mst import MST
+from ..sdg.mst import MST, MSTHand
 from ..sdg.privbayes import PrivBayes
 from ..sdg.privsyn import PrivSyn
 from ..sdg.tabfairgan import TabFairGANMethod
@@ -52,6 +52,7 @@ except ImportError:
 
 SDG_METHODS: Dict[str, SDGMethod] = {
     "mst": MST(), "privbayes": PrivBayes(), "aim": AIM(), "privsyn": PrivSyn(),
+    "mst_hand": MSTHand(),
 }
 if DECAFMethod is not None:
     SDG_METHODS["decaf"] = DECAFMethod()

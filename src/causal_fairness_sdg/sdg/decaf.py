@@ -162,7 +162,7 @@ class DECAFMethod(SDGMethod):
 
         columns = list(data.columns)
         col_index = {c: i for i, c in enumerate(columns)}
-        dag = as_digraph(resolve_graph(dataset_name, data, self.graph), columns)
+        dag = as_digraph(resolve_graph(dataset_name, data, self.graph, roles, seed), columns)
         dag_seed = [[col_index[p], col_index[c]] for p, c in dag.edges]
 
         # Min-max scale onto [0, 1] iff the generator's heads are bounded to
